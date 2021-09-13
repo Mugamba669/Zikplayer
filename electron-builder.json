@@ -1,0 +1,55 @@
+{
+    "appId": "com.mugambabruno.zik_player",
+    "productName": "ZPlayer",
+    "copyright": "COPYRIGHT MUGAMBA BRUNO",
+    "directories": {
+        "app": "./",
+        "output": "dist",
+        "buildResources": "/images/"
+    },
+    "files": [
+        "./package.json",
+       "./main.js",
+        "./node_modules",
+        "./tools", 
+        "./Eq.html",
+         "./lyrics.js",
+         "./components",
+         "./audiotagger",
+         "./tests",
+         "./streaming",
+        "./images"
+    ],
+   
+    "dmg": {
+        "backgroundColor": "#080808",
+        "window": {
+            "width": "750",
+            "height": "500"
+        },
+        "contents": [
+            {
+                "x": 100,
+                "y": 100
+            },
+            {
+                "x": 300,
+                "y": 100,
+                "type": "link",
+                "path": "/Applications"
+            }
+        ]
+    },
+    "mac": {
+        "target": "dmg",
+        "category": "public.app-category.utilities",
+      },
+    "win": {
+        "target": "nsis",
+         "icon": "./images/zik.png",
+    },
+    "linux": {
+        "target":"deb",
+        "icon":"./images/zik.png"
+    }
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- <title>Document</title> -->
+	<style type="text/css">
+		body{
+			width:100%;
+			height:100%;
+			position: fixed !important;
+			display:flex !important;
+			flex-direction: column !important;
+			align-items:center !important;
+			justify-content:center !important;
+	
+		}
+		.controls {
+			width: 300px;
+			padding: 10px;
+			/* background: #ff0000; */
+			transform:rotate(-90deg)translateX(-50px) translateY(10px);
+
+		}
+		input[type="range"]{
+			width:100%;
+			overflow:hidden;
+			-webkit-appearance: none;
+			background:rgb(85, 4, 4);
+			margin:20px;
+			height:20px;
+			cursor:pointer;
+			border-radius: 6px;
+
+		}
+ input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 19.6px;
+    height: 19.6px;
+    background:#63cdff;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    transform: translateY(-1px);;
+}
+input[type="range"]::-webkit-slider-runnable-track{
+			height: 20px !important;
+		}
+	</style>
+</head>
+<body>
+	<input type="file" id="file"/>
+	<div class="controls">
+		<input type="range" id="threshold" step="0.01" value="-20" max="0" min="-100">
+		<input type="range" id="knee" value="10" step="0.01" max="40" min="0">
+		<input type="range" id="attack" value="0.3" step="0.01"  max="1" min="0">
+		<input type="range" id="release" value="0" step="0.01" max="1" min="0">
+		<input type="range" id="ratio" value="1" step="0.01" max="20" min="0">
+	</div>
+	<script src="./tools/webkit-input-range-fill-lower.min.js"></script>
+	<script src="./tools/jquery-1.9.1.min.js"></script>
+	<script>
+	document.addEventListener("DOMContentLoaded", ()=>{
+	new WebkitInputRangeFillLower({
+        selectors: ['threshold','release' ,'attack','knee','ratio'],
+        color: '#63cdff'
+    });
+})
+var audio = new Audio();
+var context = new AudioContext();
+$("#file").change(function(e){
+	var file = e.currentTarget.files[0]
+	audio.src = URL.createObjectURL(file);
+	audio.play();
+	context.resume()
+})
+audio.onplaying = function(){
+	var source =  context.createMediaElementSource(audio);
+	var analyser = context.createAnalyser();
+	var compressor = context.createDynamicsCompressor();
+	
+	compressor.attack.setValueAtTime(0.3,context.currentTime); //(0->1)
+	compressor.threshold.setValueAtTime(-20,context.currentTime);//(0-> -100)
+	compressor.knee.setValueAtTime(10,context.currentTime);//(0 -> 40)
+	compressor.ratio.setValueAtTime(1,context.currentTime);//( 1-> 20)
+	compressor.release.setValueAtTime(0,context.currentTime);//(0-> 1)
+	
+	// settings
+	$('#attack').on('input',function(){
+		compressor.attack.setValueAtTime(this.value,context.currentTime); //(0->1)
+	})
+
+
+	$('#threshold').on('input',function(){
+		compressor.threshold.setValueAtTime(this.value,context.currentTime);//(0-> -100)
+	})
+
+	$('#knee').on('input',function(){
+		compressor.knee.setValueAtTime(this.value,context.currentTime);//(0 -> 40)
+	})
+
+
+	$('#ratio').on('input',function(){
+		compressor.ratio.setValueAtTime(this.value,context.currentTime);//( 1-> 20)
+	})
+
+	$('#release').on('input',function(){
+		compressor.release.setValueAtTime(this.value,context.currentTime);//(0-> 1)
+	});
+	source.connect(compressor);
+	compressor.connect(analyser)
+	analyser.connect(context.destination);
+
+}
+
+	</script>
+</body>
+</html>

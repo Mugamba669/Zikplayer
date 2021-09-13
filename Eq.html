@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <!-- <title>3Dzik_Player</title> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+    <!-- Demo styles -->
+    <link rel="stylesheet" href='./tools/swiper-bundle.min.css'>
+    <link rel="stylesheet" type="text/css" href="./tools/font-awesome-4.3.0/css/font-awesome.css"></link>
+    <link rel="stylesheet" type="text/css" href="./tools/Eq.css"></link>
+    <link rel="stylesheet" type="text/css" href="./tools/1ui.css"></link>
+    <link rel="stylesheet" type="text/css" href="./tools/drawer.css"></link>
+</head>
+
+<body>
+    <!-- Swiper -->
+    <div class="pop-container">
+        <div class="pop-content">
+            <p>Do you want to restore your current settings?</p>
+            <button id="done">OK</button>
+            <button id="cancel">Cancel</button>
+        </div>
+    </div>
+
+    <div class="t-container">
+        <div class="t-content">
+            <p>Do you want to restore your current settings?</p>
+            <button id="t-done">OK</button>
+            <button id="t-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <div class="r-container">
+        <div class="r-content">
+            <p>Do you want to restore your current settings?</p>
+            <button id="r-done">OK</button>
+            <button id="r-cancel">Cancel</button>
+        </div>
+    </div>
+<!-- lyrics -->
+<div class="lyrics-container">
+    <div class="lyrics-wrapper">
+            <p class="lyrics-track w3-top">Lyrics&nbsp;&nbsp;-&nbsp;&nbsp;
+                <span class="lyric-title">Title here</span>&nbsp;&nbsp;-&nbsp;&nbsp;
+                <span class="lyric-artist">Artist here</span>
+            </p>
+            <center class="lyrics"></center>
+            <i class="view"></i>
+    </div>
+</div>
+<!-- playlist -->
+    <div class="w3-modal w3-container plist">
+        <div class="w3-modal-content list">
+        <span class="header">Tracks ( <b class="total">0</b> )<label class="w3-indigo btn-playlist" for="tracks">import music Folder</label></span>
+               <div class="plist-body"></div>
+                <button class="fab-btn fa fa-arrow-right"></button>
+                <!-- loader -->
+                <div class="loader-container">
+                    <!-- loader body -->
+                    <div class="loader-body">
+                         <!-- loader-widget -->
+                         <div class="loader-wrapper"></div>
+                         <div class="loader-wrapper"></div>
+                        <!-- text-wrapper -->
+                        <div class="text-wrapper">
+                            <p class="text-l"><span class="text-output">Loading tracks .....</span</p>
+                        </div>
+                       
+                           <!-- animate backgro
+                    <div class="loader-animate"></div> -->
+                    </div>
+                    <div class="success-container">
+                        <p>Loaded <b class="msg"></b></p>
+                    </div>
+                </div>
+        </div>
+       
+    </div>
+    <input type="file" style="display: none;" webkitdirectory id='tracks'/>
+    <!-- deprected -->
+    <div id="mono-error" class="w3-animate-zoom w3-modal">
+        <div class="w3-modal-content w3-khaki">
+            <h3>This feature is <b class="w3-text-red">Depreacted</b> in ths version but will be supported in later version.</h3>
+        </div>
+    </div>
+    <!-- bottom sheet -->
+    <div class="bottom-container">
+        <div class="bottom-sheet">
+            <p>Next Track: <span  class="next-track"></span></p>
+        </div>
+    </div>
+    <!-- Changelog -->
+    <div id="changelog" class="w3-modal">
+        <div id="change-cont" style="overflow: auto;" class="w3-modal-content">
+            <dl class="w3-text-green">Quick Guide</dl>
+            <dt>
+            <p><dd><li>To use this app click on <b>"Add music"</b>  button at the and select your favourite song to see how it works</li></dd></p>
+            <p><dd><li>Swipe on the screen <b class="w3-tag w3-round"><<< [left]</b>&nbsp;&nbsp;and&nbsp;&nbsp;<b class="w3-tag w3-round">[right]>>></b> to navigate more features.</li></dd></p>
+            <p><dd class=""><li>Added <b class="w3-tag w3-round">Playlist button</b> where you can import a folder containing your music files.<label class="w3-tag w3-khaki w3-round">!!! This feature is only for desktop users</label></label> </li></dd></p>
+            <p><dd><li>Added lyrics <span class="w3-tag w3-red">This feature is still under test</span></li></dd></p>
+            <p><dd><li>More versions are comming.</li></dd></p>
+            <p><dd><li>And please kindly provide your feedback about your experience.</li></dd></p>
+          </dt>
+            <dl>
+                <!-- <dt class="w3-tag w3-black">Changelog</dt><br> -->
+                <!-- <dd> <span class="w3-tag w3-red">New*</span>&nbsp;Auto EQ-Tunner.</dd><br> -->
+                <dd class="w3-text-white"><span class="w3-tag w3-red">New*</span>&nbsp;Additional tune in the equalizer <b class="w3-tag black w3-round">Dance-Hall</b></dd>
+            </dl>
+            <div class="fab">
+                <button class="btn-fab fa fa-check" id="close-log"></button>
+            </div>
+        </div>
+    </div>
+    <!-- pop up for visualizers-->
+    <div class="box w3-modal w3-animate-top">
+        <div class="body w3-modal-content ">
+            <p class="w3-hover-light-blue"> Bottom dancing bars</p>
+            <p class="w3-hover-light-blue"> Dusty particles visual</p>
+            <p class="w3-hover-light-blue"> Chrolo double dancing bars</p>
+            <p class="w3-hover-light-blue"> Center spiral visual bars</p>
+            <p class="w3-hover-light-blue"> Sinal-WaveForm visual</p>
+            <p class="w3-hover-light-blue"> Bar Histogram visual</p>
+            <p class="w3-hover-light-blue"> Glass Pills visual</p>
+            <p class="w3-hover-light-blue"> Riple-Wave visual</p>
+            <p class="w3-hover-light-blue">No visual Display</p>
+        </div>
+    </div>
+<canvas id="image-color" style="display: none;"></canvas>
+  <!-- Drawer btn -->
+  <div class="drawer">
+    <div class="btn-wrapper">
+        <button class="fa fa-arrow-circle-right setting"></button>
+    </div>
+    <!--  -->
+</div>
+ <!-- Drawer slide -->
+
+ <div class="sidebar">
+    <table class="w3-table-all">
+        <tbody>
+            <tr>
+                <td class="fa fa-gears"></td>
+                <td>Settings</td>
+            </tr>
+
+            <tr>
+                <td class="fa fa-paint-brush"></td>
+                <td class="w3-dropdown-hover">
+                   <b >Themes</b>
+                   <div class="w3-dropdown-content w3-bar-block">
+                       <p class="w3-bar-item">Activate Easy Access</p>
+                   </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="fa fa-info-circle"></td>
+                <td>About</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+  
+    <div class="swiper-container">
+        <div class="visualizers">
+             <!-- double visualizer -->
+         <div class="double-visual">
+            <canvas class="db" id="up-bars-visual"></canvas>
+            <canvas class="db" id="dw-bars-visual"></canvas>
+        </div>
+        <!-- -------- -->
+
+        <div class="norm-visual">
+            <!-- bars visualizer -->
+            <canvas class="bv" id="bars-visual"></canvas>
+            <!-- dusty particles visualizer -->
+            <canvas class="sv" id="spec-visual"></canvas>
+        </div>
+
+  
+                        <!-- spiral visualizer -->
+                        <div class="spiral">
+                            <div class="row1">
+                                <canvas class="sp1"></canvas>
+                                <canvas class="sp1"></canvas>
+                            </div>
+                            <div class="row2">
+                                <canvas class="sp1"></canvas>
+                                <canvas class="sp1"></canvas>
+                            </div>
+                        </div>
+                        <!----------------------------------->
+        <!-- fullscreen canvas -->
+        <div class="full">
+            <canvas class="canvas-full"></canvas>
+            <canvas class="wave-full"></canvas>
+            <canvas class="histogram-full"></canvas>
+            <canvas class="ripple-wave"></canvas>
+        </div>
+        </div>
+        
+        <div class="swiper-wrapper"> 
+            <div class="swiper-slide">
+                <br>
+                    <div class="body-content">
+                        <input type="file" accept="audio/*" id="demo">
+                        <br>
+                        <div class="image-container">
+                            <img src="" id="trackId" alt="TrackId">
+                        </div>
+                    <div class="main-body">
+                        <div class="btn-container">
+                            <button class="repeat-off fa fa-repeat" id="prev"></button>
+                            <button class="repeat-on fa fa-repeat" id="prev"></button>
+                            <button id="prevTrack" class="fa fa-step-backward"></button>
+
+                            <button id="pause" style="cursor: pointer;" class="fa fa-pause btn-tn"></button>
+                            <button id="play" style="cursor: pointer;" class="fa fa-play btn-tn"></button>
+
+                            <button class="fa fa-step-forward" id="nextTrack"></button>
+                            <button class="mute-on fa fa-volume-off" id="next"></button>
+                            <button class="mute-off fa fa-volume-up" id="next"></button>
+
+                        </div>
+                        
+                        <div class="slider-container ">
+                            <input type="range" class="progress-bar" value="0" max="" min="" id="prog">
+                        </div>
+                        <br>
+                        <div id="update">
+                            <span class=" w3-tag w3-round time">0:00</span><span class="w3-tag w3-round total-tracks"><b class="current">0</b> / <b class="tt-T">0</b></span><span class="w3-tag w3-round time">0:00</span>
+                        </div>
+                    </div>
+                </div>
+                        <div class="details">
+                                <span id="title" class="title"><b>Title</b></span><br/>
+                                <div class="bottom-details">
+                                    <span id="artist" class="artist">artist </span>
+                                    <span class="separator">|</span> 
+                                    <span id="album" class="album">album</span>
+                                    <span class="separator2">|</span> 
+                                    <span id="size"class="size">size</span> 
+
+                                </div>
+                            
+                        </div>
+
+                <div class="control">
+                    <button class="" id="tags">Track Info</button>
+                    <button class="" id="feedback">Feedback</button>
+                    <button class="" id="playlist">Playlist</button>
+                    <button id="visual-select">Visuals</button>
+                    <button id='add-music'>Add Music</button>
+                    <button id='lyrics-btn'>Lyrics</button>
+                    
+                </div>
+            </div>
+<!-- Equalizer -->
+            <div class="swiper-slide shade200">
+                <p>Equalizer</p>
+                <hr>
+        <div class="eq-cont">
+            <div class="eq-options">
+                <select id="eqns">
+                    <option selected value="normal">Normal</option>
+                    <option value="bass">Hip Hop</option>
+                  <option value="rock">Rock</option>
+                  <option value="rnb">R&B</option>
+                  <option value="reg">Reggea</option>
+                  <option value="flat">Flat</option>
+                  <option value="dance">Dance-Hall</option>
+                  <option value="heavy">Heavy Metal</option>
+                    <option value="vocal">Vocal Boost</option>
+                    <option value="pop">Pop</option>
+                </select>
+                <br>
+                <!-- <hr> -->
+                <button id="reset" class="eq-reset">Reset</button>
+            </div>
+            
+
+                <br>
+                <!-- <div class="auto">
+                    <button>Auto-EQ</button>
+                </div> -->
+               
+                <div class="eq-cont-slides">
+                <!-- stereo -->
+                <p class="p-label">Stereo : <span id="st-out">0 dB</span></p>
+                <input type="range" value="0" max="5" id="stereo" min="0" step="0.01"> 
+                <!-- mid -->
+                <p class="p-label">Mid XT : <span id="tb2">0 dB</span></p>
+                <input type="range" value="0" max="3" id="treb-boost" min="0" step="0.01">
+                <!-- bass -->
+                <p class="p-label">Bass : <span id="bb1">50 dB</span></p>
+                <input type="range" value="50" max="120" min="0" step="0.01" id="bass">
+                <!-- bass-boast -->
+                <p class="p-label">Bass Boost : <span id="bb2">2 dB</span></p>
+                <input type="range" value="2" max="4" min="0" step="0.01" id='bass-boost'>
+                <br>
+            </div>
+                <br>
+            </div>
+         </div>
+
+
+            <div class="swiper-slide shade200">
+                <p>Audio Tuning</p>
+                <hr>
+                <div class="tun-container">
+                <p class="p-label">Volume : <span id="vol">17 %</span></p>
+                <input type="range" id="vol-add" value="0.17" max="1" min="0" step="0.01">
+                <p class="p-label">Speed Rate : <span id="sp-rate">1.00 xp </span></p>
+                <input type="range" id="rate-xp" value="1" max="2" min="0" step="0.01">
+
+                <p class="p-label">Balance : <span id="bal">0 dB</span></p>
+                <input type="range" value="0" id="balance" max="1" min="-1" step="0.01">
+
+                <p class="p-label">Audio Gain : <span id="audio-b">1.0 dB</span></p>
+                <input type="range" value="1" id="audio-boost" max="3" min="0" step="0.01">
+            </div>
+                <button style="display:none ;" class="tuning" id="reset">Reset</button>
+
+            </div>
+
+            <div class="swiper-slide shade200">
+                <p>Compressor</p>
+                <div class="compress">
+                    <div class="comp-reset">
+                        <button>Reset</button>
+                    </div>
+                <div class="comp-slider">
+                <p class="p-label">Threshold : <span id="threshold-v">-24 db</span></p>
+                <input type="range" id="threshold" value="-24" max="0" min="-100" step="0.01">
+                
+                <p class="p-label">Knee : <span id="knee-v">30 </span></p>
+                <input type="range" id="knee"value="30" step="0.01" max="40" min="0">
+
+                <p class="p-label">Attack : <span id="attack-v">0.003 dB</span></p>
+                <input type="range" id="attack" value="0.003" step="0.01"  max="1" min="0">
+
+                <p class="p-label">Release : <span id="release-v">0.250 dB</span></p>
+                <input type="range" id="release" value="0.250" step="0.01" max="1" min="0">
+               
+                <p class="p-label">Ratio : <span id="ratio-v">12 dB</span></p>
+                <input type="range" id="ratio" value="12" step="0.01" max="20" min="0">
+            </div>
+            </div>
+                <br>
+            </div>
+
+
+
+            <div class="swiper-slide shade200">
+                <p>Room Effects</p>
+                <hr>
+                <br>
+                <div class="room-box">
+                <div class="room-options">
+                <div class="sw">
+                    <!-- <label class="w3-tag w3-round" style="font-size:14px;" for="switch" id="tx">Off</label>
+                    <input type="checkbox" id="switch"> -->
+                    <span class="fa fa-toggle-off off"></span>
+                    <span class="fa fa-toggle-on on"></span>
+                </div>
+
+                <select id="r-effects" disabled>
+     		<option value="">Preset</option>
+     		<option value="echo">Echo</option>
+     		<option value="auditorium">Auditorium</option>
+     		<option value="scene">Scene</option>
+     		<option value="smallroom">Small Room</option>
+     		<option value="medium">Medium Room</option>
+     		<option value="greathall">Great Hall</option>
+     		<option value="stadium">Stadium</option>
+     </select>
+     <button id="reset" class="room">Reset</button>
+    </div>
+                <br>
+                
+            <div class="room-box-slides">
+                <p class="p-label">Delay 01 : <span id="d1">0 dB</span></p>
+                <input type="range" id="d1-v" value="0" max="1.6" min="0" step="0.01" disabled='true'>
+
+                <p class="p-label">Size 01 : <span id="s1">0 dB</span></p>
+                <input type="range" id="s1-v" value="0" max="1.5" min="0" step="0.01" disabled>
+
+                <p class="p-label">Delay 02 : <span id="d2">0 dB</span></p>
+                <input type="range" id="d2-v" value="0" max="1.6" min="0" step="0.01" disabled>
+
+                <p class="p-label">Size 02 : <span id="s2">0 dB</span></p>
+                <input type="range" value="0" id="s2-v" max="1.5" min="0" step="0.01" disabled>
+                <br>
+                <br>
+              
+            </div>
+        </div>
+        </div>
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+
+
+    <!-- Swiper JS -->
+    <script src="./tools/swiper-bundle.min.js"></script>
+    <script src="./tools/webkit-input-range-fill-lower.min.js"></script>
+    <script src="./tools/jquery-1.9.1.min.js"></script>
+    <script src="./tools/jquery-ui.min.js"></script>
+    <script src="./tools/id3-minimized.js"></script>
+    <script src="./tools/default.js"></script>
+    <script type="module"  src="./tools/Eq.js"></script>
+    <!-- <script type="module" src="./bundle.js"></script> -->
+</body>
+
+</html>

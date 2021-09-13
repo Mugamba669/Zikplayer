@@ -1,0 +1,23 @@
+@import url('../tools/w3.css');
+tr:nth-child(even){
+    background-color: #666;
+    /* color: #fff; */
+}
+body{
+    user-select: none;
+    background: transparent;
+    
+}
+table{
+    -webkit-app-region:drag;
+    background: #000;
+    color: #eee;
+    border-radius: 50px;
+    filter: contrast(20px) brightness(3px);
+}
+thead{
+    background: #666;
+}
+title{
+    font:100 20px Arial !important;
+}

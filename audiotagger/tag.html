@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./tag.css">
+    <link rel="stylesheet" href="../tools/swiper-bundle.min.css"/>
+    <title>AudioTrac Editor</title>
+    
+</head>
+<body>
+        <div class="tags-container swiper-container"> 
+            <div class="swiper-wrapper">
+                <div class="tags-editor swiper-slide">
+                    <h4>Music Info</h4>
+                    <input type="text" class="title" placeholder="Title" value=""/>
+                    <input type="text" placeholder="Artist"  value=""/>
+                    <input type="text" placeholder="Album" value=""/>
+                    <input type="text" placeholder="Genre" value=""/>
+                    <input type="number" placeholder="Year" value=""/>
+                    <input type="text" placeholder="Composer" value=""/>
+                    <!-- <input type="text" placeholder="Description" value=""/>  -->
+                    <!-- <input type="file" placeholder="Track Source" value=""/>  -->
+                    <!-- <input type="file" accept="image/*" /> -->
+                   <div class="btn-controls">
+                         <button class="btn" type="reset">Cancel</button>
+                          <button class="btn">Done</button>
+                    </div>
+                </div> 
+                <!-- Editor -->
+                <div class="tags-editor swiper-slide">
+                    <h4>Tags Editor</h4>
+                    <input type="text" class="title" placeholder="Title" value=""/>
+                    <input type="text" placeholder="Artist"  value=""/>
+                    <input type="text" placeholder="Album" value=""/>
+                    <input type="text" placeholder="Genre" value=""/>
+                    <input type="number" placeholder="Year" value=""/>
+                    <input type="text" placeholder="Composer" value=""/>
+                    <input type="text" placeholder="Description" value=""/> 
+                    <!-- <input type="file" placeholder="Track Source" value=""/>  -->
+                    <input type="file" accept="image/*" />
+                   <div class="btn-controls">
+                         <button class="btn" type="reset">Cancel</button>
+                          <button class="btn">Done</button>
+                    </div>
+                </div> 
+            </div>
+         </div>
+</body>
+<script src="../tools/jquery-1.9.1.min.js"></script>
+<script src="../tools/swiper-bundle.min.js"></script>
+<script type="module" src="./tag.js"></script>
+</html>

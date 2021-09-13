@@ -1,0 +1,34 @@
+./.dist
+/tests
+
+audio.js
+file.html
+file.js
+style.css
+text.txt
+config.xml
+tagger.js
+test.php
+tracks.json
+tracks.txt
+/node_modules
+/streaming
+/lib
+/build
+fpm
+/dist
+
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+/.history
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
