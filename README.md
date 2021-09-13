@@ -1,5 +1,5 @@
-# Initial Release for Audio-Droid WebVersion
->>Zikplayer [windows and Linux Versions is already available here.](https://official-zikplayer-site.herokuapp.com)
+# Zikplayer Desktop App
+>>### Get Zikplayer [windows and Linux Versions is already available here.](https://official-zikplayer-site.herokuapp.com)
 
 # TODOS
 >>>   Implemenet saving user presets like  the room effects and equalizer
@@ -15,7 +15,10 @@
 >>> Changing different pages using $.ajax()
     
 >>  Implemenet different window views in settings ( pocket-Mobile,pocket-mini)
-      Adding an intro when for first user asking for music folders(s)
-      Changing app skins ( default(cover art change background),{ dark theme},{ light theme},{gradient-background})
-      Implemeneting track sorting in ( Genres , albums , playlists , artists , composer, year ,..)
-      Implemenet the track searching algorithim from (all songs , albums,artist,..)
+>>> Adding an intro when for first user asking for music folders(s)
+
+>>>  Changing app skins ( default(cover art change background),{ dark theme},{ light theme},{gradient-background})
+
+>>> Implemeneting track sorting in ( Genres , albums , playlists , artists , composer, year ,..)
+
+>>> Implemenet the track searching algorithim from (all songs , albums,artist,..)
