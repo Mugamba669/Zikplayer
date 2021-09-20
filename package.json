@@ -1,6 +1,6 @@
 {
   "name": "zplayer",
-  "version": "1.4.1",
+  "version": "1.5.11",
   "description": "Enjoy the power of music",
   "main": "./main.js",
   "scripts": {
@@ -13,8 +13,7 @@
   },
   "devDependences": {
     "nodemon": "2.0.7",
-    "node": "12.18.2",
-    "browser-id3-writer": "4.4.0"
+    "node": "12.18.2"
   },
   "repository": {
     "type": "git",
@@ -32,28 +31,20 @@
   },
   "homepage": "https://github.com/Mugamba669/JS-MusicFx#readme",
   "dependencies": {
-    "@ffmpeg/ffmpeg": "^0.10.1",
-    "@xmldom/xmldom": "^0.7.3",
     "4lyrics": "^1.1.61",
     "axios": "0.21.1",
-    "billboard-top-100": "^2.4.16",
     "cheerio": "*",
     "custom-electron-titlebar": "^3.2.7",
     "deezer-public-api": "^1.0.4",
+    "edit-json-file": "^1.6.0",
     "emojis-list": "^3.0.0",
-    "file-saver": "2.0.5",
-    "folder-walker": "^3.2.0",
-    "fy-shuffle": "^1.0.0",
     "genius-lyrics-api": "3.0.6",
     "jquery": "^3.6.0",
     "node-id3": "0.2.3",
     "node-youtube-music": "^0.3.6",
-    "rabbit-lyrics": "^2.1.1",
-    "solenolyrics": "^5.0.0",
-    "xpath": "^0.0.32",
     "ytdl-core": "^4.9.1"
   },
   "devDependencies": {
-    "electron": "^13.1.7"
+    "electron": "^12.1.1"
   }
 }

@@ -5,19 +5,18 @@
     "directories": {
         "app": "./",
         "output": "dist",
-        "buildResources": "/images/"
+        "buildResources": "/images"
     },
     "files": [
         "./package.json",
        "./main.js",
         "./node_modules",
         "./tools", 
-        "./Eq.html",
+        "./ZPlayer.html",
+        "./renderer.js",
+        "./preload.js",
          "./lyrics.js",
-         "./components",
-         "./audiotagger",
-         "./tests",
-         "./streaming",
+         "./Core",
         "./images"
     ],
    
@@ -46,10 +45,10 @@
       },
     "win": {
         "target": "nsis",
-         "icon": "./images/zik.png",
+         "icon": "./dist/.icon-ico/icon.ico",
     },
     "linux": {
-        "target":"deb",
+        "target":["deb","snap"],
         "icon":"./images/zik.png"
     }
 }

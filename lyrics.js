@@ -1,18 +1,14 @@
-const NodeID3 = require('node-id3');
-const { getLyrics ,getAlbumArt ,getSong, getSongById } = require('genius-lyrics-api');
-const customTitlebar = require('custom-electron-titlebar');
+const { ipcRenderer } = require('electron');
+const { getAlbumArt } = require('genius-lyrics-api');
+const Lyrics = require('4lyrics')
+const $ = require('jquery');
 window.addEventListener('DOMContentLoaded', ()=>{
-new customTitlebar.Titlebar({
-  backgroundColor: customTitlebar.Color.fromHex('#000')
-});
 // retrive title and 
-document.querySelector("#lyrics-btn").onclick = function(){
-    var artist =  document.querySelector('.lyric-artist').innerHTML;
-      var title = document.querySelector('.lyric-title').innerHTML;
-     var path = document.querySelector(".view").innerHTML;
-      console.log(artist);
-      console.log(title);
-      console.log("'"+path+"'");
+$("#lyrics-btn").click(function(){
+    var artist =  $('.lyric-artist').text();
+      var title = $('.lyric-title').text();
+     var path = $(".view").text();
+
 
     var tags = {
       APIC:""
@@ -25,40 +21,39 @@ document.querySelector("#lyrics-btn").onclick = function(){
     }
   // user notified when offline
     window.onoffline = function(e){
-      document.querySelector(".lyrics").innerHTML = "";
-      document.querySelector(".lyrics").innerHTML = "OOps its seems your currently offline, trying turning on data connection!!!!";
+      $(".lyrics").text("");
+      ipcRenderer.send("networkError","OOps its seems you have lost internet connection, trying checking if data bundle is still valid!!!!")
     }
 // user notified when online
       
     
-document.querySelector(".lyrics").innerHTML = "Please wait while we load your lyrics....";
-      getLyrics(options).then((lyrics) => {
+$(".lyrics").text("Please wait while we load your lyrics....");
 
-        if(lyrics == null){
-          document.querySelector(".lyrics").innerHTML = "";
-          document.querySelector('.lyrics').innerHTML = 'Failed to fetch lyrics, try to edit your audio tags by adding title of the song and the artist of the song.';
-        }else{
-          NodeID3.Promise.write({USLT:'"'+lyrics+'"'},"'"+path+"'")
-          document.querySelector(".lyrics").innerHTML = "";
-          var pre = document.createElement("pre");
-          var text = document.createTextNode(lyrics);
-          pre.append(text);
-          document.querySelector('.lyrics').appendChild(pre);
-        }
+      Lyrics.musixmatch.getURL(`${title} ${artist}`)
+    .then((r) => Lyrics.musixmatch.getLyrics(r))
+    .then((lyrics) => {
+        
+          $(".lyrics").text(""); 
+          $('.lyrics').append($("<pre></pre>").text(lyrics));
+    }).catch((error)=>{
+      console.log(error)
+      ipcRenderer.send("noTags",'Failed to fetch lyrics, try to edit your audio tags by adding title of the song and the artist of the song.');
+      $(".lyrics").text("");
+    }).catch((error) => {
+      ipcRenderer.send("networkError",'Failed to load resource: net::ERR_INTERNET_DISCONNECTED');
     })
     // cover image if needed
-    getAlbumArt(options).then((art)=>{
-      if(art == null){
-        // $('<pre></pre>').text('Failed to fetch , try to edit your audio tags by adding title of the song and the artist of the song.').appendTo(".lyrics");
-      }else{
-        document.querySelector("#trackId").setAttribute("src",art);
-       document.querySelector(".swiper-container").style.backgroundImage = "url("+art+")";
-        console.log(art)
-        tags.APIC = art;
-        let rsc = "'"+path+"'";
-        // NodeID3.write({APIC:art},rsc);
-      }
-    })
-}
+    // getAlbumArt(options).then((art)=>{
+    //   if(art == null){
+       
+    //   }else{
+    //     $("#trackId").attr("src",art);
+    //    $(".swiper-container").css({"backgroundImage": "url("+art+")"});
+        
+    //     tags.APIC = art;
+
+    //   }
+    // })
+})
 
 })

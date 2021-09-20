@@ -1,6 +1,9 @@
 @import "./w3.css";
 
+*{
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif, sans-serif ;
 
+}
 .swiper-container {
     width: 100%;
     height: 100%;
@@ -245,43 +248,45 @@ input[type="file"] {
     flex: content;
     background-color: transparent;
     pointer-events: none !important;
-    z-index: 2 !important;
+    z-index: 5 !important;
     flex-direction: column;
     align-items: center;
     justify-content: center;    
 }
 .bottom-container .bottom-sheet{
-    /* width: 90%; */
-    height: 0px;
-    padding: 10px;
-    transition: 0.3s ease-in-out;
+    border-collapse: collapse;
+    padding: 7px;
+    transition: 0.4s cubic-bezier(0.39, 0.575, 0.565, 1);
     z-index: 3 !important;
-     /* opacity: 0; 
-     visibility: hidden; */
-    color: white;
-    background: rgb(12, 12, 12);
-    border: 2px solid #555;
+    color: #eeee;
+    background: rgb(22, 21, 21);
+    box-shadow: inset 0px 0px 10p 0px #ddd;
+    border: 2px solid #3333;
     position: absolute !important;
-    display: flex;
     margin: 18px;
     overflow-wrap: break-word !important;
-    flex-wrap: wrap !important;
-    border-radius: 10px;
+    border-radius: 15px;
+    display: flex;
     flex-direction: row;
-    bottom: 48px;
-    align-items:flex-start;
-    justify-content: center;
+    align-items: center!important;
+    justify-content:center!important;
+    left: 0;
+    bottom: -100px;
+    visibility: hidden !important;
+    bottom: 58px;
+    margin-top: -48px;
 }
-.bottom-container .bottom-sheet {
-    margin-top: -38px;
+.bottom-container .bottom-sheet td{
+    padding: 8px;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-direction: column!important;
 }
-.bottom-container .bottom-sheet p{
-    color:#ffff;
-    /* position: absolute; */
-    margin-top: -3%;
-    margin-left: 15px;
-    font: 900 14px Arial;
-   
+.bottom-container .bottom-sheet.active {
+   left: 400px;
+   bottom: 10px;
+   visibility: visible !important;
 }
 .view{
     opacity: 0;
@@ -291,12 +296,6 @@ input[type="file"] {
     height: 60px;
     object-fit: cover !important;
     border-radius:50% ;
-}
-/* animate  bottom sheet */
-.bottom-container .bottom-sheet{
-    height: 70px;
-    opacity: 1;
-    visibility: visible;
 }
 hr {
     width: 100%;
@@ -355,17 +354,17 @@ hr {
 }
 .plist .list{
     width: 950px;
+    height: 500px;
     background: rgba(7, 8, 8, 0.8);
     
 }
 .plist .list .plist-body{
+    border-collapse: collapse;
     padding: 10px;
-    width: 950px;
+    width: 100%;
     margin: 0px;
-    /* position: absolute; */
-    justify-self: start;
-    justify-content: center !important;
     left: 10%;
+    font: 600 19px Arial !important;
     top: 3%;
     color: #fff;
     box-shadow: inset 0px 0px 10px #222;
@@ -409,25 +408,37 @@ hr {
     }
 }
  .list-tile{
-    font: 100 16px Arial !important;
+    font: 600 20px Ubuntu , Gecko,sans-serif, serif,Helvetica!important;
     padding: 0px !important;
-    height: 55px;
+    height: 50px;
     width: 100%;
-    padding: 5px;
+    padding: 10px;
     text-align: justify;
-    margin: 15px;
-    line-height: 90px !important;
     border-radius: 5px;
     cursor: pointer;
 }
-/* .plist .list .list-tile:hover{
-    background: rgb(4, 97, 184);
-    color: #ffff; */
-/* } */
- .coverArt{
+.list-tile:nth-child(even){
+    background-color: #333;
+}
+
+.list-tile:nth-child(odd){
+    background-color: #000;
+}
+
+ .coverArt {
     width:50px;
     height: 50px;
     object-fit: contain;
+    margin: 10px;
+    border-radius: 50%;
+}
+
+.Art{
+    width:70px;
+    height: 70px;
+    object-fit: contain;
+    margin: 0;
+    padding: 0;
     border-radius: 50%;
 }
 #demo {
@@ -604,25 +615,32 @@ hr {
 
 /* track details */
 .details{
-    width: 88%;
-    z-index: 3 !important;
+    width: 100%;
+    /* z-index: 3 !important; */
+    display: flex;
+    flex-direction: column!important;
+    justify-content: center!important;
+    align-items: center !important;
     position: absolute;
     overflow-wrap: unset;
+    font-family: Ubuntu !important;
     overflow-x: hidden;
-    bottom: 10px;  
-     transform: translateY(150px);
+    left: -100px;  
+    top: -65px;
+    box-shadow:0px 0px 1.4px 0px #ddd;
     color: #fff;
-    background-color: rgba(8, 8, 8, 0.9) !important;
+    background-color: rgba(8, 8, 8, 0.089) !important;
     border-radius: 5px;
-    padding: 10px;
-    font-weight: lighter!important;
-    transition: 01s ease-in-out;
-    margin:13px ;
+    padding: 5px;
+    visibility: hidden !important;
+    opacity: 0;
+    transition: 1s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    margin: 25px!important;
 }
 .details.active{
-    transform: translateY(0px);
-    /* transition-delay:1s; */
-    /* animation: title 0.4s ease-out 0.5s forwards!important; */
+    left:0px;
+    visibility:visible !important;
+    opacity: 1;
 }
 @keyframes title {
     0%{
@@ -637,18 +655,31 @@ hr {
 }
 /* track title */
 .details .title{
+    overflow: scroll;
+    text-align: center;
     /* overflow-x: scroll; */
-    font-weight: lighter!important;
-    font-size:15px!important;
-    white-space: nowrap;
+    font-weight: 400!important;
+    font-size:18px!important;
+    padding: 15px;
     opacity: 0;
-    visibility: none !important;
+    visibility: hidden!important;
     display: none;
-    text-orientation: sideways-right;
-     transition: 0.2s cubic-bezier(0.95, 0.05, 0.795, 0.035);
+     transition: 0.2s cubic-bezier(0.95, 0.05, 0.795, 1);
     text-transform: uppercase!important;
     position: relative !important;
-    font-family: Arial, Helvetica, sans-serif;
+}
+.details .title::-webkit-scrollbar{
+    appearance: none;
+    background:transparent;
+}
+.details .title::-webkit-scrollbar-corner{
+    appearance: none;
+    background:transparent;
+}
+.details .title b{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-orientation: sideways-right;
 }
 /* active details */
 .details .title.active{
@@ -701,20 +732,51 @@ hr {
 }
 /* bottom details */
 .bottom-details{
-    display: inline!important;
+    width: 100%;
+    display: flex!important;
+    flex-direction: row !important;
+    justify-content: center!important;
+    white-space: nowrap!important;
+    overflow: scroll;
+    align-items: center!important;
     visibility: collapse;
     position: relative;
-    transition: 1s ease-out;
+    transition: 1s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    text-align: center!important;
     /* animation: title 2.4s ease-in 1.53s linear forwards; */
 }
+.bottom-details::-webkit-scrollbar{
+    appearance: none;
+    background: transparent;
+    
+}
+
+.bottom-details::-webkit-scrollbar-corner{
+    appearance: none;
+    background: transparent;
+    
+}
+
+.bottom-details::-webkit-scrollbar-thumb{
+    appearance: none;
+    background: #1111;
+    width: 30px;
+    height: 30px;
+    box-shadow:inset 0px 0px 4px 0px #ddd ;
+    border-radius: 10px;
+}
 .details span.artist{
-    font: lighter 12px Arial;
+    margin: 5px;
+    font-size: 17px;
+    font-weight: 300;
     transition: 1s ease-in-out;
     opacity: 0;
 }
 /* track artist */
 .details .album{
-    font: lighter 12px Arial;
+    margin: 5px;
+    font-weight: 300;
+    font-size: 17px;
     opacity: 0;
     transition: 1s ease-in-out;
     position: relative !important;
@@ -734,7 +796,9 @@ hr {
     font-weight: lighter;
 }
 .details .size{
-    font: lighter 12px Arial;
+    font-weight: 300;
+    font-size: 17px;
+    margin: 5px;
     transition: 1s ease-in-out;
     opacity: 0;
     
@@ -939,7 +1003,10 @@ select {
     margin: 5px;
 }
 .visualizers{
-    background: linear-gradient(-180deg, rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.59),rgba(0, 0, 0, 0.69),rgba(0, 0, 0, 0.85),rgba(0, 0, 0, 0.95), rgba(0, 0, 0,1));
+    backdrop-filter: blur(60px);
+    filter: saturate(200px);
+    background: #00000033;
+    /* background: linear-gradient(-180deg, rgba(0, 0, 0, 0.45),rgba(0, 0, 0, 0.59),rgba(0, 0, 0, 0.69),rgba(0, 0, 0, 0.85),rgba(0, 0, 0, 0.95), rgba(0, 0, 0,1)); */
     position: fixed !important;
     width: 100%;
     height: 100%;
@@ -1106,10 +1173,11 @@ select {
     justify-content: center!important;
 }
 .body-content .btn-container button{
-border: 2px dotted #444;
+border: 2px solid #444;
 cursor: pointer;
 margin: 15px;
 padding: 4px !important;
+box-shadow: inset 0px 0px 13px 0px #837e7e;
 font-size: 20px;
 border-radius: 50%;
 }
@@ -1117,39 +1185,50 @@ border-radius: 50%;
     width: 40px;
     height: 40px;
 }
+.btn-container .show-vol{
+    width: 30px;
+    height: 30px;
+}
 .body-content .main-body{
     width: 600px;
     display: flex;
     flex-direction: column;
-    margin:10%;
+    margin:50px;
+    padding: 10px;
+    right: 50px;
     position: absolute;
-    right: 0;
+    bottom: 160px;
 }
 /* mobile view */
 @media (max-width:901px) {
     /* UI responsive */
     .plist .list .plist-body{
-        padding: px;
+        padding: 10px;
         width: 400px;
         margin: 0px;
         left: 0;
     }
     /* body-content */
 .body-content{
+    margin: 60px;
     width: 100%;
     height: 100vh;
     display: flex;
+    justify-content: center!important;
+    align-items: center!important;
     flex-direction: column;
     /* background: rgba(17, 16, 16,0.4); */
 
 }
     .body-content .image-container {
+        top: 100px;
+        position: absolute;
         width: 200px;
         height: 200px;
         /* transform: scale(3) !important; */
         align-items: center!important;
         justify-content: center;
-        position: relative;
+        /* position: relative; */
        
     }
     .image-container.active{
@@ -1465,20 +1544,12 @@ border-radius: 50%;
 }
 /* scaling */
 /* loader container */
-.plist .list p:nth-child(even){
-    background: rgba(184, 187, 187,0.08);
-    padding: 12px;
-    border-radius: 3px;
-    display: flex;
-    /* position: absolute; */
-    /* flex-direction: row-reverse; */
-    line-height: 0;
-}
-.plist .list p:nth-child(even) img , .list p:nth-child(odd) img{
+
+/* .plist .list p:nth-child(even) img , .list p:nth-child(odd) img{
     margin-bottom: 5px;
     margin-left: 5px;
     margin-top: 2px;
-}
+} */
 .plist .list p:nth-child(even) b , .list p:nth-child(odd) b{
     margin-top: -20px !important;
     margin-left: 20px !important;
@@ -1487,14 +1558,14 @@ border-radius: 50%;
     text-align: center;
     top: 0;
 }
-.plist .list p:nth-child(odd){
+/* .plist .list p:nth-child(odd){
     padding: 10px;
     display: flex;
-    /* position: absolute; */
+    /* position: absolute; *
     flex-direction: row;
     line-height: 0;
-}
-.plist .list .loader-container{
+}*/
+.plist .list .loader-container{ 
     position: fixed;
     z-index: 7 !important;
     width: 100%;

@@ -3,13 +3,13 @@
 
 <head>
     <meta charset="utf-8">
-    <!-- <title>3Dzik_Player</title> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-
+    <title>ZPlayer</title>
     <!-- Demo styles -->
     <link rel="stylesheet" href='./tools/swiper-bundle.min.css'>
+    <link rel="icon" type="image/png" href="./images/pAudio.jpeg"/>
     <link rel="stylesheet" type="text/css" href="./tools/font-awesome-4.3.0/css/font-awesome.css"></link>
     <link rel="stylesheet" type="text/css" href="./tools/Eq.css"></link>
+    <!-- <link rel="stylesheet" type="text/css" href="./tools/tailwind.css"></link> -->
     <link rel="stylesheet" type="text/css" href="./tools/1ui.css"></link>
     <link rel="stylesheet" type="text/css" href="./tools/drawer.css"></link>
 </head>
@@ -39,6 +39,37 @@
             <button id="r-cancel">Cancel</button>
         </div>
     </div>
+
+    <div class="welcome-container">
+        <div class="welcome-content">
+            <div class="header">
+                    <p>Welcome to ZPlayer</p>
+            </div>
+            <div class="content-body">
+                    <img src="./images/zik.png" class="zp-logo"/>
+                
+                
+                <p>Please Add music folder to continue</p>
+            </div>
+            <div class="content-footer">
+                <button class="import-folder" >Import Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add folder panel -->
+            <div class="add-container">
+                <div class="add-body">
+                    <p></p>
+                    <table  class="add-panel">
+                    <tbody class="folders"></tbody>
+                    </table>
+                <div class="add-btn">
+                    <button class="add-folder">Add Folder</button>
+                    <button class="remove-folder">Done</button>
+                </div>
+            </div>
+        </div>
 <!-- lyrics -->
 <div class="lyrics-container">
     <div class="lyrics-wrapper">
@@ -52,10 +83,15 @@
 </div>
 <!-- playlist -->
     <div class="w3-modal w3-container plist">
+
         <div class="w3-modal-content list">
-        <span class="header">Tracks ( <b class="total">0</b> )<label class="w3-indigo btn-playlist" for="tracks">import music Folder</label></span>
-               <div class="plist-body"></div>
-                <button class="fab-btn fa fa-arrow-right"></button>
+            <button class="fab-options fa fa-plus"></button>
+            <button class="fab-btn fa fa-arrow-right"></button>
+
+        <span class="header">Tracks ( <b class="total">0</b> </span>
+
+               <table class="plist-body"></table>
+            
                 <!-- loader -->
                 <div class="loader-container">
                     <!-- loader body -->
@@ -78,7 +114,14 @@
         </div>
        
     </div>
-    <input type="file" style="display: none;" webkitdirectory id='tracks'/>
+
+    <div class="vol-container" >
+        <div class="vol-panel">
+            <input type="range" id="vol-add" value="0.17" max="1" min="0" step="0.01">
+        </div>
+        <p class="p-label">Volume : <span id="vol">17 %</span></p>
+       <button class="fa fa-reply close-panel"></button>
+    </div>
     <!-- deprected -->
     <div id="mono-error" class="w3-animate-zoom w3-modal">
         <div class="w3-modal-content w3-khaki">
@@ -87,9 +130,27 @@
     </div>
     <!-- bottom sheet -->
     <div class="bottom-container">
-        <div class="bottom-sheet">
-            <p>Next Track: <span  class="next-track"></span></p>
-        </div>
+       
+            <table class="bottom-sheet">
+                <tr>
+                    <td>
+                        &nbsp;
+                        &nbsp;
+                        <p class="fa fa-fast-forward"></p>
+                        &nbsp;
+                        &nbsp;
+                        &nbsp;
+                    </td>
+                    <td>                      
+                        &nbsp;
+                        <img src="" class="Art"/>
+                        &nbsp;
+                    </td>
+                    <td>
+                        &nbsp;
+                        <p class="next-track"></p></td>
+                </tr>
+            </table>
     </div>
     <!-- Changelog -->
     <div id="changelog" class="w3-modal">
@@ -164,22 +225,7 @@
 </div>
   
     <div class="swiper-container">
-        <div class="visualizers">
-             <!-- double visualizer -->
-         <div class="double-visual">
-            <canvas class="db" id="up-bars-visual"></canvas>
-            <canvas class="db" id="dw-bars-visual"></canvas>
-        </div>
-        <!-- -------- -->
-
-        <div class="norm-visual">
-            <!-- bars visualizer -->
-            <canvas class="bv" id="bars-visual"></canvas>
-            <!-- dusty particles visualizer -->
-            <canvas class="sv" id="spec-visual"></canvas>
-        </div>
-
-  
+        <div class="visualizers">  
                         <!-- spiral visualizer -->
                         <div class="spiral">
                             <div class="row1">
@@ -195,11 +241,8 @@
         <!-- fullscreen canvas -->
         <div class="full">
             <canvas class="canvas-full"></canvas>
-            <canvas class="wave-full"></canvas>
-            <canvas class="histogram-full"></canvas>
-            <canvas class="ripple-wave"></canvas>
         </div>
-        </div>
+    </div>
         
         <div class="swiper-wrapper"> 
             <div class="swiper-slide">
@@ -211,7 +254,23 @@
                             <img src="" id="trackId" alt="TrackId">
                         </div>
                     <div class="main-body">
+                        <div class="details">
+                            <span id="title" class="title">
+                                <b>Title</b>
+                            </span>
+                            <div class="bottom-details">
+                                <span id="artist" class="artist">artist </span>
+                                <span class="separator">|</span> 
+                                <span id="album" class="album">album</span>
+                                <span class="separator2">|</span> 
+                                <span id="size"class="size">size</span> 
+
+                            </div>
+                        
+                    </div>
+
                         <div class="btn-container">
+                            <button class="fa fa-volume-up show-vol"></button>
                             <button class="repeat-off fa fa-repeat" id="prev"></button>
                             <button class="repeat-on fa fa-repeat" id="prev"></button>
                             <button id="prevTrack" class="fa fa-step-backward"></button>
@@ -221,7 +280,7 @@
 
                             <button class="fa fa-step-forward" id="nextTrack"></button>
                             <button class="mute-on fa fa-volume-off" id="next"></button>
-                            <button class="mute-off fa fa-volume-up" id="next"></button>
+                            <button class="mute-off fa fa-volume-down" id="next"></button>
 
                         </div>
                         
@@ -234,19 +293,7 @@
                         </div>
                     </div>
                 </div>
-                        <div class="details">
-                                <span id="title" class="title"><b>Title</b></span><br/>
-                                <div class="bottom-details">
-                                    <span id="artist" class="artist">artist </span>
-                                    <span class="separator">|</span> 
-                                    <span id="album" class="album">album</span>
-                                    <span class="separator2">|</span> 
-                                    <span id="size"class="size">size</span> 
-
-                                </div>
-                            
-                        </div>
-
+                      
                 <div class="control">
                     <button class="" id="tags">Track Info</button>
                     <button class="" id="feedback">Feedback</button>
@@ -298,7 +345,7 @@
                 <input type="range" value="50" max="120" min="0" step="0.01" id="bass">
                 <!-- bass-boast -->
                 <p class="p-label">Bass Boost : <span id="bb2">2 dB</span></p>
-                <input type="range" value="2" max="4" min="0" step="0.01" id='bass-boost'>
+                <input type="range" value="" max="4" min="0" step="0.01" id='bass-boost'>
                 <br>
             </div>
                 <br>
@@ -310,8 +357,6 @@
                 <p>Audio Tuning</p>
                 <hr>
                 <div class="tun-container">
-                <p class="p-label">Volume : <span id="vol">17 %</span></p>
-                <input type="range" id="vol-add" value="0.17" max="1" min="0" step="0.01">
                 <p class="p-label">Speed Rate : <span id="sp-rate">1.00 xp </span></p>
                 <input type="range" id="rate-xp" value="1" max="2" min="0" step="0.01">
 
@@ -333,19 +378,19 @@
                     </div>
                 <div class="comp-slider">
                 <p class="p-label">Threshold : <span id="threshold-v">-24 db</span></p>
-                <input type="range" id="threshold" value="-24" max="0" min="-100" step="0.01">
+                <input type="range" class="compressor" id="threshold" value="-24" max="0" min="-100" step="0.01">
                 
                 <p class="p-label">Knee : <span id="knee-v">30 </span></p>
-                <input type="range" id="knee"value="30" step="0.01" max="40" min="0">
+                <input type="range" class="compressor" id="knee"value="30" step="0.01" max="40" min="0">
 
                 <p class="p-label">Attack : <span id="attack-v">0.003 dB</span></p>
-                <input type="range" id="attack" value="0.003" step="0.01"  max="1" min="0">
+                <input type="range" class="compressor" id="attack" value="0.003" step="0.01"  max="1" min="0">
 
                 <p class="p-label">Release : <span id="release-v">0.250 dB</span></p>
-                <input type="range" id="release" value="0.250" step="0.01" max="1" min="0">
+                <input type="range" class="compressor" id="release" value="0.250" step="0.01" max="1" min="0">
                
                 <p class="p-label">Ratio : <span id="ratio-v">12 dB</span></p>
-                <input type="range" id="ratio" value="12" step="0.01" max="20" min="0">
+                <input type="range" class="compressor" id="ratio" value="12" step="0.01" max="20" min="0">
             </div>
             </div>
                 <br>
@@ -382,16 +427,16 @@
                 
             <div class="room-box-slides">
                 <p class="p-label">Delay 01 : <span id="d1">0 dB</span></p>
-                <input type="range" id="d1-v" value="0" max="1.6" min="0" step="0.01" disabled='true'>
+                <input type="range" class="room-effects" id="d1-v" value="0" max="1.6" min="0" step="0.01" disabled='true'>
 
                 <p class="p-label">Size 01 : <span id="s1">0 dB</span></p>
-                <input type="range" id="s1-v" value="0" max="1.5" min="0" step="0.01" disabled>
+                <input type="range" class="room-effects"  id="s1-v" value="0" max="1.5" min="0" step="0.01" disabled>
 
                 <p class="p-label">Delay 02 : <span id="d2">0 dB</span></p>
-                <input type="range" id="d2-v" value="0" max="1.6" min="0" step="0.01" disabled>
+                <input type="range" class="room-effects"  id="d2-v" value="0" max="1.6" min="0" step="0.01" disabled>
 
                 <p class="p-label">Size 02 : <span id="s2">0 dB</span></p>
-                <input type="range" value="0" id="s2-v" max="1.5" min="0" step="0.01" disabled>
+                <input type="range" class="room-effects"  value="0" id="s2-v" max="1.5" min="0" step="0.01" disabled>
                 <br>
                 <br>
               
@@ -406,13 +451,11 @@
 
     <!-- Swiper JS -->
     <script src="./tools/swiper-bundle.min.js"></script>
-    <script src="./tools/webkit-input-range-fill-lower.min.js"></script>
-    <script src="./tools/jquery-1.9.1.min.js"></script>
-    <script src="./tools/jquery-ui.min.js"></script>
-    <script src="./tools/id3-minimized.js"></script>
     <script src="./tools/default.js"></script>
-    <script type="module"  src="./tools/Eq.js"></script>
-    <!-- <script type="module" src="./bundle.js"></script> -->
+    <script src="./tools/jquery-1.9.1.min.js"></script>
+    <script src="./tools/Eq.js"></script>
+    <script  src="./tools/webkit-input-range-fill-lower.min.js"></script>
+    <script type="module"> require('./renderer')</script>
 </body>
 
 </html>

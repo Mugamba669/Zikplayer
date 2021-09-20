@@ -1,5 +1,4 @@
-import { Equalizer } from "../tools/Equalizer.js";
-// const { Notification } = require('electron')
+
 var controls = {
     spaceBetween: 0,
     parallax:true,
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 // 
-(function($) {
+
     $('#effects-off').hide();
     $('#effects-on').on('click', function() {
         $(this).hide();
@@ -65,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
         //$(this).css("opacity","0");
     });
     $(window).on("load", function() {
-        $("#changelog").show();
         $(".on").hide();
     });
     // close pop message
@@ -116,12 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     break; 
             } 
         })
+
+        
         // open sidebar
         $(".setting").click(function(){
                 $(this).toggleClass("active fa-arrow-circle-right").addClass("fa-times")
                 $(".sidebar").toggleClass("active")
             })
-})(jQuery);
+
 
 // default display
 $(window).on("load", function() {
@@ -131,7 +131,7 @@ $(window).on("load", function() {
     $(".total-tracks").hide();
     //   alert("Cordova");
 });
-(function($){
+
     $(document).ready(function(){
 
         $("#visual-select").click(function() {
@@ -141,13 +141,8 @@ $(window).on("load", function() {
             $(this).hide();
         });
         try {
-            // Default selection
-        $("#bars-visual").show()
-        $("#spec-visual").hide();
-        $("#up-bars-visual").hide();
-        $("#dw-bars-visual").hide();
-        $(".canvas-full").hide();
-        $(".wave-full").hide();
+        $(".canvas-full").show();
+        // $(".wave-full").hide();
         $(".histogram-full").hide();
         $(".sp1").hide();
         $(".ripple-wave").hide()
@@ -158,40 +153,33 @@ $(window).on("load", function() {
         
         // bars visualizer
         $(".body p").eq(0).click(function() {
-            $("#bars-visual").show().css("transform", "translateY(115px)");;
+            // $("#bars-visual").show().css("transform", "translateY(115px)");;
             $("#spec-visual").hide();
             $(".double-visual").hide();
-            $(".canvas-full").hide()
-            $(".wave-full").hide()
+            $(".canvas-full").show()
             $(".sp1").hide();
-            $(".ripple-wave").hide()
-            $(".histogram-full").hide();
         });
         
         // Spectrum visualizer
         $(".body p").eq(1).click(function() {
-            $("#spec-visual").show();
+            // $("#spec-visual").show();
             $("#bars-visual").hide();
             $(".double-visual").hide();
-            $(".canvas-full").hide()
-            $(".wave-full").hide()
+            $(".canvas-full").show()
+            // $(".wave-full").hide()
             $(".sp1").hide();
-            $(".ripple-wave").hide()
-            $(".histogram-full").hide();
+            // $(".ripple-wave").hide()
+            // $(".histogram-full").hide();
         });
         
         // double visulizer
         $(".body p").eq(2).click(function() {
-            $(".double-visual").show();
-            $("#up-bars-visual").show();
-            $("#dw-bars-visual").show();
-            $("#spec-visual").hide();
+            $(".double-visual").hide();
+            $("#up-bars-visual").hide();
+            $("#dw-bars-visual").hide();
             $("#bars-visual").hide();
-            $(".canvas-full").hide()
-            $(".wave-full").hide()
+            $(".canvas-full").show()
             $(".sp1").hide();
-            $(".ripple-wave").hide()
-            $(".histogram-full").hide();
         });
         // Spiral visualizer
         $(".body p").eq(3).click(function() {
@@ -201,9 +189,9 @@ $(window).on("load", function() {
             $("#spec-visual").hide();
             $("#bars-visual").hide();
             $(".canvas-full").hide();
-            $(".wave-full").hide();
-            $(".ripple-wave").hide()
-            $(".histogram-full").hide();
+            // $(".wave-full").hide();
+            // $(".ripple-wave").hide()
+            // $(".histogram-full").hide();
             $(".sp1").show();
         });
         
@@ -231,8 +219,6 @@ $(window).on("load", function() {
             $(".canvas-full").show();
             $(".wave-full").hide();
             $(".sp1").hide();
-            $(".ripple-wave").hide()
-            $(".histogram-full").hide();
         });
         
          // Show sine wave
@@ -242,8 +228,8 @@ $(window).on("load", function() {
             $("#dw-bars-visual").hide();
             $("#spec-visual").hide();
             $("#bars-visual").hide();
-            $(".canvas-full").hide();
-            $(".wave-full").show();
+            $(".canvas-full").show();
+            // $(".wave-full").show();
             $(".ripple-wave").hide()
             $(".histogram-full").hide();
             $(".sp1").hide();
@@ -256,10 +242,10 @@ $(window).on("load", function() {
             $("#dw-bars-visual").hide();
             $("#spec-visual").hide();
             $("#bars-visual").hide();
-            $(".canvas-full").hide();
+            $(".canvas-full").show();
             $(".wave-full").hide();
             $(".ripple-wave").hide()
-            $(".histogram-full").show();
+            // $(".histogram-full").show();
             $(".sp1").hide();
         });
   // show riple wave
@@ -269,14 +255,13 @@ $(window).on("load", function() {
     $("#dw-bars-visual").hide();
     $("#spec-visual").hide();
     $("#bars-visual").hide();
-    $(".canvas-full").hide();
+    $(".canvas-full").show();
     $(".wave-full").hide();
-    $(".ripple-wave").show()
+    // $(".ripple-wave").show()
     $(".histogram-full").hide();
     $(".sp1").hide();
 });
-    })
-})(jQuery)
+})
 
 $(".auto button").click(function() {
     $(".load-body").show().addClass("active");
@@ -300,14 +285,4 @@ $('.lyrics-container').click(function(){
 })
 // 
 $(".bottom-container").hide();
-var q = new Equalizer();/**
-    Initiating the Equalizer Engine
-     */
-q.getFile('#demo');
-q.getProgressData('.progress-bar');
-q.getControlButtons(".btn-tn");
-q.timeUpdate(".time");
-q.getTempo("#rate-xp", "#sp-rate");
-q.getAudioVolume("#vol-add", "#vol");
-q.repeatStopTrack(".repeat-on",".repeat-off",'.mute-on','.mute-off');
-q.getPlaylist("#tracks");
+

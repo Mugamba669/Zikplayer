@@ -1,18 +1,21 @@
-const {app,Menu, BrowserWindow} = require('electron');
-// const { nativeTheme } = require('electron/main');
+const {app,Menu,ipcMain, BrowserWindow,dialog, Tray, nativeImage, nativeTheme} = require('electron');
+const defaultPic = require('./tools/default');
 const path = require('path');
-
+const os = require('os');
+var mainWindow  = null;
+let icon = nativeImage.createFromDataURL(`${defaultPic.image}`)
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1300,
     minWidth:1300,
     minHeight: 580,
+    // backgroundColor:"#000000",
     height: 580,
-    alwaysOnTop:false,
     frame:false,
+    icon:nativeImage.createFromPath('./images/zik.png'),
     webPreferences: {
-      preload:path.join(__dirname,"./lyrics.js"),
+      preload:path.join(__dirname,"preload.js"),
       nodeIntegration:true,
       nodeIntegrationInWorker:true,
       nodeIntegrationInSubFrames:true,
@@ -21,70 +24,81 @@ function createWindow () {
     }
   })
   // and load the index.html of the app.
-  mainWindow.loadFile('./Eq.html');
-  mainWindow.setIcon(path.join(__dirname,"./images/zik.png"));
-}
-// help window 
-function openHelp(){
-  var  helpWindow = new BrowserWindow({
-    width:750,
-    height:569,
-    backgroundColor:'#000',
-    frame:false,
-    maximizable:false,
-    resizable:false,
-    icon:path.join(__dirname,'/images/zik.png'),
-    webPreferences:{
-      preload:path.join(__dirname,"./components/preload.js"),
-      nodeIntegration:true,
-      nodeIntegrationInWorker:true,
-      enableRemoteModule:true,
-      contextIsolation:false
-    }
-  });
-  helpWindow.loadFile(path.join(__dirname,'./components/index.html'));
-  }
+  // mainWindow.setIcon();
+  mainWindow.setProgressBar(0.5);
+  mainWindow.loadFile(path.join(__dirname,'ZPlayer.html'));
+  /**
+   * Getting music folders
+   */
+      ipcMain.on('open-music-folder',(event)=>{
+      
+        dialog.showOpenDialog(mainWindow,{
+            title:"Open Music",
+            properties:['openDirectory'],
+            buttonLabel:'Choose Music Folder',
+            defaultPath:`${os.homedir()}/Music/`
+            //  filters: [
+            //         { name: 'Audio', extensions: ['mp3', 'm4a', 'aac'] }]
+        }).then((files)=>{
+            if(files) event.sender.send('musicFiles',files);
+        });
+    })
+    /**========================================== */
 
-  // tags window
-  function showAudioTags() {
-    var  tagsWindow = new BrowserWindow({
-      title:"Tag Editor",
-      width:600,
-      height:550,
-      resizable:false,
-      alwaysOnTop:true,
-      frame:false,
-      maximisable:false,
-      webPreferences:{
-        preload:path.join(__dirname,"./audiotagger/index.js"),
-        nodeIntegration:true,
-      nodeIntegrationInWorker:true,
-      nodeIntegrationInSubFrames:true,
-      enableRemoteModule:true
-      }
-    });
-    tagsWindow.loadFile(path.join(__dirname,"./audiotagger/tag.html"));
-   }
+    /**
+     * Networks error
+     */
+    ipcMain.on('networkError',(event,args) =>{
+      
+        dialog.showErrorBox("Network Error",args)
+    })
+    /**-------------------------------------- */
+
+    /**
+     * No Lyrics
+     */
+    ipcMain.on('noTags',(event,args)=>{
+      dialog.showMessageBox(mainWindow,{
+        message:args
+      })
+    })
+
+    /**
+     * No directories to delete
+     */
+    ipcMain.on('Nofolders',(e,args)=>{
+      dialog.showErrorBox("Illegal Operation",args)
+    })
+}
+ 
   // lanch app when ready
 app.whenReady().then(()=>{
   var menu = Menu.buildFromTemplate([
-    ,{
-      label:"ZPlayer",icon:path.join(__dirname,"./images/zik.png")
+    {
+      label:"ZPlayer"
     },
     {label:"Tools",submenu:[
       {label:"Exit",accelerator:"Ctrl + Q",click:()=> app.quit()},
-      {label:"FullScreen",accelerator:"F11",role:"toggleFullScreen"},
+      {label:"Reload",accelerator:"F8",role:"reload"},
       {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
       {label:"Help",accelerator:"Ctrl + H",click:()=> openHelp()}
     ]},
-    {label:"Utilities",submenu:[
-      {label:"Audio Tags Editor",icon:path.join(__dirname,"./images/zik.png"),accelerator:"Ctrl + T",click:()=> showAudioTags()}
-    ]}
   ]);
 
   Menu.setApplicationMenu(menu);
   createWindow();
   setTimeout(() => {
-    openHelp();
-  }, 8000);
+    // openHelp();
+  }, 10000);
+ 
+ let tray = new Tray(icon);
+  
+  tray.setToolTip('ZPLayer');
+  tray.setContextMenu(Menu.buildFromTemplate([
+    {label:"DevTools",accelerator:"F12",role:"toggleDevTools"},
+
+  ]));
 });
+/***
+ * IPC messages
+ */
