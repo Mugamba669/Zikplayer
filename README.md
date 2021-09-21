@@ -3,10 +3,10 @@
 
 ### * Also now available on
  - Get Zikplayer official site [windows and Linux Versions is already available here.](https://official-zikplayer-site.herokuapp.com)
-
- - snapstore for all Linux distrbutions
+## [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ziki)
+ - For all Linux distrbutions
     ```bash
-       sudo snap install zplayer 
+       sudo snap install ziki 
     ```
 ## Features
 - 7 Graphic Visualisers
