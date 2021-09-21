@@ -14,7 +14,6 @@ tracks.txt
 /node_modules
 /streaming
 /lib
-/build
 fpm
 /dist
 
