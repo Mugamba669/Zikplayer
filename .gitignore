@@ -29,5 +29,3 @@ fpm
 # testing
 /coverage
 
-# production
-/build
