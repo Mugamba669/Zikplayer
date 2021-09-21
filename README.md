@@ -9,11 +9,22 @@
        sudo snap install zplayer 
     ```
 ## Features
+- 7 Graphic Visualisers
+- Fetch online lyrics
 - Full Screen Graphical display
 - 4Band Equalizer
 - Audio Compressor (For Amplifying and Lowering the Bass)
-- Rom Effects (Scene, Auditronim,...)
-                
+- Room Effects (Scene, Auditronim,...)
+
+  ## Screenshots
+  <img src="./build/Screenshot from 2021-09-21 18-59-36 (copy).png" width="300">              
+  <img src="./build/Screenshot from 2021-09-21 19-00-49 (copy).png" width="300">              
+  <img src="./build/Screenshot from 2021-09-21 19-01-42.png" width="300">   
+  <img src="./build/Screenshot from 2021-09-21 19-03-08.png" width="300">              
+  <img src="./build/Screenshot from 2021-09-21 19-03-21.png" width="300">              
+  <img src="./build/Screenshot from 2021-09-21 19-03-42.png" width="300">              
+             
+
 ## TODOS
 -   Implemenet saving user presets like  the room effects and equalizer
 
@@ -35,9 +46,11 @@
 
 - Implemenet the track searching algorithim from (all songs , albums,artist,..)
 
-## * Tech Stack 
+## Tech Stack 
 - Electron JS
 - jQuery
 - Node JS
 - CSS3
 - HTML5
+
+

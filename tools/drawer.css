@@ -1,13 +1,21 @@
 .sidebar{
-    top: 0 !important;
+    box-shadow: inset 0px 0px 2px 0px #eee;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    top: 140px !important;
     position: fixed !important;
     z-index: 2!important;
-    height: 100vh;
-    background:rgb(0, 0, 0);
+    height: 60vh;
+    backdrop-filter: blur(20px);
+    background:#00000080;
     transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     width: 0px;
     opacity: 0;
-    pointer-events: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* pointer-events: none; */
     visibility: hidden;
 }
 .sidebar table{
@@ -17,6 +25,29 @@ body .sidebar.active{
     width: 300px;
     opacity: 1;
     visibility: visible;
+}
+.table{
+    padding: 15px;
+    color: #fff;
+    font: 600 19px Ubuntu;
+    width: 100%;
+    border-collapse: collapse;
+}
+.table tbody tr{
+    cursor: pointer !important;
+   padding: 20px;
+}
+
+.table tbody tr:nth-child(odd){
+    background: #1d1c1c8a;
+}
+.table tbody td{
+    /* border: 1px solid #eee; */
+    padding: 7px;
+}
+.table tbody td b{
+    margin: 7px;
+    font-size: 17px !important;
 }
 .drawer{
     top: 0 !important;
@@ -50,6 +81,10 @@ body .sidebar.active{
     height:52px;
     left:300px;
 }
+
+
+
+
 
 .compress{
     width:100%;

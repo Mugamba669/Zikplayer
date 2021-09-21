@@ -118,8 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // open sidebar
         $(".setting").click(function(){
-                $(this).toggleClass("active fa-arrow-circle-right").addClass("fa-times")
-                $(".sidebar").toggleClass("active")
+                $(this).toggleClass("active fa-gear").addClass("fa-times")
+                $(".sidebar").toggleClass("active");
             })
 
 

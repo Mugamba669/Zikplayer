@@ -1,6 +1,6 @@
 {
-    "appId": "com.mugambabruno.zik_player",
-    "productName": "ZPlayer",
+    "appId": "com.mugambabruno.zikapp",
+    "productName": "Ziki",
     "copyright": "COPYRIGHT MUGAMBA BRUNO",
     "directories": {
         "app": "./",

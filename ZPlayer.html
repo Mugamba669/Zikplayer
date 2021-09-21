@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>ZPlayer</title>
+    <title>Ziki</title>
     <!-- Demo styles -->
     <link rel="stylesheet" href='./tools/swiper-bundle.min.css'>
     <link rel="icon" type="image/png" href="./images/pAudio.jpeg"/>
@@ -192,33 +192,56 @@
   <!-- Drawer btn -->
   <div class="drawer">
     <div class="btn-wrapper">
-        <button class="fa fa-arrow-circle-right setting"></button>
+        <button class="fa fa-gear setting"></button>
     </div>
     <!--  -->
 </div>
  <!-- Drawer slide -->
-
  <div class="sidebar">
-    <table class="w3-table-all">
+    <table class="table">
         <tbody>
-            <tr>
-                <td class="fa fa-gears"></td>
-                <td>Settings</td>
-            </tr>
+            <tr id="playlist">
+                <td>
+                    <b class="fa fa-list-alt"></b>
+                </td>
 
-            <tr>
-                <td class="fa fa-paint-brush"></td>
-                <td class="w3-dropdown-hover">
-                   <b >Themes</b>
-                   <div class="w3-dropdown-content w3-bar-block">
-                       <p class="w3-bar-item">Activate Easy Access</p>
-                   </div>
+                <td>
+                    <b>Playlist</b>
                 </td>
             </tr>
 
-            <tr>
-                <td class="fa fa-info-circle"></td>
-                <td>About</td>
+                <!-- Visualizers -->
+            <tr id="visual-select">
+                <td>
+                    <b class="fa fa-cubes"></b>
+                </td>
+
+                <td>
+                    <b>Visualizers</b>
+                </td>
+            </tr>
+
+
+            <!-- Lyrics -->
+            <tr id='lyrics-btn'>
+                <td>
+                    <b class="fa fa-file-text"></b>
+                </td>
+
+                <td>
+                    <b>Lyrics</b>
+                </td>
+            </tr>
+
+            <!-- Feedback -->
+            <tr id="feedback">
+                <td>
+                    <b class="fa fa-mail-reply"></b>
+                </td>
+
+                <td>
+                    <b>Feedback</b>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -248,11 +271,11 @@
             <div class="swiper-slide">
                 <br>
                     <div class="body-content">
-                        <input type="file" accept="audio/*" id="demo">
-                        <br>
+
                         <div class="image-container">
                             <img src="" id="trackId" alt="TrackId">
                         </div>
+
                     <div class="main-body">
                         <div class="details">
                             <span id="title" class="title">
@@ -294,7 +317,7 @@
                     </div>
                 </div>
                       
-                <div class="control">
+                <!-- <div class="control">
                     <button class="" id="tags">Track Info</button>
                     <button class="" id="feedback">Feedback</button>
                     <button class="" id="playlist">Playlist</button>
@@ -302,7 +325,7 @@
                     <button id='add-music'>Add Music</button>
                     <button id='lyrics-btn'>Lyrics</button>
                     
-                </div>
+                </div> -->
             </div>
 <!-- Equalizer -->
             <div class="swiper-slide shade200">

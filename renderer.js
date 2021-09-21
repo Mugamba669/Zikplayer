@@ -59,7 +59,7 @@ $("#eqns").on('input', function() {
  * Initializing the equalizer
  */
 var eq = new ZPlayer(audio);
-eq.getFile('#demo');
+eq.startPlayer();
 eq.getProgressData('.progress-bar');
 eq.getControlButtons(".btn-tn");
 eq.timeUpdate(".time");
@@ -252,3 +252,23 @@ $('.close-panel').on('click',function(){
     })
     })
 
+    /**
+     * Closing the drawer
+     */
+
+     $('#playlist').click(function(){
+        $('.setting').removeClass('active');
+        $('.sidebar').removeClass('active');
+    })
+
+
+$('#visual-select').click(function(){
+    $('.setting').removeClass('active');
+    $('.sidebar').removeClass('active');
+})
+
+
+$('#lyrics-btn').click(function(){
+    $('.setting').removeClass('active');
+    $('.sidebar').removeClass('active');
+})

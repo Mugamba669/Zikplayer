@@ -10,7 +10,7 @@ function createWindow () {
     width: 1300,
     minWidth:1300,
     minHeight: 580,
-    // backgroundColor:"#000000",
+    backgroundColor:"#000000",
     height: 580,
     frame:false,
     icon:nativeImage.createFromPath('./images/zik.png'),

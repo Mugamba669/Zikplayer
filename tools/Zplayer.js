@@ -8,9 +8,6 @@ class ZPlayer {
             this.audio = audio;
             this.h = 0;
             this.playing = true;
-            this.srcURL = function(src){
-                return URL.createObjectURL(src)
-            }
             this._ = function(selector) {
                 return document.querySelector(selector);
             }
@@ -47,26 +44,7 @@ class ZPlayer {
                 this._('.bottom-details').classList.remove('active');
                 this._('.image-container').classList.remove('active');
                 this._('#trackId').style.animationPlayState = 'paused';
-            }
-            // this.audio.onplay = ()=>{ 
-            //     this._('.title').classList.add('active');
-            //     this._('.artist').classList.add('active');
-            //     this._('.album').classList.add('active');
-            //     this._('.size').classList.add('active');
-            //     this._('.separator').classList.add('active');
-            //     this._('.separator2').classList.add('active');
-            //     this._('.details').classList.add('active');
-            //     this._('.image-container').classList.add('active');
-            //     this._('.bottom-details').classList.add('active');
-            //     this._('#trackId').style.animationPlayState = 'running';
-            //     // this._('#trackId').style.Transform = 'scale(0.7)';
-            // }
-            this.upload = function(e) {
-                var file = e.currentTarget.files[0];
-                this.fileInfo.trackId(file);
-                this._("#size").textContent = this.fileInfo.size(file);
-            }.bind(this);
-           
+            }           
             // this.fs = require('fs')
             this.tune = () => {
                 this._('.title').classList.add('active');
@@ -101,107 +79,9 @@ class ZPlayer {
                $("#pause").hide()
                this.h = 0;
            }
-            this.fileInfo = {
-                name: function(file) {
-                    return file.name;
-                },
-                size: function(file) {
-                    var result = (file.size / (1000 * 1000)).toFixed(2) + "MB";
-                    return result;
-                },
-                type: function(file) {
-                    return file.type;
-                },
-                path:function(file){
-                    return file.path;
-                },
-                trackId: (file) => {
-                    var url = URL.createObjectURL(file);
-                    $(".view").text(file.path)
-                    this.audio.src = url;
-                    this.audio.play();
-                      // keyboard shotcuts
-        $(document).on("keydown",function(e){
-            switch (e.key) {
-                case " ":
-                    // console.log(that.playing)
-                    if(this.playing == true){
-                        $("#play").show();
-                        $("#pause").hide();
-                        this.audio.pause();
-                        // console.log(that.playing)
-                    }else{
-                        $("#play").hide();
-                        $("#pause").show();
-                        this.audio.play();
-                        // console.log(that.playing)
-                    }
-                    break;
-            }
-        }.bind(this))
-                    ID3.loadTags(url, () => {
-                        var tags = ID3.getAllTags(url);
-                        console.log(tags.genre);
-
-                        $("#can").click(function() {
-                            
-                            $(".load-body").removeClass("active");
-                        });
-
-                       this.trackInfo(tags,file)
-                       $(".lyric-title").text(`${tags.title}`)
-                       $('.lyric-artist').text(tags.artist);
-                    //    image manuplation
-                        var image = tags.picture;
-                      this.base64Image(image);
-                    }, {
-                        dataReader: FileAPIReader(file),
-                        tags: ["title", "artist","lyrics", "picture", "genre"]
-                    });
-                }
-            };
-            
-            this.listTracks = (title,file)=>{
-                switch (title) {
-                    case undefined:
-                        return this.fileInfo.name(file);
- 
-                    default:
-                        return title;
-                }
-            }
-            this.base64Image = (image)=>{
-               if (image) {
-                   var base64String = '';
-                   for (var i = 0; i < image.data.length; i++) {
-                       base64String += String.fromCharCode(image.data[i]);
-                   }
-                   this._("#trackId").src = "data:" + image.format + ";base64," + window.btoa(base64String);
-                   this._(".swiper-container").style.backgroundImage = "url(data:" + image.format + ";base64," + window.btoa(base64String) + ")";
-               } else {
-                   this._("#trackId").src = defaultPic.image;
-                   this._(".swiper-container").style.backgroundImage = "url(" + defaultPic.image + ")";
-               }
-            }
-            this.base64Cover = (image)=>{
-                if (image) {
-                    var base64String = '';
-                    for (var i = 0; i < image.data.length; i++) {
-                        base64String += String.fromCharCode(image.data[i]);
-                    }
-                    return "data:" + image.format + ";base64," + window.btoa(base64String);
-                
-                } else {
-                    return defaultPic.image;
-                    
-                }
-            }
-           
         }
         //Equalizer methods
-    getFile(selector) {
-        // loading one track at a time
-        this._(selector).addEventListener('change', this.upload, false);
+    startPlayer() {
         // trigglering visualizers when the audio starts playing
         this.audio.addEventListener('playing', this.tune,false)
     }
@@ -291,33 +171,13 @@ class ZPlayer {
            
 
              
-                let check = $("<input/>").attr('type','radio').attr('name','listtile').attr('value',`${index}`).css({"appearance":""}).addClass('radiolist');
-                console.log(check.val())
+                let check = $("<input/>").attr('type','radio').attr('name','listtile').attr('value',`${index}`).css({"appearance":"none"}).addClass('radiolist');
+                // console.log(check.val())
                 var artWork = $("<td></td>").append( $('<img/>').attr('src', tags.artwork).addClass('coverArt'));
                 var tile = $("<td></td>").append($("<p></p>").text(tags.title)).append($("<p></p>").text(tags.artist))
                 $("<tr></tr>").append(artWork).append(tile).addClass('list-tile').append(check).appendTo(".plist-body")
                 .on('click',function(){
                     $('title').text(`${tags.title}`);
-                    // document.querySelector('.radiolist').click();
-
-             /**
-             * highlight list-tile
-             */
-            
-                // var tile = document.querySelector('.radiolist');
-                // console.log(tile);
-                // $(tile).on('change',function(){
-                //     if(tile.checked){
-                //         $('.list-tile')
-                //             .eq($('.radiolist')
-                //                 .val())
-                //                     .css({
-                //                 "color":"#fff",
-                //                 "backgroundColor":"#00ccff"
-                //         })
-                //     }
-                // })
-               
 
                     //  track next
                     $(".total-tracks").show(function(){
@@ -343,7 +203,7 @@ class ZPlayer {
             // show next when renaining 41seconds
             var crossfade = that.audio.duration - that.audio.currentTime;
             const result = Math.floor(parseInt(crossfade));
-            console.log(result)
+            // console.log(result)
                 // h += 0.65;
                 //     $("pre").css("transform","translateY(-"+h+"px)")
             if(result == 41){
@@ -354,7 +214,7 @@ class ZPlayer {
         $(document).on("keydown",function(e){
             switch (e.key) {
                 case " ":
-                    console.log(that.playing)
+                    // console.log(that.playing)
                     if(that.playing == true){
                         $("#play").show();
                         $("#pause").hide();
@@ -431,7 +291,7 @@ class ZPlayer {
                 $(".bottom-container").show()
                 $('.bottom-sheet').addClass('active');
                 $(".Art").attr("src",defaultPic.image); 
-                $
+                
                  $(".next-track").text('No more previous tracks')
                  setTimeout(() => {
                     $('.bottom-sheet').removeClass('active');
@@ -513,7 +373,7 @@ class ZPlayer {
        }
     //    show next track
     function showNextTrack(tags){
-        console.log('next track'+tags.title)
+        // console.log('next track'+tags.title)
             $(".bottom-container").show()
             $('.bottom-sheet').addClass('active');
             $(".Art").attr("src",tags.artwork); 
@@ -534,7 +394,8 @@ class ZPlayer {
                 
             })
             var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
-            $('.size').text(`${size} MB`)
+            $('.size').text(`${size} MB`);
+
             $('title').text(`${tags.title}`)
             $(".view").text(tags.path)
                 $(".lyric-title").text(`${tags.title}`)
@@ -549,7 +410,6 @@ class ZPlayer {
                 $(".swiper-container").css({"backgroundImage": `url(${tags.artwork})`})
         
             }
-
       
     }
     getAudioVolume(volu, ou) {
