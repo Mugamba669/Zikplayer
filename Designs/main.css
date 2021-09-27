@@ -1,0 +1,42 @@
+.btns{
+    width: 100%;
+    background-color:#00000065;
+    height: 100%;
+    position: fixed;
+    z-index: 8!important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.btns .btns-container{
+    /* width: 150px; */
+    position: absolute!important;
+    bottom: 100px;
+    display: flex;
+    border-radius:10px;
+    flex-direction: row !important;
+    padding: 10px;
+    backdrop-filter: blur(8px);
+    border: 1px solid #ccc;
+    align-items: center;
+    justify-content: center;
+}
+.btns .btns-container .btns-bt{
+    position: relative;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin: 10px;
+    font-size:20px;
+    outline: none;
+    border: 1px solid #222;
+    
+}
+.btns  .btns-header p{
+    /* position: absolute; */
+    /* right: 10px; */
+    text-align: center;
+    color: #e6dde6;
+    font: 400 63px Ubuntu;
+}

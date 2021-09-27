@@ -1,6 +1,6 @@
 {
   "name": "ziki",
-  "version": "1.5.13",
+  "version": "1.5.14",
   "description": "Enjoy the power of music",
   "main": "./main.js",
   "scripts": {

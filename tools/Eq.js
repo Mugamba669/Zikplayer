@@ -69,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // close pop message
     $("#close-log").click(function() {
         $("#changelog").hide();
-        // new Notification({title:"ZikiDroid",body:"Changelog closed"}).show();
     });
     
     // load one track
@@ -141,11 +140,8 @@ $(window).on("load", function() {
             $(this).hide();
         });
         try {
-        $(".canvas-full").show();
-        // $(".wave-full").hide();
-        $(".histogram-full").hide();
+        $(".canvas-full").hide();
         $(".sp1").hide();
-        $(".ripple-wave").hide()
         } catch (error) {
             console.log(error)
         }
@@ -153,112 +149,53 @@ $(window).on("load", function() {
         
         // bars visualizer
         $(".body p").eq(0).click(function() {
-            // $("#bars-visual").show().css("transform", "translateY(115px)");;
-            $("#spec-visual").hide();
-            $(".double-visual").hide();
             $(".canvas-full").show()
             $(".sp1").hide();
         });
         
         // Spectrum visualizer
         $(".body p").eq(1).click(function() {
-            // $("#spec-visual").show();
-            $("#bars-visual").hide();
-            $(".double-visual").hide();
             $(".canvas-full").show()
-            // $(".wave-full").hide()
             $(".sp1").hide();
-            // $(".ripple-wave").hide()
-            // $(".histogram-full").hide();
         });
         
         // double visulizer
         $(".body p").eq(2).click(function() {
-            $(".double-visual").hide();
-            $("#up-bars-visual").hide();
-            $("#dw-bars-visual").hide();
-            $("#bars-visual").hide();
             $(".canvas-full").show()
             $(".sp1").hide();
         });
         // Spiral visualizer
         $(".body p").eq(3).click(function() {
-            $(".double-visual").hide();
-            $("#up-bars-visual").hide();
-            $("#dw-bars-visual").hide();
-            $("#spec-visual").hide();
-            $("#bars-visual").hide();
             $(".canvas-full").hide();
-            // $(".wave-full").hide();
-            // $(".ripple-wave").hide()
-            // $(".histogram-full").hide();
             $(".sp1").show();
         });
         
          // no visualizer
          $(".body p").eq(8).click(function() {
-            $(".double-visual").hide();
-            $("#up-bars-visual").hide();
-            $("#dw-bars-visual").hide();
-            $("#spec-visual").hide();
-            $("#bars-visual").hide();
             $(".canvas-full").hide();
-            $(".wave-full").hide();
-            $(".ripple-wave").hide()
-            $(".histogram-full").hide();
             $(".sp1").hide();
         });
 
           // Show glass pills
           $(".body p").eq(6).click(function() {
-            $(".double-visual").hide();
-            $("#up-bars-visual").hide();
-            $("#dw-bars-visual").hide();
-            $("#spec-visual").hide();
-            $("#bars-visual").hide();
             $(".canvas-full").show();
-            $(".wave-full").hide();
             $(".sp1").hide();
         });
         
          // Show sine wave
          $(".body p").eq(4).click(function() {
-            $(".double-visual").hide();
-            $("#up-bars-visual").hide();
-            $("#dw-bars-visual").hide();
-            $("#spec-visual").hide();
-            $("#bars-visual").hide();
             $(".canvas-full").show();
-            // $(".wave-full").show();
-            $(".ripple-wave").hide()
-            $(".histogram-full").hide();
             $(".sp1").hide();
         });
         
           // show histogram
           $(".body p").eq(5).click(function() {
-            $(".double-visual").hide();
-            $("#up-bars-visual").hide();
-            $("#dw-bars-visual").hide();
-            $("#spec-visual").hide();
-            $("#bars-visual").hide();
-            $(".canvas-full").show();
-            $(".wave-full").hide();
-            $(".ripple-wave").hide()
-            // $(".histogram-full").show();
+            $(".canvas-full").show();           
             $(".sp1").hide();
         });
   // show riple wave
   $(".body p").eq(7).click(function() {
-    $(".double-visual").hide();
-    $("#up-bars-visual").hide();
-    $("#dw-bars-visual").hide();
-    $("#spec-visual").hide();
-    $("#bars-visual").hide();
     $(".canvas-full").show();
-    $(".wave-full").hide();
-    // $(".ripple-wave").show()
-    $(".histogram-full").hide();
     $(".sp1").hide();
 });
 })
@@ -269,7 +206,8 @@ $(".auto button").click(function() {
 
 // playlist
 $('#playlist').click(function(){
-    $(".plist").addClass('w3-show')
+    $(".plist").addClass('active')
+    $(".plist-cont").addClass('active')
 })
 // lyrics
 $('.lyrics-container').hide()
@@ -285,4 +223,3 @@ $('.lyrics-container').click(function(){
 })
 // 
 $(".bottom-container").hide();
-

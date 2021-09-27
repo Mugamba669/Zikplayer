@@ -1,12 +1,12 @@
-## Zikplayer Desktop App
-<img src="./images/zik.png" width="100" style=""/>
+## Ziki Player Desktop App
+<img src="./images/zik.png" style="justify-content:center!important;align-items:center; display:flex; flex-direction:column; position:sticky; left:30%;" width="150" style=""/>
 
-### * Also now available on
+## Available on
  - Get Zikplayer official site [windows and Linux Versions is already available here.](https://official-zikplayer-site.herokuapp.com)
 ## [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ziki)
  - For all Linux distrbutions
     ```bash
-       sudo snap install ziki 
+       sudo snap install --beta ziki 
     ```
 ## Features
 - 7 Graphic Visualisers

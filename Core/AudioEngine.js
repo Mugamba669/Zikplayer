@@ -63,7 +63,7 @@ class AudioEngine{
         this.analyser.connect(this.audioCtx.destination);
 
       /* Visualisser */
-        this.visualizer = new Visualizer(this.analyser,document.querySelector('.canvas-full'))
+        this.visualizer = new Visualizer(this.analyser,'.canvas-full')
         var that = this;
             // this.visualizer.barsVisualiser();
         $(".body p").eq(0).click(function() {
@@ -145,7 +145,7 @@ class AudioEngine{
          this.analyser.fftSize = 1024;
          this.analyser.minDecibels = -80;
          this.analyser.maxDecibels = -10;
-         this.analyser.smoothingTimeConstant = 0.85; 
+         this.analyser.smoothingTimeConstant = 0.90; 
     }
     tuneStereo(selector){
         var valueSt = 0,that =this;

@@ -1,7 +1,10 @@
 'use strict';
 const fs = require('fs');
-const defaultPic = require("./default");
+const { ipcRenderer } = require('electron');
+const defaultPic = require("../tools/default");
 const path = require('path');
+const Axios = require('axios');
+const cheerio = require("cheerio");
 class ZPlayer {
 
     constructor(audio) {
@@ -156,20 +159,17 @@ class ZPlayer {
 
     }
     getPlaylist(tags = {},index = 0,playlist = []){
-        var that = this;      
-        // $('.fab-btn').hide();
-    
-
-/**========================================================== */
-     
-    /**=================================== */
+        var that = this;     
             // var time = new Date().getUTCMilliseconds();
             $('.total').text(`${index+1}`).css({
                 "color":"#fff",
             });
  /**=================================== */
            
-
+ $(".total-tracks").show(function(){
+    $(".current").text(`${(index + 1)}`);
+    $(".tt-T").text(`${(playlist.length)}`);
+});
              
                 let check = $("<input/>").attr('type','radio').attr('name','listtile').attr('value',`${index}`).css({"appearance":"none"}).addClass('radiolist');
                 // console.log(check.val())
@@ -180,10 +180,7 @@ class ZPlayer {
                     $('title').text(`${tags.title}`);
 
                     //  track next
-                    $(".total-tracks").show(function(){
-                        $(".current").text(`${(index + 1)}`);
-                        $(".tt-T").text(`${(playlist.length)}`);
-                    });
+                   
                     // show track whose lyrics are to be displayed
                     $(".lyric-title").text(`${tags.title}`)
                     $('.lyric-artist').text(tags.artist);
@@ -191,7 +188,6 @@ class ZPlayer {
                new Notification(tags.title,{
                 icon:tags.artwork,
                 body:tags.artist,
-                timestamp:200,
                 
             })
             var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
@@ -304,7 +300,8 @@ class ZPlayer {
 
             }
         });
-                $(".plist").removeClass("w3-show").addClass('w3-hide')
+                $(".plist").removeClass("active")
+                $(".plist-cont").removeClass("active")
                 that._('.title').classList.add('active');
                 that._('.artist').classList.add('active');
                 that._('.album').classList.add('active');
@@ -330,7 +327,6 @@ class ZPlayer {
         new Notification(tags.title,{
             icon:tags.artwork,
             body:tags.artist,
-            timestamp:200,
             
         });
         var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
@@ -353,7 +349,7 @@ class ZPlayer {
         new Notification(tags.title,{
             icon:tags.artwork,
             body:tags.artist,
-            timestamp:200,
+           
             
         })
         var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
@@ -389,8 +385,7 @@ class ZPlayer {
         const prevTrack = function(tags){
             new Notification(tags.title,{
                 icon:tags.artwork,
-                body:tags.artist,
-                timestamp:200,
+                body:tags.artist
                 
             })
             var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
@@ -477,5 +472,114 @@ class ZPlayer {
             }
         });
     }
+    /**
+     * this method implements online music from nowviba.com
+     */
+     searchSongs(query) {
+
+        console.log(query);
+        // var streams = JSON.parse(fs.readFileSync(path.join(__dirname,"./streams.json")));
+      let searchSource = `https://www.nowviba.com/music/pages/search.php?q=${query}`;
+        if(typeof query != 'string') throw new Error("Only strings are allowed");
+
+        $('.stream-component').remove();
+        Axios.get(searchSource).then((response)=>{
+                var html = response.data;
+                const ch = cheerio.load(html);
+                var trackList = ch('.container a');
+           trackList.map((index,track) => {
+               var element = track;
+            var more = (`${element.children[0].children[1].attribs.style}`).replace("background-image:","");
+               
+            var  stream = {
+                  title: element.children[0].children[3].children[1].children[0].data,
+                  artist:element.children[0].children[3].children[3].children[0].data,
+                 coverArt:more.replace('url(',"").replace(");",""),
+                  url:element.attribs.href,
+                }
+               
+                Axios.get(`https://www.nowviba.com/music/pages/${stream.url}`).then((response)=>{
+                    var detail = response.data;
+                    var ch = cheerio.load(detail);
+
+                  let  sourceFile =  ch('.dwnTkNt').attr().href;
+                console.log(sourceFile.replace(/(.*)[\/\\]/,"").replace(" ","_"))
+                console.log(stream.title);
+             $('.search-results').text(`(${index}) results found`)
+
+				var streamComponent = function(avatar = '',title = ''){
+					var avatar = $('<img/>').attr('src',avatar).addClass('stream-component-avatar');
+					var componentHeader = $('<div></div>').addClass("stream-component-header").append(avatar);
+				// stream content body
+				var track = `<table class="panel">
+								<tr class="title-panel">
+									<td class="title">${title}</td>
+								</tr>
+							</table>`;
+				var streamBodyComponent = $('<div></div>').addClass('stream-component-body').append(track);
+					// main component
+					var downloadBtn = $('<button></button>').addClass('stream-play')
+                        .append(
+                            $('<a></a>').addClass('fa fa-download').attr('href',sourceFile).attr('download',`${sourceFile.replace(/(.*)[\/\\]/,"").replace(" ","_")}`)
+                        )
+						.on('click',function(){
+                            ipcRenderer.send('downloadsong');
+                            ipcRenderer.on('downloading',(event,args)=>{
+                                console.log(args)
+                            })
+							// alert($(this))
+						});
+
+						/* Stream component*/
+					var component = $("<div></div>").addClass("stream-component").append(componentHeader)
+					.append(streamBodyComponent).append(downloadBtn);
+					$('.stream-body').append(component);
+				}
+                streamComponent(stream.coverArt,stream.title)
+            })
+        })
+          
+    }); 
+
+    }
+    streamHot100(){
+        Axios.get(`https://www.nowviba.com/music/pages/top100.php`).then((dom)=>{
+            var response = dom.data;
+            const ch = cheerio.load(response);
+            let trackList = ch('.hot100')
+            // let trackPic = ch('img.imagefillstr');
+        trackList.map((index,element)=>{
+            // console.log()
+            let hot100 = {
+                title:`${element.children[0].children[5].children[0].children[0].data}`,
+                artist:`${element.children[0].children[5].children[1].children[0].data}`,
+                artWork:`${element.children[0].children[3].children[1].attribs.data}`,
+                url:element.children[2].children[3].children[1].attribs.src
+            }
+           
+
+				var streamComponent = function(avatar = '',title = ''){
+					var avatar = $('<img/>').attr('src',avatar).addClass('stream-component-avatar');
+					var componentHeader = $('<div></div>').addClass("stream-component-header").append(avatar);
+				// stream content body
+				var track = `<table class="panel">
+								<tr class="title-panel">
+									<td class="title">${title}</td>
+								</tr>
+							</table>`;
+				var streamBodyComponent = $('<div></div>').addClass('stream-component-body').append(track);
+					// main component
+
+						/* Stream component*/
+					var component = $("<div></div>").addClass("stream-component").append(componentHeader)
+					.append(streamBodyComponent);
+					$('.stream-body').append(component);
+				}
+                streamComponent(hot100.artWork,hot100.title);
+        })
+           
+        })
+    }
+     
 } 
 module.exports =  ZPlayer;

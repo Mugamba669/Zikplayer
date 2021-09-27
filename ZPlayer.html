@@ -5,41 +5,53 @@
     <meta charset="utf-8">
     <title>Ziki</title>
     <!-- Demo styles -->
-    <link rel="stylesheet" href='./tools/swiper-bundle.min.css'>
+    <link rel="stylesheet" href='./Designs/swiper-bundle.min.css'>
     <link rel="icon" type="image/png" href="./images/pAudio.jpeg"/>
-    <link rel="stylesheet" type="text/css" href="./tools/font-awesome-4.3.0/css/font-awesome.css"></link>
-    <link rel="stylesheet" type="text/css" href="./tools/Eq.css"></link>
-    <!-- <link rel="stylesheet" type="text/css" href="./tools/tailwind.css"></link> -->
-    <link rel="stylesheet" type="text/css" href="./tools/1ui.css"></link>
-    <link rel="stylesheet" type="text/css" href="./tools/drawer.css"></link>
+    <link rel="stylesheet" type="text/css" href="./Designs/font-awesome-4.3.0/css/font-awesome.css"></link>
+    <link rel="stylesheet" type="text/css" href="./Designs/Eq.css"></link>
+    <link rel="stylesheet" type="text/css" href="./Designs/1ui.css"></link>
+    <link rel="stylesheet" type="text/css" href="./Designs/stream-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="./Designs/drawer.css"></link>
+    <link rel="stylesheet" type="text/css" href="./Designs/main.css"></link>
+    
 </head>
 
 <body>
-    <!-- Swiper -->
-    <div class="pop-container">
-        <div class="pop-content">
-            <p>Do you want to restore your current settings?</p>
-            <button id="done">OK</button>
-            <button id="cancel">Cancel</button>
+    <!-- <div class="btns">
+        <div class="btns-header">
+            <p>More Controls</p>
         </div>
-    </div>
-
-    <div class="t-container">
-        <div class="t-content">
-            <p>Do you want to restore your current settings?</p>
-            <button id="t-done">OK</button>
-            <button id="t-cancel">Cancel</button>
+        <div class="btns-container">
+           
+            <button class="repeat-on fa fa-repeat btns-bt" id=""></button>
+            <button class="repeat-off fa fa-repeat btns-bt" id=""></button>
+            <button class="random fa fa-random btns-bt" id=""></button>
         </div>
-    </div>
-
-    <div class="r-container">
-        <div class="r-content">
-            <p>Do you want to restore your current settings?</p>
-            <button id="r-done">OK</button>
-            <button id="r-cancel">Cancel</button>
-        </div>
-    </div>
-
+    </div> -->
+   
+    <!-- Online music -->
+     <div class="streaming-conatiner">
+		<div class="streaming-cont">
+			<div class="header-search">
+				<input type="search" value="" class="search"/>
+				<button class="find">
+					<b class="fa fa-search"></b>
+				</button>
+				 hot 100 
+			     <button>
+					Hot 100
+				</button>
+				<p class="search-results"></p>
+			</div>
+			<div class="stream-body"> -- -->
+				
+				<!-- Streaming component -->
+			
+				<!----------------- -->
+			</div>
+		</div>
+	</div>
+    <!----------------- -->
     <div class="welcome-container">
         <div class="welcome-content">
             <div class="header">
@@ -82,16 +94,16 @@
     </div>
 </div>
 <!-- playlist -->
-    <div class="w3-modal w3-container plist">
 
-        <div class="w3-modal-content list">
-            <button class="fab-options fa fa-plus"></button>
-            <button class="fab-btn fa fa-arrow-right"></button>
+    <div class="plist">     
+        <div class="plist-cont">
+            <table class="plist-body"></table>
+        </div> 
+        <!-- <span class="header">Tracks ( <b class="total">0</b> </span> -->
+               
 
-        <span class="header">Tracks ( <b class="total">0</b> </span>
-
-               <table class="plist-body"></table>
-            
+               <button class="fab-options fa fa-plus"></button>
+               <button class="fab-btn fa fa-arrow-right"></button>
                 <!-- loader -->
                 <div class="loader-container">
                     <!-- loader body -->
@@ -111,7 +123,7 @@
                         <p>Loaded <b class="msg"></b></p>
                     </div>
                 </div>
-        </div>
+       
        
     </div>
 
@@ -282,20 +294,21 @@
                                 <b>Title</b>
                             </span>
                             <div class="bottom-details">
+                                <!-- <h2>                               -->
+                                <span class="dt">
                                 <span id="artist" class="artist">artist </span>
                                 <span class="separator">|</span> 
                                 <span id="album" class="album">album</span>
                                 <span class="separator2">|</span> 
                                 <span id="size"class="size">size</span> 
-
+                            </span>
+                        <!-- </h2> -->
                             </div>
                         
                     </div>
 
                         <div class="btn-container">
                             <button class="fa fa-volume-up show-vol"></button>
-                            <button class="repeat-off fa fa-repeat" id="prev"></button>
-                            <button class="repeat-on fa fa-repeat" id="prev"></button>
                             <button id="prevTrack" class="fa fa-step-backward"></button>
 
                             <button id="pause" style="cursor: pointer;" class="fa fa-pause btn-tn"></button>
@@ -304,6 +317,7 @@
                             <button class="fa fa-step-forward" id="nextTrack"></button>
                             <button class="mute-on fa fa-volume-off" id="next"></button>
                             <button class="mute-off fa fa-volume-down" id="next"></button>
+                            
 
                         </div>
                         
@@ -314,18 +328,9 @@
                         <div id="update">
                             <span class=" w3-tag w3-round time">0:00</span><span class="w3-tag w3-round total-tracks"><b class="current">0</b> / <b class="tt-T">0</b></span><span class="w3-tag w3-round time">0:00</span>
                         </div>
+                      
                     </div>
                 </div>
-                      
-                <!-- <div class="control">
-                    <button class="" id="tags">Track Info</button>
-                    <button class="" id="feedback">Feedback</button>
-                    <button class="" id="playlist">Playlist</button>
-                    <button id="visual-select">Visuals</button>
-                    <button id='add-music'>Add Music</button>
-                    <button id='lyrics-btn'>Lyrics</button>
-                    
-                </div> -->
             </div>
 <!-- Equalizer -->
             <div class="swiper-slide shade200">

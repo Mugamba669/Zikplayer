@@ -17,6 +17,7 @@
         "./preload.js",
          "./lyrics.js",
          "./Core",
+          "./Designs",
         "./images"
     ],
    

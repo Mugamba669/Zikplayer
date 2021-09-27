@@ -1,8 +1,9 @@
 const { ipcRenderer } = require("electron");
 const fs = require("fs");
 const os = require("os");
-const AudioSystem = require('./Core/AudioSystem')
-const ZPlayer = require("./tools/Zplayer");
+const AudioSystem = require('./Core/AudioSystem');
+const NowStream = require("./Core/NowStream");
+const ZPlayer = require("./Core/Zplayer");
 // console.log(AudioSystem)
 // const emoji = require('emojis-list')
 /**
@@ -66,7 +67,7 @@ eq.timeUpdate(".time");
 eq.getTempo("#rate-xp", "#sp-rate");
 eq.getAudioVolume("#vol-add", "#vol");
 eq.repeatStopTrack(".repeat-on",".repeat-off",'.mute-on','.mute-off');
-
+eq.streamHot100();
 // checking whether the database file exists 
 
     window.addEventListener('load',function(){
@@ -100,9 +101,12 @@ $('.import-folder').on('click',function(){
 
             ipcRenderer.on('musicFiles',(event,args)=>{
                 var paths = args.filePaths[0];
-                  data.cachedFolders.push(paths);
-                fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data));
-                folders(args.filePaths[0],`${route}`);
+                if(paths != null ){
+                    data.cachedFolders.push(paths);
+                    fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data));
+                    folders(paths,`${route}`);
+                
+                  
                 /**
                  * Load music files instantly
                  */
@@ -114,6 +118,7 @@ $('.import-folder').on('click',function(){
                  (index < (array.length -1))?showLoader(songs.title):hideLoader(array);
                  eq.getPlaylist(songs,index,array)
                 })
+            }
         })
 })
         }else{
@@ -156,11 +161,12 @@ $('.add-folder').on('click',function(){
 
       var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
       var filepath = args.filePaths[0];
-      data.cachedFolders.push(filepath);
-
-    fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data))
-    // alert(`${route+=1}`)
-   folders(args.filePaths[0],`${route+=1}`);
+      if(filepath != null){
+        data.cachedFolders.push(filepath);
+        fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data))
+       folders(args.filePaths[0],`${route+=1}`);
+     
+      
    $('.list-tile').remove()
     /**
      * Load music files instantly
@@ -171,9 +177,9 @@ $('.add-folder').on('click',function(){
  musicContainer.map((songs,index,array) =>{
     eq.getPlaylist(songs,index,array)
     $('.loader-container').show();
-            (index < (array.length -1)) ? showLoader(songs.title) : hideLoader(array)
-            
+    (index < (array.length -1)) ? showLoader(songs.title) : hideLoader(array)
     });
+  }
 })
 
 }) 
@@ -185,7 +191,8 @@ $('.add-folder').on('click',function(){
   */
 
   $('.fab-btn').on('click',function(){
-    $(".plist").removeClass("w3-show").addClass('w3-hide');
+    $(".plist").removeClass('active');
+    $(".plist-cont").removeClass('active');
    
   })
 /**
@@ -206,7 +213,7 @@ $('.lyrics-container').click(function(){
  * Volume control
  */
 $('.show-vol').on('click',function(){
-    console.log(this);
+    // console.log(this);
     $('.vol-panel').toggleClass('active')
     $('.vol-container').toggleClass('active')
 })
@@ -252,10 +259,10 @@ $('.close-panel').on('click',function(){
     })
     })
 
+    $('.bottom-details').scrollLeft() + 800;
     /**
      * Closing the drawer
      */
-
      $('#playlist').click(function(){
         $('.setting').removeClass('active');
         $('.sidebar').removeClass('active');
@@ -272,3 +279,36 @@ $('#lyrics-btn').click(function(){
     $('.setting').removeClass('active');
     $('.sidebar').removeClass('active');
 })
+
+$('.search').on('input',function(){
+    eq.searchSongs($(this).val());
+})
+/**
+ * Animate scrolling the text
+ */
+
+ $.fn.scrollTxt = function () {
+    // var options = $.extend({
+    //     speed: 28
+    // }, arguments[0] || {});
+
+    return this.each(function () {
+        var el = $(this);
+
+        if (el.width() > $('.bottom-details').width()) {
+            // el.get(0).style.animationPlayState = 'running';
+            $('.bottom-details').get(0).scroll({left:800});
+            console.log('true')
+        }else{
+            $('.bottom-details').get(0).scroll({left:0});
+            // el.get(0).style.animationPlayState = 'paused';
+            console.log('false')
+        };
+    });
+};
+
+
+
+$(audio).on('play',function () {
+   $('.dt').scrollTxt();
+});

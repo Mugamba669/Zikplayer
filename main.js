@@ -1,4 +1,4 @@
-const {app,Menu,ipcMain, BrowserWindow,dialog, Tray, nativeImage, nativeTheme} = require('electron');
+const {app,Menu,ipcMain, BrowserWindow,dialog, Tray, nativeImage, nativeTheme, webContents, DownloadItem} = require('electron');
 const defaultPic = require('./tools/default');
 const path = require('path');
 const os = require('os');
@@ -25,7 +25,40 @@ function createWindow () {
   })
   // and load the index.html of the app.
   // mainWindow.setIcon();
-  mainWindow.setProgressBar(0.5);
+  ipcMain.on('downloadsong',(event,args)=>{
+      mainWindow.webContents.session.on('will-download',(ent,downloadItem,webContents)=>{
+  
+      downloadItem.setSavePath(`${os.homedir()}/Music/Ziki/${downloadItem.getFilename()}`)
+      
+      downloadItem.on('updated',(e,state)=>{
+        if(state == 'interrupted'){
+          dialog.showMessageBox(mainWindow, {
+            icon:nativeImage.createFromDataURL(defaultPic.image),
+            message:"Download failed, Please check your network.",
+          });
+        } else if(state == 'progressing'){
+          event.sender.send('downloading',downloadItem.getReceivedBytes())
+          var total = downloadItem.getTotalBytes();
+          // event.sender.send('totaldownload',total)
+          mainWindow.setProgressBar(downloadItem.getReceivedBytes()/downloadItem.getTotalBytes())
+        }
+      })
+
+      downloadItem.once('done', (event, state) => {
+        if (state === 'completed') {
+         dialog.showMessageBox(mainWindow,{
+             message:"Download was successfull",
+             icon:nativeImage.createFromDataURL(defaultPic.image),
+         })
+        } else {
+          dialog.showErrorBox("Error",`Download Failed  ${state}`)
+        }
+      })
+
+  })
+
+})
+  // mainWindow.setProgressBar();
   mainWindow.loadFile(path.join(__dirname,'ZPlayer.html'));
   /**
    * Getting music folders

@@ -4,85 +4,129 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<link rel="stylesheet" type="text/css" href="./Designs/font-awesome-4.3.0/css/font-awesome.css"/>
+	<link rel="stylesheet" type="text/css" href="./Designs/stream-ui.css"/>
+	<title>Demo</title>
 	<style>
-		canvas{
-			width:100%;
-			height:100%;
-			margin:0;
-			padding:0;
-			
-		}
-		#test{
-			position:absolute;
-			z-index:1;
-		}
+		
 	</style>
 </head>
 <body>
-	<input type="file" accept="audio/mp3" id="test"/>
-	<canvas></canvas>
+	<div class="streaming-conatiner">
+		<div class="streaming-cont">
+			<div class="header-search">
+				<input type="search" value="" class="search"/>
+				<button class="find">
+					<b class="fa fa-search"></b>
+				</button>
+				<!-- hot 100 -->
+				<button>
+					Hot 100
+				</button>
+				<p class="search-results"></p>
+			</div>
+			<div class="stream-body">
+				
+				<!-- Streaming component -->
+			
+				<!----------------- -->
+			</div>
+		</div>
+	</div>
 	<script src="./tools/jquery-1.9.1.min.js"></script>
-	<script type="module">
-		import {defaultPic} from './tools/default.js'
-		$(document).ready(function(){
-			var audio = new Audio()
-			$("#test").change(function(e) {
-				var file = e.currentTarget.files[0];
-				audio.src = URL.createObjectURL(file)
-				audio.play();
-			});
-			$(audio).on('playing',function() {
-				var audioContext = new AudioContext();
-				var source = audioContext.createMediaElementSource(audio);
-				var analyser = audioContext.createAnalyser();
-				source.connect(analyser);
-				analyser.connect(audioContext.destination);
-				// analyser.fftSize = 256;
-				analyser.maxDecibels = -80;
-				analyser.maxDecibels = -10;
-				analyser.smoothingTimeConstant = 0.90
-				var renderCanvas = ()=>{
-				window.requestAnimationFrame(renderCanvas);
-				var freqDomain = new Uint8Array(analyser.frequencyBinCount);
-				analyser.getByteFrequencyData(freqDomain);
+	<script> require('./renderer')</script>
+	<script>
+		// $(document).ready(function(){
 
-				var canvas = $('canvas').get(0);
-			$(canvas).attr("width", window.innerWidth).attr('height', window.innerHeight)
-			var context = canvas.getContext("2d");
-			context.clearRect(0,0,canvas.width,canvas.height);
-			for(let i = 0;i < canvas.width;i++){
-			var value = freqDomain[i] / 400;
-			var barx = i * 4;
-			var barW = 3;
-			var height = canvas.height * value;
-			var barH = canvas.height - height - 1;
+		// 		var streamComponent = function(avatar = '',artist = '',title = ''){
+		// 			var avatar = $('<img/>').attr('src',avatar).addClass('stream-component-avatar');
+		// 			var componentHeader = $('<div></div>').addClass("stream-component-header").append(avatar);
+		// 		// stream content body
+		// 		var track = `<table class="panel">
+		// 						<tr class="title-panel">
+		// 							<td class="title">${title}</td>
+		// 						</tr>
+		// 						<tr class="artist-panel">
+		// 							<td class="artist">${artist}</td>
+		// 						</tr>
+		// 					</table>`;
+		// 		var streamBodyComponent = $('<div></div>').addClass('stream-component-body').append(track);
+		// 			// main component
+		// 			var downloadBtn = $('<button></button>').addClass('stream-play')
+		// 				.append($('<b></b>').addClass('fa fa-download'))
+		// 				.on('click',function(){
+		// 					alert($(this))
+		// 				});
 
-			var gradient = context.createLinearGradient(0,0,0,canvas.height);
-			gradient.addColorStop(0,"#9E2222");
-			gradient.addColorStop(1,"#657009");
-			context.fillStyle = gradient;
-			context.setTransform(1, 0, 0, 1, 0, 0);
-			context.translate(1250, -300);
-			context.scale(-1, 1)
-			context.fillRect(barx,barH,barW,height);
+		// 				/* Stream component*/
+		// 			var component = $("<div></div>").addClass("stream-component").append(componentHeader)
+		// 			.append(streamBodyComponent).append(downloadBtn);
+		// 			$('.stream-body').append(component);
+		// 		}
 
-			var gradient = context.createLinearGradient(1,2,1,canvas.height);
-			gradient.addColorStop(0,"#9E2222");
-			gradient.addColorStop(1,"#657009");
+		// 		for (let index = 0; index < 20; index++) {
+		// 			streamComponent("./images/pAudio.jpeg","Artist","Title")
+		// 		}
+		// })
+	// 	import {defaultPic} from './tools/default.js'
+	// 	$(document).ready(function(){
+	// 		var audio = new Audio()
+	// 		$("#test").change(function(e) {
+	// 			var file = e.currentTarget.files[0];
+	// 			audio.src = URL.createObjectURL(file)
+	// 			audio.play();
+	// 		});
+	// 		$(audio).on('playing',function() {
+	// 			var audioContext = new AudioContext();
+	// 			var source = audioContext.createMediaElementSource(audio);
+	// 			var analyser = audioContext.createAnalyser();
+	// 			source.connect(analyser);
+	// 			analyser.connect(audioContext.destination);
+	// 			// analyser.fftSize = 256;
+	// 			analyser.maxDecibels = -80;
+	// 			analyser.maxDecibels = -10;
+	// 			analyser.smoothingTimeConstant = 0.90
+	// 			var renderCanvas = ()=>{
+	// 			window.requestAnimationFrame(renderCanvas);
+	// 			var freqDomain = new Uint8Array(analyser.frequencyBinCount);
+	// 			analyser.getByteFrequencyData(freqDomain);
+
+	// 			var canvas = $('canvas').get(0);
+	// 		$(canvas).attr("width", window.innerWidth).attr('height', window.innerHeight)
+	// 		var context = canvas.getContext("2d");
+	// 		context.clearRect(0,0,canvas.width,canvas.height);
+	// 		for(let i = 0;i < canvas.width;i++){
+	// 		var value = freqDomain[i] / 400;
+	// 		var barx = i * 4;
+	// 		var barW = 3;
+	// 		var height = canvas.height * value;
+	// 		var barH = canvas.height - height - 1;
+
+	// 		var gradient = context.createLinearGradient(0,0,0,canvas.height);
+	// 		gradient.addColorStop(0,"#9E2222");
+	// 		gradient.addColorStop(1,"#657009");
+	// 		context.fillStyle = gradient;
+	// 		context.setTransform(1, 0, 0, 1, 0, 0);
+	// 		context.translate(1250, -300);
+	// 		context.scale(-1, 1)
+	// 		context.fillRect(barx,barH,barW,height);
+
+	// 		var gradient = context.createLinearGradient(1,2,1,canvas.height);
+	// 		gradient.addColorStop(0,"#9E2222");
+	// 		gradient.addColorStop(1,"#657009");
 			
-			// context.scale(-0.3,1)
-			context.fillStyle = gradient;
-			context.setTransform(1, 0, 0, 1, 0, 0);
-			context.translate(1250, 1016);// 1050, 916
-			context.scale(-1,-1);
-			context.fillRect(barx,barH,barW,height);
-			}
-		}
-				renderCanvas();
+	// 		// context.scale(-0.3,1)
+	// 		context.fillStyle = gradient;
+	// 		context.setTransform(1, 0, 0, 1, 0, 0);
+	// 		context.translate(1250, 1016);// 1050, 916
+	// 		context.scale(-1,-1);
+	// 		context.fillRect(barx,barH,barW,height);
+	// 		}
+	// 	}
+	// 			renderCanvas();
 			
-	  })
-	})
+	//   })
+	// })
 	
 
 	</script>

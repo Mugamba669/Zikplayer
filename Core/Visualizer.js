@@ -7,7 +7,8 @@ const $ = require('jquery');
 module.exports = class Visualizer{
     constructor(analyser,canvas) {
         this.analyser = analyser;
-        this.canvas = canvas;
+        this.cs = canvas;
+        this.canvas = document.querySelector(this.cs);
         this.context = this.canvas.getContext('2d');
         this.bufferLength = this.analyser.frequencyBinCount;
         this.freqDomain = new Uint8Array(this.bufferLength);
@@ -20,8 +21,8 @@ module.exports = class Visualizer{
          window.requestAnimationFrame(renderCanvas);
             this.analyser.getByteFrequencyData(this.freqDomain)
 
-            $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight)
-            window.onresize = ()=>  $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
+            $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight)
+            window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
         /**
          *Lets start by clearing the canvas
          */
@@ -55,8 +56,8 @@ renderCanvas()
             window.requestAnimationFrame(renderDusty);
             this.analyser.getByteTimeDomainData(this.freqDomain)
                this.analyser.getByteFrequencyData(this.freqDomain)
-               $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight)
-               window.onresize = ()=>  $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
+               $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight)
+               window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
            /**
             *Lets start by clearing the canvas
             */
@@ -192,29 +193,27 @@ renderCanvas()
         window.requestAnimationFrame(renderUpDownFrame);
            var freqDomain = new Uint8Array(this.analyser.frequencyBinCount);
           this.analyser.getByteFrequencyData(freqDomain);
-           //analyser.getByteTimeDomainData(freqDomain);
           
            $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
            window.onresize = ()=>  $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        //    this.context.fillStyle = '#CF94F1';
-           for(let i = 0;i < this.canvas.width;i++){
-			var value = freqDomain[i] / 400;
-			var barx = i * 4;
-			var barW = 3;
+           for(let i = 0;i < this.bufferLength;i++){
+			var value = freqDomain[i*2] / 400;
+			var barx = i * 5.5;
+			var barW = 2;
 			var height = this.canvas.height * value;
 			var barH = this.canvas.height - height - 1;
 
 		// Up frame
 			this.context.fillStyle = "#E8F572";
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
-			this.context.translate(1250, -400);
+			this.context.translate(1300, -400);
 			this.context.scale(-1, 1)
 			this.context.fillRect(barx,barH,barW,height);
             // down frame
-			this.context.fillStyle = "#E2EE74";
+			this.context.fillStyle = "#E8F572";
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
-			this.context.translate(1250, 1080);// 1050, 916
+			this.context.translate(1300, 1080);// 1050, 916
 			this.context.scale(-1,-1);
 			this.context.fillRect(barx,barH,barW,height);
 			}
@@ -233,14 +232,14 @@ renderCanvas()
     var context;
     // creating spiral visualizer
     visuals.forEach(elem => {
-        context = elem.getContext("2d");
+        context = $(elem).get(0).getContext("2d");
         $(elem).attr("width",window.innerWidth ).attr("height",window.innerHeight/2);
         window.onresize = ()=>  $(elem).attr("width",window.innerWidth).attr("height",window.innerHeight/2);
        var WIDTH = elem.width;
        var HEIGHT = elem.height;
         context.clearRect(0, 0, WIDTH, HEIGHT);
        
-        context.fillStyle = "#FA91C6";
+        context.fillStyle = "#FFB28F";
         for (let index = 0; index < WIDTH; index++) {
             var barX = index * 3;
             var barWidth = 2;
@@ -260,18 +259,17 @@ spiralVisual()
     this.analyser.getByteFrequencyData(this.freqDomain);
     
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.context.strokeStyle = '#85B6EE';
-    for (var i = 0; i < this.bufferLength ; i++) {
-        var barWidth = i * 4;
-        var barX = 3;
-        var percent = this.freqDomain[i] / 227;
+    this.context.strokeStyle = '#85EE8A';
+    for (var i = 0; i < this.bufferLength / 5 ; i++) {
+        var barWidth = i * 12;
+        var barX = 7.5;
+        var percent = this.freqDomain[i] / 327;
         var height = (this.canvas.height * percent);
         var barHeight = this.canvas.height - height - 1;
         this.context.strokeRect(barWidth, barHeight, barX, height);
     }
      }
-   glassPills()
-
+   glassPills();
    }
 
 }
