@@ -3,12 +3,32 @@
  * @ Mugamba Bruno 2021
  */
 const $ = require('jquery');
+const EqKnobs = require('../Plugins/Eq-knobs');
 const Visualizer = require('./Visualizer');
 
 class AudioEngine{
     constructor(audio = {}){
         this.bst = 0;
+        this.globalBass = 0;
+        this.globalBBoost = 0;
+        this.globalStereo = 0;
+        this.globalTreb = 0;
+      
+        this.si1 = null
+        this.dy2 = null
+        this.si2 = null;
         this.audio  = audio;
+        this.changeColor = (value = 0)=>{
+            if(value < 20){
+                return "#88ff88";
+            }else if(value < 40 ){
+        
+            }else if(value < 60){
+                return "#567CE4";
+            }else if(value < 101){
+                return "#FF0101";
+            }
+        }
         this.audioCtx = new AudioContext();
         this.source = this.audioCtx.createMediaElementSource(this.audio);
         this.analyser = this.audioCtx.createAnalyser();
@@ -62,43 +82,6 @@ class AudioEngine{
         this.stereo.connect(this.analyser);
         this.analyser.connect(this.audioCtx.destination);
 
-      /* Visualisser */
-        this.visualizer = new Visualizer(this.analyser,'.canvas-full')
-        var that = this;
-            // this.visualizer.barsVisualiser();
-        $(".body p").eq(0).click(function() {
-        that.visualizer.barsVisualiser();
-        })
-
-        $(".body p").eq(2).click(function() {
-        that.visualizer.choroFloroVisualiser();
-        })
-
-        $(".body p").eq(1).click(function() {
-        that.visualizer.dustyParticles();
-        });
-
-        $(".body p").eq(6).click(function() {
-        that.visualizer.glassTilesVisualiser();
-        })
-
-        $(".body p").eq(5).click(function() {
-        that.visualizer.historgramVisualiser();
-        })
-
-        $(".body p").eq(7).click(function() {
-        that.visualizer.ripleWaveVisualiser()
-        })
-
-        $(".body p").eq(4).click(function() {
-        that.visualizer.sineWaveVisualiser();
-        });
-
-        $(".body p").eq(3).click(function() {
-        that.visualizer.spiralVisualiser(".sp1");
-        })
-        /*=============================================*/
-
         this.stereo.type = 'highpass';
         this.bass.type = 'lowpass';
   
@@ -126,33 +109,178 @@ class AudioEngine{
         this.rightGain = this.audioCtx.createGain();
         this.midGain = this.audioCtx.createGain();
         //     
-
+        this.dy1 = (value)=>{
+           return new EqKnobs({
+                initialValue:value,
+                minValue:0,
+                maxValue:1.6,
+                size:140,
+                trackWidth:0.4,
+                trackColor:'#ccff00'
+            });
+        }
+        this.eqsw = false;
         new WebkitInputRangeFillLower({
             selectors: 'treb-boost',
             color: '#63cdff'
         });
 
+       
+
+          /* Visualisser */
+          try {
+            $(".canvas-full").hide();
+            $(".sp1").hide();
+            } catch (error) {
+                console.log(error)
+            }
+
+        this.visualizer = new Visualizer(this.analyser,'.canvas-full')
+        var that = this;
+            // this.visualizer.barsVisualiser();
+        $(".visual-table tr").eq(0).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.barsVisualiser();
+        })
+
+        $(".visual-table tr").eq(2).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.choroFloroVisualiser();
+        });
+
+        $(".visual-table tr").eq(1).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+             that.visualizer.dustyParticles();
+        });
+
+        $(".visual-table  tr").eq(6).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.glassTilesVisualiser();
+        });
+
+        $(".visual-table  tr").eq(5).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.historgramVisualiser();
+        })
+
+        $(".visual-table  tr").eq(7).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.ripleWaveVisualiser()
+        })
+
+        $(".visual-table  tr").eq(8).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.colorstetchVisualiser()
+        })
+
+        $(".visual-table  tr").eq(4).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.sineWaveVisualiser();
+        });
+
+        $(".visual-table  tr").eq(3).on('click',function() {
+            $(".canvas-full").hide();
+            $(".sp1").show();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.spiralVisualiser(".sp1");
+        })
+
+        $(".visual-table  tr").eq(9).on('click',function() {
+            $(".canvas-full").show();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+            that.visualizer.floatingBars();
+        })
+
+        $(".visual-table  tr").eq(10).on('click',function() {
+            $(".canvas-full").hide();
+            $(".sp1").hide();
+            $('.Visualbox .body').removeClass('active')
+            $('.Visualbox').removeClass('active')
+        })
+        /*=============================================*/
         /**
+         * Enable Eq settings
+         */
+        $(".tune-on-eq").on('change',() => {
+            if($(".tune-on-eq").get(0).checked  == true){
+                this.eqsw = true;
+                $('#eqns').attr('disabled',false);
+                // this.source.diconnect(this.analyser)
+                // this.analyser.disconnect(this.audioCtx.destination);
+
+                this.source.connect(this.treble)
+                this.treble.connect(this.compressor);
+                this.compressor.connect(this.audioBoost);
+                this.audioBoost.connect(this.balance);
+                this.balance.connect(this.analyser);
+                this.analyser.connect(this.audioCtx.destination);
+                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
+            }else{
+                // bassDisCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
+                this.eqsw = false;
+                $('#eqns').attr('disabled',true);
+                this.source.disconnect(this.treble)
+                this.treble.disconnect(this.compressor);
+                this.compressor.disconnect(this.audioBoost);
+                this.audioBoost.disconnect(this.balance);
+                this.balance.disconnect(this.analyser);
+                this.analyser.disconnect(this.audioCtx.destination);
+
+                this.source.connect(this.analyser)
+                this.analyser.connect(this.audioCtx.destination);
+            }
+        });
+         /**
          * connections
          */
-        this.source.connect(this.treble)
-         this.treble.connect(this.compressor);
-         this.compressor.connect(this.audioBoost);
-         this.audioBoost.connect(this.balance);
-         this.balance.connect(this.analyser);
-         this.analyser.connect(this.audioCtx.destination);
+          this.source.connect(this.analyser)
+          this.analyser.connect(this.audioCtx.destination);
          // --Analyser settings
          this.analyser.fftSize = 1024;
-         this.analyser.minDecibels = -80;
-         this.analyser.maxDecibels = -10;
-         this.analyser.smoothingTimeConstant = 0.90; 
+         this.analyser.minDecibels = -90;
+         this.analyser.maxDecibels = 0;
+         this.analyser.smoothingTimeConstant = 0.88; 
     }
     tuneStereo(selector){
-        var valueSt = 0,that =this;
-        $(selector).on('input',function(){
-            valueSt = $(this).val();
-            $("#st-out").text(parseFloat(valueSt));
-            that.St_treble_boost.gain.value = valueSt;
+        var that =this;
+       new EqKnobs({
+        trackColor:"#D4E069",
+        size:110,
+        trackWidth:0.3,
+        initialValue:this.globalStereo,
+        minValue:0,
+        bgColor:'#333333',
+        maxValue:5,
+       }).knobControl(selector,(knob,output)=>{
+            $("#st-out").text((output).toFixed(2));
+            that.St_treble_boost.gain.value = output;
             that.source.connect(that.St_treble)
             that.St_treble.connect(that.St_treble_boost)
             that.St_treble_boost.connect(that.analyser)
@@ -167,17 +295,18 @@ class AudioEngine{
                 this.treble.type = 'peaking';
                 this.treble.frequency.value = 2000;
                 // stereo.frequency.value = 0.60;
-                $("#bass").val(20);
                 $('#bb2').text(Math.floor(parseFloat(1.4).toFixed(1)) + ' dB');
                 $('#bb1').text(Math.floor(parseFloat(20).toFixed(1)) + ' dB');
-                $("#treb-boost").val(0.60);
-                $("#bass-boost").val(1.4);
+                this.globalTreb = 0.60;
+               this.globalBBoost = 1.4;
+               this.globalBass = 20;
+               this.globalStereo = 0;
                 this.bst = 1.4;
                 $('#tb2').text(parseFloat(0.6).toFixed(3) + ' dB');
                 this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
                 $('#threshold').val(0);
                 $('#threshold-v').text(0);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser)
+                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser)
                 break;
 
             case 'rnb':
@@ -189,16 +318,18 @@ class AudioEngine{
                 this.bass.frequency.value = 58;
                 // bass.gain.value = 15;
                this.bassBoost.gain.setValueAtTime(2.0, this.audioCtx.currentTime);
-                $("#bass-boost").val(2.0);
+
+               this.globalTreb = 0.8;
+               this.globalBBoost = 2.0;
+               this.globalBass = 58;
+               this.globalStereo = 0;
                 this.bst = 2.0;
-                $("#treb-boost").val(0.80);
-                $("#bass").val(58);
                 $('#bb2').text(Math.floor(parseFloat(2.0).toFixed(1)) + ' dB');
                 $('#bb1').text(Math.floor(parseFloat(58).toFixed(1)) + ' dB');
                 $('#tb2').text(parseFloat(0.8).toFixed(3) + ' dB');
                 $('#threshold').val(-58.4)
                 $('#threshold-v').text(-58.4);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
+                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
                 break;
 
             case 'dance':
@@ -214,23 +345,31 @@ class AudioEngine{
                 this.bass.frequency.value = 46;
                 this.bassBoost.gain.setValueAtTime(2.7, this.audioCtx.currentTime);
                 $('#bb2').text(Math.floor(parseFloat(2.7).toFixed(2)) + ' dB');
-                $("#bass-boost").val(1.4);
+    
                   this.bst = 2.7;
-                $("#bass").val(46);
+                  this.globalTreb = 0.50;
+                  this.globalBBoost = 1.4;
+                  this.globalBass = 46;
+                  this.globalStereo = 0;
                 $('#bb1').text(Math.floor(parseFloat(50).toFixed(1)) + ' dB');
                 $('#tb2').text(parseFloat(0.5).toFixed(3) + ' dB');
                 $('#threshold').val(0);
                 $('#threshold-v').text(0);
-                new WebkitInputRangeFillLower({
-                    selectors: ["bass","threshold","bass-boost","treb-boost"],
-                    color: '#63cdff'
-                });
-            
-                this.source.connect(this.bassBoost);
+
+            if(this.eqsw == true){
+                 this.source.connect(this.bassBoost);
                 this.bassBoost.connect(this.bass);
                 this.bass.connect(this.dance);
                 this.dance.connect(this.analyser);
                 this.analyser.connect(this.audioCtx.destination);
+            }else{
+                this.source.disconnect(this.bassBoost);
+                this.bassBoost.disconnect(this.bass);
+                this.bass.disconnect(this.dance);
+                this.dance.disconnect(this.analyser);
+                this.analyser.disconnect(this.audioCtx.destination);
+            }
+               
                 break;
 
             case 'reg':
@@ -239,17 +378,20 @@ class AudioEngine{
                 this.bass.frequency.value = 35;
                 // bass.Q.value = 7;
                 this.bassBoost.gain.setValueAtTime(4.0, this.audioCtx.currentTime);
-                $("#treb-boost").val(0.49);
                 this.stereo.frequency.value = 0.49;
-                $("#bass").val(35);
+        
                 this.bst = 4.0;
+                this.globalTreb = 0.49;
+                this.globalBBoost = 4.0;
+                this.globalBass = 35;
+                this.globalStereo = 0;
                 $('#bb2').text(Math.floor(parseFloat(4.0).toFixed(1)) + ' dB');
                 $("#bass-boost").val(parseFloat(4.0).toFixed(1) + ' dB');
                 $('#tb2').text(parseFloat(0.49).toFixed(2) + ' dB');
                 this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
                 $('#threshold').val(0)
                 $('#threshold-v').text(0);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
+               
                 break;
 
             case 'bass':
@@ -258,18 +400,20 @@ class AudioEngine{
                 this.bass.frequency.value = 55;
                 // bass.Q.value = 3;
                 this.bassBoost.gain.setValueAtTime(2.5, this.audioCtx.currentTime);
-                $("#treb-boost").val(0.70);
+                
                 this.stereo.frequency.value = 0.70;
-                $("#bass").val(55);
+               
                 this.bst = 2.5;
+                this.globalTreb = 0.70;
+                this.globalBBoost = 2.5;
+                this.globalBass = 55;
+                this.globalStereo = 0;
                 $('#bb2').textContent = Math.floor(parseFloat(3.5).toFixed(1)) + ' dB';
-                $("#bass-boost").val(2.5);
+
                 $('#bb1').text(Math.floor(parseFloat(58).toFixed(1)) + ' dB');
              
                 $('#tb2').text(parseFloat(0.7).toFixed(3) + ' dB');
-                $('#threshold').val(0);
-                $('#threshold-v').text(0);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
+                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
                 break;
 
             case 'flat':
@@ -279,35 +423,42 @@ class AudioEngine{
                 // this.stereo.frequency.value = 
                 this.bassBoost.gain.setValueAtTime(1.0, this.audioCtx.currentTime);
                 $('#bb2').text(Math.floor(parseFloat(1.0).toFixed(1)) + ' dB');
-                $("#bass-boost").val(1.0);
+                
                 this.bst = 1.0;
-
-                $("#bass").val(20);
+                this.globalTreb = 0.60;
+                this.globalBBoost = 1.0;
+                this.globalBass = 20;
+                this.globalStereo = 0;
+                
                 $('#bb1').text(Math.floor(parseFloat(30).toFixed(1)) + ' dB');
                
                 $('#tb2').text(parseFloat(1).toFixed(3) + ' dB');
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx ,this.analyser);
+                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx ,this.analyser);
                 break;
 
             case 'rock':
                 this.treble.type = 'bandpass';
                 this.bass.frequency.value = 53;
                 this.treble.frequency.value = 1800;
-                $("#bass-boost").val(2.59);
+               
                 this.bassBoost.gain.setValueAtTime(2.59, this.audioCtx.currentTime);
                 $('#bb2').text(Math.floor(parseFloat(2.59).toFixed(1)) + ' dB');
 
-                $("#bass").val(53);
+
                 $('#bb1').text(Math.floor(parseFloat(75).toFixed(1)) + ' dB');
               
                 $('#tb2').text(parseFloat(0.5).toFixed(3) + ' dB');
-                $("#treb-boost").val(0.50);
+             
                 this.stereo.frequency.value = 0.50;
                 this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
                 this.bst = 2.59;
                 $('#threshold').val(0)
                 $('#threshold-v').text(0);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
+                this.globalTreb = 0.50;
+                this.globalBBoost = 2.59;
+                this.globalBass = 53;
+                this.globalStereo = 0;
+                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
                 break;
 
             case 'heavy':
@@ -329,7 +480,7 @@ class AudioEngine{
                 this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
                 $('#threshold').val(0)
                 $('#threshold-v').text(0);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
+                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
                 break;
 
             case 'vocal':
@@ -339,19 +490,22 @@ class AudioEngine{
                 $('#bb2').text(Math.floor(parseFloat(0).toFixed(1)) + ' dB');
 
                 this.treble.frequency.value = 2000;
-                $("#bass").val(0);
-                $("#bass-boost").val(0);
+        
                 this.bst = 0;
+                this.globalTreb = 1.8;
+                this.globalBBoost = 0;
+                this.globalBass = 0;
+                this.globalStereo = 0;
                 $('#bb1').text(Math.floor(parseFloat(0).toFixed(1)) + ' dB');
                
                 $('#tb2').textContent = parseFloat(1.8).toFixed(2) + ' dB';
              
-                $("#treb-boost").val(1.8);
+               
                 this.stereo.frequency.value = 1.8;
                this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
                 $('#threshold').val(0)
                 $('#threshold-v').text(0);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
+                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
                 break;
 
             case 'pop':
@@ -359,46 +513,64 @@ class AudioEngine{
                 this.bass.frequency.value = 70;
                this.treble.Q.value = 1;
                this.treble.frequency.value = 600;
-                $("#treb-boost").val(0.7);
+                
                 this.stereo.frequency.value = 0.7;
                 this.bassBoost.gain.setValueAtTime(2.0, this.audioCtx.currentTime);
-                $("#bass").val(70);
+             
                 this.bst = 2.0;
-                $("#bass-boost").val(2.0);
+                this.globalTreb = 0.70;
+                this.globalBBoost = 2.0;
+                this.globalBass = 70;
+                this.globalStereo = 0;
+                
                 $('#bb2').text(Math.floor(parseFloat(2.0).toFixed(1)) + ' dB');
 
                 $('#bb1').text(Math.floor(parseFloat(70).toFixed(1)) + ' dB');
                 
                 $('#tb2').textContent = parseFloat(0.7).toFixed(3) + ' dB';
-                $("#treb-boost").val(0.7);
+              
                 this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
                  $('#threshold').val(0)
                  $('#threshold-v').text(0);
-                 bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
+                //  bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
                 break;
         }
     }
     tuneBass(selector){
-        var b1 = 30,
-        that = this;
-
     // from user 
-    $(selector).on('input', function(){
-            $('#bb1').text(Math.floor(parseFloat(this.value).toFixed(1)) + ' dB');
-            that.bass.frequency.setValueAtTime(this.value, that.audioCtx.currentTime);
-        })
-        // initial values 
-    $('#bb1').text(Math.floor(parseFloat(b1).toFixed(1)) + ' dB');
+       
+ new EqKnobs({
+        trackColor:"#88ff88",
+        size:120,
+        trackWidth:0.45,
+        initialValue:this.globalBass,
+        bgColor:'#333333',
+        minValue:0,
+        maxValue:120,
+    }).knobControl(selector,(knob,output)=>{
+        //   console.log('bass '+output)
+            $('#bb1').text((output).toFixed(1) + ' dB');
+            // this.changeColor(knobs.)
+            this.bass.frequency.setValueAtTime(output, this.audioCtx.currentTime);
+    });
     }
 
     tuneMidVocal(selector){
         this.treble.type = 'peaking';
         this.treble.frequency.value = 2000;
-        var that = this;
-        $(selector).on('input',function() {
-            $('#tb2').text(parseFloat($(this).val()).toFixed(3) + ' dB');
-             that.trebleBoost.gain.setValueAtTime($(this).val(), that.audioCtx.currentTime);
-         })
+
+       new EqKnobs({
+            trackColor:"#D4E069",
+            size:110,
+            trackWidth:0.3,
+            initialValue:this.globalTreb,
+            minValue:0,
+            bgColor:'#333333',
+            maxValue:4,
+        }).knobControl(selector,(knob,output)=>{
+            $('#tb2').text((output.toFixed(2))+ ' dB');
+            this.trebleBoost.gain.setValueAtTime(output, this.audioCtx.currentTime);
+        })
     }
 
     /**
@@ -408,36 +580,49 @@ class AudioEngine{
      */
     tuneBassBooster(selector){
     //-------Initials 
-    var that = this;
     $('#bb2').text(parseFloat(2.0).toFixed(2) + ' dB');
     this.bassBoost.gain.value = 2.0;
 
-    $(selector).on('input',function(){
-        $('#bb2').text(parseFloat(this.value).toFixed(2) + ' dB');
-        that.bst = parseFloat(this.value).toFixed(2) + ' dB';
-        that.bassBoost.gain.setValueAtTime($(this).val(), that.audioCtx.currentTime);
-        var val = parseInt(this.value);
-        nodeSwitch(val, that.source, that.bassBoost);
-    });
-
-    var nodeSwitch = function(value, a, b) {
+    var nodeSwitch = (value, a, b) => {
         switch (value) {
             case 0:
                 a.disconnect(b);
-                b.disconnect(that.bass);
-                a.connect(that.bass);
-                that.bass.connect(that.analyser);
-                that.analyser.connect(that.audioCtx.destination);
+                b.disconnect(this.bass);
+                a.connect(this.bass);
+                this.bass.connect(this.analyser);
+                this.analyser.connect(this.audioCtx.destination);
                 break;
 
             default:
                 a.connect(b);
-                b.connect(that.bass);
-                that.bass.connect(that.analyser);
-                that.analyser.connect(that.audioCtx.destination);
+                b.connect(this.bass);
+                this.bass.connect(this.analyser);
+                this.analyser.connect(this.audioCtx.destination);
                 break;
         }
     }
+        let bbvalue = parseFloat($('#bb2').text());
+     new EqKnobs({
+        trackColor:"#88ff88",
+        size:120,
+        trackWidth:0.45,
+        bgColor:'#333333',
+        initialValue:bbvalue,
+        value:this.globalBBoost,
+        minValue:0,
+        maxValue:4,
+    }).knobControl(selector, (knob,value)=>{
+        $('#bb2').text((value).toFixed(2) + ' dB');
+        this.bst = (value) + ' dB';
+        this.bassBoost.gain.setValueAtTime(value, this.audioCtx.currentTime);
+        if(this.eqsw == true){
+            nodeSwitch(value, this.source, this.bassBoost);
+        }
+      
+    });
+   
+      
+    
     }
     /**
      * This method aids in tunning the audio compressions
@@ -445,50 +630,96 @@ class AudioEngine{
     tuneCompressor(selector){
         var inputs = document.querySelectorAll(selector);
         var that = this;
-        $(inputs).each(function(index,dom){
+        $(inputs).each((index,dom) => {
             switch (index) {
                 case 2:
                     // $(dom).val()
-                    $(dom).on('input',function(){
-                        $('#knee-v').text(parseFloat($(this).val()).toFixed(1) + ' dB');
-                        that.compressor.attack.setValueAtTime($(this).val(),that.audioCtx.currentTime); //(0->1)
+                    new EqKnobs({
+                            trackColor:"red",
+                            trackWidth:0.4,
+                            bgColor:"#222",
+                            initialValue:0.003,
+                            maxValue:1,
+                            size:140,
+                            minValue:0,
+                        }).knobControl(dom,(knob,value)=>{
+                        $('#attack-v').text(parseFloat(value).toFixed(1) + ' dB');
+                        this.compressor.attack.setValueAtTime(value,this.audioCtx.currentTime); //(0->1)
                     })
                 break;
                 
                 case 0:
-                    $(dom).on('input',function(){
-                        $('#threshold-v').text(parseFloat($(this).val()).toFixed(1) + ' dB');
-                        that.compressor.threshold.setValueAtTime($(this).val(),that.audioCtx.currentTime);//(0-> -100)
-                    })
+                    new EqKnobs({
+                        trackColor:"#73EEE8",
+                        trackWidth:0.4,
+                        bgColor:"#222",
+                        initialValue:0,
+                        maxValue:0,
+                        size:140,
+                        minValue:-100,
+                    }).knobControl(dom,(knob,value)=>{
+                        $('#threshold-v').text(parseFloat(value).toFixed(1) + ' dB');
+                        this.compressor.threshold.setValueAtTime(value,this.audioCtx.currentTime);//(0-> -100)
+                })
+
                 break;
 
                 case 1:
-                    $(dom).on('input',function(){
-                        $('#knee-v').text(parseFloat($(this).val()).toFixed(1) + ' dB');
-                        that.compressor.knee.setValueAtTime($(this).val(),that.audioCtx.currentTime);//(0 -> 40)
-                    })
+                    
+                    new EqKnobs({
+                        trackColor:"#8D60F8E7",
+                        trackWidth:0.4,
+                        bgColor:"#222",
+                        initialValue:20,
+                        maxValue:30,
+                        size:140,
+                        minValue:0,
+                    }).knobControl(dom,(knob,value)=>{
+                        $('#knee-v').text(parseFloat(value).toFixed(1) + ' dB');
+                        this.compressor.knee.setValueAtTime(value.toFixed(2),this.audioCtx.currentTime);//(0 -> 40)
+                })
                 break;
                 
                 case 4:
-                    $(dom).on('input',function(){
-                        $('#ratio-v').text(parseFloat($(this).val()).toFixed(1) + ' dB');
-                        that.compressor.ratio.setValueAtTime($(this).val(),that.audioCtx.currentTime);//( 1-> 20)
-                    })
+                    
+                    new EqKnobs({
+                        trackColor:"#65D14A",
+                        trackWidth:0.4,
+                        bgColor:"#222",
+                        initialValue:12,
+                        maxValue:20,
+                        size:140,
+                        minValue:1,
+                    }).knobControl(dom,(knob,value)=>{
+                      
+                        $('#ratio-v').text(parseFloat(value).toFixed(1) + ' dB');
+                        this.compressor.ratio.setValueAtTime(value.toFixed(2),this.audioCtx.currentTime);//( 1-> 20)
+                })
                 break;
 
                 case 3:
-                    $(dom).on('input',function(){
-                        $('#release-v').text(parseFloat($(this).val()).toFixed(1) + ' dB');
-                        that.compressor.release.setValueAtTime($(this).val(),that.audioCtx.currentTime);//(0-> 1)
-                    });
+                    new EqKnobs({
+                        trackColor:"#D1C44A",
+                        trackWidth:0.4,
+                        bgColor:"#222",
+                        initialValue:0.25,
+                        maxValue:1,
+                        size:140,
+                        minValue:0,
+                    }).knobControl(dom,(knob,value)=>{
+                        $('#release-v').text(parseFloat(value).toFixed(2) + ' dB');
+                        this.compressor.release.setValueAtTime(value,this.audioCtx.currentTime);//(0-> 1)
+                })
                 break;
             }
         })
     }
-    tuneRoomOptions(options){
+    tuneRoomOptions(selector){
 
-        var d1, d2, s1, s2,that = this;
-        switch (options) {
+        var d1 = 0, d2 = 0, s1 = 0, s2 = 0,that = this;
+        
+        $(selector).on('input',()=> {
+        switch ($(selector).val()) {
             case 'echo':
                 d1 = 0.11;
                 s1 = 0.36;
@@ -555,7 +786,50 @@ class AudioEngine{
             default:
                 roomDefault();
                 break;
+
         }
+        
+    })
+    that.dy1(d1).knobControl('.dy1',(knob,value)=>{
+        $("#d1").text(value.toFixed(2)+ ' dB');
+         this.delay1.delayTime.setValueAtTime(value,this.audioCtx.currentTime)
+       })
+           new EqKnobs({
+            initialValue:d2,
+            minValue:0,
+            maxValue:1.6,
+            size:140,
+            trackWidth:0.4,
+            trackColor:'#ccff00'
+        }).knobControl('.d2',(knob,value)=>{
+         $("#d2").text(value.toFixed(2)+ ' dB');
+          this.delay1.delayTime.setValueAtTime(value,this.audioCtx.currentTime)
+        })
+
+        new EqKnobs({
+            initialValue:s1,
+            minValue:0,
+            maxValue:1.5,
+            size:140,
+            trackWidth:0.4,
+            trackColor:'#ccff00'
+        }).knobControl('.s1',(knob,value)=>{
+         $("#s1").text(value.toFixed(2)+ ' dB');
+          this.size1.gain.setValueAtTime(value,this.audioCtx.currentTime)
+        })
+
+        new EqKnobs({
+            initialValue:s2,
+            minValue:0,
+            maxValue:1.5,
+            size:140,
+            trackWidth:0.4,
+            trackColor:'#ccff00'
+        }).knobControl('.s2',(knob,value)=>{
+         $("#s2").text(value.toFixed(2) + ' dB');
+          this.size2.gain.setValueAtTime(value,this.audioCtx.currentTime)
+        })
+
         /**
          * Helper methods
          */
@@ -596,21 +870,23 @@ class AudioEngine{
     
            $("#r-effects").val('None');
             /*-------------Styling siders on change*/
-            new WebkitInputRangeFillLower({
-                selectors: ["s1-v", "s2-v", "d1-v", "d2-v"],
-                color: '#63cdff'
-            });
+            // new WebkitInputRangeFillLower({
+            //     selectors: ["s1-v", "s2-v", "d1-v", "d2-v"],
+            //     color: '#63cdff'
+            // });
         }
     
         //Update RoomEffects sliders
         function updateREffects(a, b, c, d) {
-            $("#d1-v").val(a);
+            let pos = 0;
+            // $("#d1-v").val(a);
+           
             $("#d1").text(a + ' dB');
-            $("#d2-v").val(b);
+            // $("#d2-v").val(b);
             $("#d2").text(b + ' dB');
-            $("#s1-v").val(c);
+            // $("#s1-v").val(c);
             $("#s1").text(a + ' dB');
-            $("#s2-v").val(d);
+            // $("#s2-v").val(d);
             $("#s2").text(d + ' dB');
             //Echo Values
             that.echo.delayTime.value = a;
@@ -622,121 +898,85 @@ class AudioEngine{
             that.size1.gain.value = c;
             that.size2.gain.value = d;
             //-------------Styling siders on change
-            new WebkitInputRangeFillLower({
-                selectors: ["s1-v", "s2-v", "d1-v", "d2-v"],
-                color: '#63cdff'
-            });
+            // new WebkitInputRangeFillLower({
+            //     selectors: ["s1-v", "s2-v", "d1-v", "d2-v"],
+            //     color: '#63cdff'
+            // });
         }
     }
     tuneRoomEffects(selectors){
 
         var inputs = document.querySelectorAll(selectors);
         var that = this;
-        $(inputs).each(function(index,domElement){
+        $(inputs).each((index,domElement) => {
             switch (index) {
-                case 0:
-                    // $(domElement).val(0.5)
-                    $(domElement).on('input',function(){
-                        $("#d1").text($(this).val()+ ' dB');
-                        that.delay1.delayTime.setValueAtTime($(this).val(),that.audioCtx.currentTime)
-                    })
-                    break;
-
-                    case 1:
-                        // $(domElement).val(0.6)
-                        $(domElement).on('input',function(){
-                            $("#s1").text($(this).val()+ ' dB');
-                        that.size1.gain.setValueAtTime($(this).val(),that.audioCtx.currentTime)
-                            
-                        })
-                        break;
-
                         case 3:
-                            // $(domElement).val(0.6)
-                            $(domElement).on('input',function(){
-                            $("#s2").text($(this).val()+ ' dB');
-                        that.size2.gain.setValueAtTime($(this).val(),that.audioCtx.currentTime)
-                                
-                            })
+                           
                             break;
             
-                            case 3:
-                                // $(domElement).val(0.5)
-                                $(domElement).on('input',function(){
-                                    $("#d2").text($(this).val() + ' dB');
-                        that.delay2.delayTime.setValueAtTime($(this).val(),that.audioCtx.currentTime)
-                                })
+                            case 2:
+                              
                                 break;
             }
         })  
     }
-    tuneRoomSwitch(){
+    tuneRoomSwitch(selector){
          /*
      *Room Effects
      *
      */
     /*   Effects switch on
      */
-       let that = this;
-    $(".off").click(function() {
-        console.log(this)
-        $(this).hide();
-        $(".on").show();
-            effectsOn(that.source, that.splitter, that.merger, that.audioCtx) 
-            // effectsOff(source, splitter, merger, audioCtx);
-        })
-        $(".on").click(function() {
-            $(this).hide();
-            $(".off").show();
-                // effectsOn(source, splitter, merger, audioCtx) 
-                effectsOff(that.source, that.splitter, that.merger, that.audioCtx);
-            })
-        
-/**
- * 
- * @param {Helpers} source 
- * @param {*} splitter 
- * @param {*} merger 
- * @param {*} audioCtx 
- */
-
+       
         function effectsOff(source, splitter, merger, audioCtx) {
             source.disconnect(splitter);
             merger.disconnect(audioCtx.destination);
-            $("#d1-v").attr('disabled', true);
-            $("#d2-v").prop('disabled', true);
-            $("#s1-v").prop('disabled', true);
-            $("#s2-v").prop('disabled', true);
+            $('.switch-label').text('off');
             $("#r-effects").prop('disabled', true);
-            $("#tx").text("Off");
         }
 
         function effectsOn(source, splitter, merger, audioCtx) {
             source.connect(splitter);
-            merger.connect(audioCtx.destination);
-            $("#d1-v").attr('disabled', false);
-            $("#d2-v").prop('disabled', false);
-            $("#s1-v").prop('disabled', false);
-            $("#s2-v").prop('disabled', false);
-            $("#tx").text("On");
+            merger.connect(audioCtx.destination)
+            $('.switch-label').text('on');
             $("#r-effects").prop('disabled', false);
         }
+
+
+        $(selector).on('change',() => {       
+                $(selector).get(0).checked?
+                effectsOn(this.source, this.splitter, this.merger, this.audioCtx):
+                effectsOff(this.source, this.splitter, this.merger, this.audioCtx);
+       })
     }
     tuneAudioBalance(selector){
-        var that = this;
-        $(selector).on('input',function(){
-            $('#bal').text(parseFloat(this.value).toFixed(1) + ' dB');
-            that.balance.pan.setValueAtTime($(this).val(),that.audioCtx.currentTime);
+        new EqKnobs({
+            trackWidth:0.4,
+            bgColor:'#222222',
+            trackColor:"#65F32C",
+            minValue:-1,
+            initialValue:0,
+            maxValue:1,
+            size:150
+        }).knobControl(selector,(knob,value)=>{
+            $('#bal').text(value.toFixed(1) + ' dB');
+            this.balance.pan.setValueAtTime(value.toFixed(2),this.audioCtx.currentTime);
         })
     }
     tuneAudioPower(selector){
         //Audio Gain
-        var that = this;
-    $(selector).on('input', function() {
-        $('#audio-b').text(parseFloat($(this).val()).toFixed(1) + ' dB');
-        that.audioBoost.gain.setValueAtTime(this.value, that.audioCtx.currentTime);
+    new EqKnobs({
+        trackWidth:0.4,
+        bgColor:'#222222',
+        trackColor:"#65F32C",
+        minValue:0,
+        initialValue:1,
+        maxValue:4,
+        size:170
+    }).knobControl(selector,(knob,value)=>{
+        $('#audio-b').text((value).toFixed(1) + ' dB');
+        this.audioBoost.gain.setValueAtTime(value, this.audioCtx.currentTime);
     })
-
     }
 }
 
@@ -763,6 +1003,14 @@ function bassCon(source, bassBoost, bass, audioCtx,analyser) {
     bassBoost.connect(bass);
     bass.connect(analyser);
     analyser.connect(audioCtx.destination);
+}
+
+function bassDisCon(source, bassBoost, bass, audioCtx,analyser) {
+
+    source.disconnect(bassBoost);
+    bassBoost.disconnect(bass);
+    bass.disconnect(analyser);
+    analyser.disconnect(audioCtx.destination);
 }
 
 let  eqDefault = function() {

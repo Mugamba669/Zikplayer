@@ -4,38 +4,76 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="./Designs/font-awesome-4.3.0/css/font-awesome.css"/>
-	<link rel="stylesheet" type="text/css" href="./Designs/stream-ui.css"/>
+	<link rel="stylesheet" type="text/css" href="./Designs/Ziki.css"/>
 	<title>Demo</title>
 	<style>
 		
 	</style>
 </head>
 <body>
-	<div class="streaming-conatiner">
-		<div class="streaming-cont">
-			<div class="header-search">
-				<input type="search" value="" class="search"/>
-				<button class="find">
-					<b class="fa fa-search"></b>
-				</button>
-				<!-- hot 100 -->
-				<button>
-					Hot 100
-				</button>
-				<p class="search-results"></p>
-			</div>
-			<div class="stream-body">
+	<div class="lib-container">
+			<div class="lib-header">
 				
-				<!-- Streaming component -->
-			
-				<!----------------- -->
+				<p>
+					<span class="material-icons-round mi-my-library-music"></span>
+					Library</p>
+
+				<p>
+					<span class="material-icons-round mi-folder"></span>
+				Folders</p>
+				
 			</div>
-		</div>
+			<div class="lib-body">
+
+				<!-- track component -->
+				<div class="trac-component">
+					<div class="component-art">
+						<img src="./images/pAudio.jpeg"/>
+					</div>
+					<div class="component-details">
+						<p class="trac-title">Title</p>
+						<p class="trac-artist">Artist Here</p>
+					</div>
+				</div>
+				<!-------------------------->
+			</div>
 	</div>
-	<script src="./tools/jquery-1.9.1.min.js"></script>
-	<script> require('./renderer')</script>
+	
+	
 	<script>
+		// $('.dw-pause').show()
+		// $('.dw-resume').hide()
+
+		// $('.dw-pause').on('click',function(){
+		// 	$(this).hide();
+		// 	$('.dw-resume').show()
+		// });
+		// $('.dw-resume').on('click',function(){
+		// 	$(this).hide();
+		// 	$('.dw-pause').show()
+		// })
+		// const updateBar = ()=>{
+			
+		// 		var w = 0
+		// 		var interval = setInterval(frame, 800);
+		
+		// 		function frame(){
+		// 			if(w > 100){
+		// 			clearInterval(interval)
+		// 		}else{
+		// 			w = w+1;
+				// console.log(w)
+			
+				// $('.download-progress').css({
+				// 	'width':w+'%'
+				// });
+				
+// 		}
+// 	}
+	
+// }
+// updateBar()
+		
 		// $(document).ready(function(){
 
 		// 		var streamComponent = function(avatar = '',artist = '',title = ''){
@@ -102,14 +140,14 @@
 	// 		var height = canvas.height * value;
 	// 		var barH = canvas.height - height - 1;
 
-	// 		var gradient = context.createLinearGradient(0,0,0,canvas.height);
-	// 		gradient.addColorStop(0,"#9E2222");
-	// 		gradient.addColorStop(1,"#657009");
-	// 		context.fillStyle = gradient;
-	// 		context.setTransform(1, 0, 0, 1, 0, 0);
-	// 		context.translate(1250, -300);
-	// 		context.scale(-1, 1)
-	// 		context.fillRect(barx,barH,barW,height);
+	// 		// var gradient = context.createLinearGradient(0,0,0,canvas.height);
+	// 		// gradient.addColorStop(0,"#9E2222");
+	// 		// gradient.addColorStop(1,"#657009");
+	// 		// context.fillStyle = gradient;
+	// 		// context.setTransform(1, 0, 0, 1, 0, 0);
+	// 		// context.translate(1250, -300);
+	// 		// context.scale(-1, 1)
+	// 		// context.fillRect(barx,barH,barW,height);
 
 	// 		var gradient = context.createLinearGradient(1,2,1,canvas.height);
 	// 		gradient.addColorStop(0,"#9E2222");
@@ -117,10 +155,10 @@
 			
 	// 		// context.scale(-0.3,1)
 	// 		context.fillStyle = gradient;
-	// 		context.setTransform(1, 0, 0, 1, 0, 0);
-	// 		context.translate(1250, 1016);// 1050, 916
-	// 		context.scale(-1,-1);
-	// 		context.fillRect(barx,barH,barW,height);
+	// 		// context.setTransform(1, 0, 0, 1, 0, 0);
+	// 		// context.translate(1250, 1016);// 1050, 916
+	// 		// context.scale(-1,-1);
+	// 		context.fillRect(100+i*4,100+256-freqDomain[i]*2,3,100); ;
 	// 		}
 	// 	}
 	// 			renderCanvas();

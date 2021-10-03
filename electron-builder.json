@@ -11,12 +11,12 @@
         "./package.json",
        "./main.js",
         "./node_modules",
-        "./tools", 
+        "./Plugins", 
         "./ZPlayer.html",
         "./renderer.js",
         "./preload.js",
-         "./lyrics.js",
          "./Core",
+         "./components",
           "./Designs",
         "./images"
     ],
@@ -46,7 +46,7 @@
       },
     "win": {
         "target": "nsis",
-         "icon": "./dist/.icon-ico/icon.ico",
+         "icon": "./images/zik.png",
     },
     "linux": {
         "target":["deb","snap"],

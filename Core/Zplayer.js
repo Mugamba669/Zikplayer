@@ -1,16 +1,20 @@
 'use strict';
 const fs = require('fs');
 const { ipcRenderer } = require('electron');
-const defaultPic = require("../tools/default");
-const path = require('path');
+const defaultPic = require("./default");
+const { extname, normalize }= require('path');
 const Axios = require('axios');
 const cheerio = require("cheerio");
+const EqKnobs = require('../Plugins/Eq-knobs');
+const $ = require('jquery');
+const isOnline = require('is-online');
 class ZPlayer {
 
     constructor(audio) {
             this.audio = audio;
             this.h = 0;
             this.playing = true;
+            this.shuffle = false;
             this._ = function(selector) {
                 return document.querySelector(selector);
             }
@@ -47,6 +51,7 @@ class ZPlayer {
                 this._('.bottom-details').classList.remove('active');
                 this._('.image-container').classList.remove('active');
                 this._('#trackId').style.animationPlayState = 'paused';
+                $(".lyrics-wrapper").removeClass('active')
             }           
             // this.fs = require('fs')
             this.tune = () => {
@@ -60,6 +65,7 @@ class ZPlayer {
                 this._('.image-container').classList.add('active');
                 this._('.bottom-details').classList.add('active');
                 this._('#trackId').style.animationPlayState = 'running';
+                this.audio.voume = 0.17
             }
             $('#pause').hide();
             this._("#play").onclick = () => {
@@ -150,12 +156,22 @@ class ZPlayer {
         });
     }
     getTempo(q, t) {
-        var slider = this._(q);
         var out = this._(t);
-        slider.addEventListener('input', function() {
-            out.textContent = parseFloat(slider.value).toFixed(2) + ' xp';
-            this.audio.playbackRate = slider.value;
-        }.bind(this), false);
+        /**
+         * new slider settings
+         */
+        new EqKnobs({
+            trackWidth:0.4,
+           size:150,
+           initialValue:1,
+           bgColor:"#222222",
+           trackColor:"#80F135",
+           maxValue:2,
+           minValue:0
+        }).knobControl(q,(knob,value)=>{
+            out.textContent = value.toFixed(2) + ' xp';
+            this.audio.playbackRate = value.toFixed(2);
+        })
 
     }
     getPlaylist(tags = {},index = 0,playlist = []){
@@ -165,22 +181,48 @@ class ZPlayer {
                 "color":"#fff",
             });
  /**=================================== */
-           
- $(".total-tracks").show(function(){
-    $(".current").text(`${(index + 1)}`);
-    $(".tt-T").text(`${(playlist.length)}`);
-});
+            $('.tt-T').text(playlist.length);
+
              
-                let check = $("<input/>").attr('type','radio').attr('name','listtile').attr('value',`${index}`).css({"appearance":"none"}).addClass('radiolist');
-                // console.log(check.val())
+                let check = $("<input/>").attr('type','checkbox').attr('name','listtile').attr('value',`${index}`).css({"appearance":"none"}).addClass('radiolist');
+                var erase = $('<td></td>').append(
+                    $('<button></button>').addClass('material-icons-round mi-delete').on('click',function(){
+                        let songTorenove = (`${(tags.path).replace('file:','')}`)
+                        $(".list-tile").eq(index).hide();
+                        ipcRenderer.send('removedSong',tags);
+                        fs.unlinkSync(normalize(songTorenove));
+                    }).css({
+                        "width":"40px",
+                        "height":"40px",
+                        "borderRadius":"50%",
+                        "color":"#fff",
+                        "cursor":"pointer",
+                        "backgroundColor":"transparent",
+                        "outline":"none",
+                         "border":"1px solid #ccc"
+                    })
+                )
+                
                 var artWork = $("<td></td>").append( $('<img/>').attr('src', tags.artwork).addClass('coverArt'));
+               let ext = (`${extname(tags.path)}`).replace('.','');
+                var trailing = $('<td></td>').append(
+                    $("<span><span>").text(`${tags.size}MB | ${ext}`).css({"color":"inherit","fontSize":"16"})
+                )
                 var tile = $("<td></td>").append($("<p></p>").text(tags.title)).append($("<p></p>").text(tags.artist))
-                $("<tr></tr>").append(artWork).append(tile).addClass('list-tile').append(check).appendTo(".plist-body")
                 .on('click',function(){
                     $('title').text(`${tags.title}`);
-
+                    $(".total-tracks").show(function(){
+                        $(".current").text(`${(index + 1)}`);
+                       
+                    });
                     //  track next
-                   
+                    // $('.view').text(`${(tags.path).replace('file://','')}`)
+
+
+                ipcRenderer.send('trackUrl',tags)
+                that.h = 0;
+            
+
                     // show track whose lyrics are to be displayed
                     $(".lyric-title").text(`${tags.title}`)
                     $('.lyric-artist').text(tags.artist);
@@ -188,10 +230,11 @@ class ZPlayer {
                new Notification(tags.title,{
                 icon:tags.artwork,
                 body:tags.artist,
-                
-            })
-            var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
-                        $('.size').text(`${size} MB`)
+            }).onclick = (e)=>{
+                ipcRenderer.send('showApp');
+            };
+            // var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
+                        $('.size').text(`${tags.size} MB`)
                         $('#title').text(tags.title)
                         $('#album').text(tags.album)
                         $('#artist').text(tags.artist)
@@ -200,12 +243,24 @@ class ZPlayer {
             var crossfade = that.audio.duration - that.audio.currentTime;
             const result = Math.floor(parseInt(crossfade));
             // console.log(result)
-                // h += 0.65;
-                //     $("pre").css("transform","translateY(-"+h+"px)")
             if(result == 41){
                 showNextTrack(playlist[(index+1)])
             }
         }
+        /**
+         * Enable or diable shuffling music
+         */
+         $('.random-off').on('click',function(){
+            $(this).hide();
+            $('.random-on').show().addClass('w3-black');
+            that.shuffle = true;
+        });
+
+        $('.random-on').on('click',function(){
+            $(this).hide();
+            $('.random-off').show();
+            that.shuffle = false;
+        })
         // keyboard shotcuts
         $(document).on("keydown",function(e){
             switch (e.key) {
@@ -234,22 +289,32 @@ class ZPlayer {
 
         
         that.audio.onended =  ()=>{ 
+            ipcRenderer.send('trackEnd');
             that.h = 0;
-            var next = index+=1;
-            if((next +1) > playlist.length){
-                $(".bottom-container").show();
-
-                $('.bottom-sheet').addClass('active');
-                $(".Art").attr("src",defaultPic.image); 
-                 $(".next-track").text('List finished')
-                 setTimeout(() => {
-                    $('.bottom-sheet').removeClass('active');
-                   }, 8000);
-                return true;
-            }else{
-                $(".current").text(`${(next) + 1 }`);
-                $(".tt-T").text(`${(playlist.length)}`);
+            
+            
+            if(that.shuffle  == true){
+                var next = Math.floor((Math.random() * (playlist.length)));
+                    $(".current").text(`${(next)}`);
+                    $(".tt-T").text(`${(playlist.length)}`);
                     nextTrack(playlist[next],next)
+            }else{
+                var next = index+=1;
+                if((next +1) > playlist.length){
+                    $(".bottom-container").show();
+                   
+                    $('.bottom-sheet').addClass('active');
+                    $(".Art").attr("src",defaultPic.image); 
+                     $(".next-track").text('List finished')
+                     setTimeout(() => {
+                        $('.bottom-sheet').removeClass('active');
+                       }, 8000);
+                    return true;
+                }else{
+                    $(".current").text(`${(next) + 1 }`);
+                    $(".tt-T").text(`${(playlist.length)}`);
+                        nextTrack(playlist[next],next)
+                }
             }
          }
 
@@ -257,23 +322,29 @@ class ZPlayer {
         // click to next track
         $('#nextTrack').show().on('click',function(){
             that.h = 0;
-            var next = index+=1;
-            if((next + 1) > playlist.length){
-
-                $(".bottom-container").show()
-                $('.bottom-sheet').addClass('active');
-                $(".Art").attr("src",defaultPic.image); 
-                $
-                 $(".next-track").text('List finished')
-                 setTimeout(() => {
-                    $('.bottom-sheet').removeClass('active');
-                    $(".bottom-container").hide();
-                   }, 8000);
-    
+            if(that.shuffle == true){
+                var next = Math.floor((Math.random() * (playlist.length)));
+                    $(".current").text(`${(next) + 1 }`);
+                    $(".tt-T").text(`${(playlist.length)}`);
+                     nextBtnTrack(playlist[next]);
             }else{
-                $(".current").text(`${(next) + 1 }`);
-                $(".tt-T").text(`${(playlist.length)}`);
-                 nextBtnTrack(playlist[next]);
+                var next = index+=1;
+                if((next + 1) > playlist.length){
+                    $(".bottom-container").show()
+                    $('.bottom-sheet').addClass('active');
+                    $(".Art").attr("src",defaultPic.image); 
+                    $
+                     $(".next-track").text('List finished')
+                     setTimeout(() => {
+                        $('.bottom-sheet').removeClass('active');
+                        $(".bottom-container").hide();
+                       }, 8000);
+        
+                }else{
+                    $(".current").text(`${(next) + 1 }`);
+                    $(".tt-T").text(`${(playlist.length)}`);
+                     nextBtnTrack(playlist[next]);
+                }
             }
         });
 
@@ -281,24 +352,33 @@ class ZPlayer {
         //  click to back to prev track
         $('#prevTrack').show().on('click',function(){
             that.h = 0;
-            var prev = index-=1;
-            if(prev < 0){
-
-                $(".bottom-container").show()
-                $('.bottom-sheet').addClass('active');
-                $(".Art").attr("src",defaultPic.image); 
-                
-                 $(".next-track").text('No more previous tracks')
-                 setTimeout(() => {
-                    $('.bottom-sheet').removeClass('active');
-                   }, 8000);
-                return true;
+            
+            if(that.shuffle == true){
+                var prev = Math.floor((Math.random() * (playlist.length)));
+                    $(".current").text(`${(prev) + 1 }`);
+                    $(".tt-T").text(`${(playlist.length)}`);
+                    prevTrack(playlist[prev]);
             }else{
-                $(".current").text(`${(prev) + 1 }`);
-                $(".tt-T").text(`${(playlist.length)}`);
-                prevTrack(playlist[prev]);
+                var prev = index-=1;
+                if(prev < 0){
 
+                    $(".bottom-container").show()
+                    $('.bottom-sheet').addClass('active');
+                    $(".Art").attr("src",defaultPic.image); 
+                    
+                     $(".next-track").text('No more previous tracks')
+                     setTimeout(() => {
+                        $('.bottom-sheet').removeClass('active');
+                       }, 8000);
+                    return true;
+                }else{
+                    $(".current").text(`${(prev) + 1 }`);
+                    $(".tt-T").text(`${(playlist.length)}`);
+                    prevTrack(playlist[prev]);
+    
+                }
             }
+        
         });
                 $(".plist").removeClass("active")
                 $(".plist-cont").removeClass("active")
@@ -321,14 +401,21 @@ class ZPlayer {
                    $("#trackId").attr('src',tags.artwork);
                    $(".swiper-container").css({"backgroundImage": `url(${tags.artwork})`})
                });
+     $("<tr></tr>").append(artWork).append(tile).addClass('list-tile').append(check).append(erase).append(trailing).appendTo(".plist-body")
            
     //    next track function
     const nextTrack = function(tags){
+        that.h = 0;
+            
+        ipcRenderer.send('trackUrl',tags)
+        // $('.view').text(`${(tags.path).replace('file://','')}`)
         new Notification(tags.title,{
             icon:tags.artwork,
             body:tags.artist,
             
-        });
+        }).onclick = (e)=>{
+            ipcRenderer.send('showApp')
+        };
         var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
         $('.size').text(`${size} MB`)
             $('title').text(`${tags.title}`)
@@ -346,14 +433,11 @@ class ZPlayer {
        }
 
        const nextBtnTrack = function(tags){
-        new Notification(tags.title,{
-            icon:tags.artwork,
-            body:tags.artist,
-           
+        that.h = 0;
             
-        })
-        var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
-        $('.size').text(`${size} MB`)
+        ipcRenderer.send('trackUrl',tags)
+        // var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
+        $('.size').text(`${tags.size} MB`)
         $(".view").text(tags.path);
         $('#title').text(tags.title)
         $('#album').text(tags.album)
@@ -383,13 +467,11 @@ class ZPlayer {
 
     //    previous track function
         const prevTrack = function(tags){
-            new Notification(tags.title,{
-                icon:tags.artwork,
-                body:tags.artist
-                
-            })
-            var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
-            $('.size').text(`${size} MB`);
+            that.h = 0;
+            
+            ipcRenderer.send('trackUrl',tags)
+            // var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
+            $('.size').text(`${tags.size} MB`);
 
             $('title').text(`${tags.title}`)
             $(".view").text(tags.path)
@@ -408,12 +490,19 @@ class ZPlayer {
       
     }
     getAudioVolume(volu, ou) {
-        var volume = this._(volu);
         var out = this._(ou);
-        volume.addEventListener('input', function() {
-            out.textContent = Math.floor(parseFloat(volume.value).toFixed(2) * 100) + ' %';
-            this.audio.volume = volume.value;
-        }.bind(this), false);
+       new EqKnobs({
+           trackWidth:0.4,
+           size:140,
+           initialValue:0.17,
+           bgColor:"#222222",
+           trackColor:"#00ffcc",
+           maxValue:1,
+           minValue:0
+       }).knobControl(volu,(knob,value)=>{
+            out.textContent = (value.toFixed(1) * 100 )+ ' %';
+            this.audio.volume = value.toFixed(2);
+       })
     }
     getImageColorpicker({canvas,renderer,image}){
            var img = document.querySelector(image);
@@ -445,19 +534,37 @@ class ZPlayer {
         tmp.forEach((item, index) => {
             switch (parseInt(index)) {
                 case 0:
-                    this.audio.addEventListener('timeupdate', function() {
+                    this.audio.addEventListener('timeupdate', () => {
                         try {
                             new WebkitInputRangeFillLower({
                                 selectors:["prog"],
-                                color:"gold"
+                                color:"gold",
                             });
-                            that.h += 0.65;
-                            $("pre").css("transform","translateY(-"+that.h+"px)")
+                            /**
+                             * 
+                             * @returns Synchronised lyrics
+                             */
+                            $.fn.syncLyrics = function(){
+                                var options = $.extend({
+                                    speed: 1000
+                                }, arguments[0] || {});
+                                return this.each(function(){
+                                    setTimeout(()=>{
+                                        $(this).get(0).scroll({
+                                            top:that.h+=0.65,
+                                            behavior:'smooth'
+                                        });
+                                    },options.speed)
+                                })
+                            }
+                       
+                           $('.lyrics').syncLyrics();
+
                             var sec = parseInt(this.audio.currentTime % 60);
                             var min = parseInt((this.audio.currentTime / 60) % 60);
                             sec < 10 ? item.textContent = min + ':' + '0' + sec : item.textContent = min + ':' + sec;
                         } catch (err) { alert(err); }
-                    }.bind(this), false);
+                    }, false);
                     break;
                     //    Track Duration
                 case 1:
@@ -503,9 +610,6 @@ class ZPlayer {
                     var ch = cheerio.load(detail);
 
                   let  sourceFile =  ch('.dwnTkNt').attr().href;
-                console.log(sourceFile.replace(/(.*)[\/\\]/,"").replace(" ","_"))
-                console.log(stream.title);
-             $('.search-results').text(`(${index}) results found`)
 
 				var streamComponent = function(avatar = '',title = ''){
 					var avatar = $('<img/>').attr('src',avatar).addClass('stream-component-avatar');
@@ -524,9 +628,54 @@ class ZPlayer {
                         )
 						.on('click',function(){
                             ipcRenderer.send('downloadsong');
+                            $('.download-body').addClass('active')
+                            $('.download-container').addClass('active')
+                            /**
+                             * show receved bytes
+                             */
                             ipcRenderer.on('downloading',(event,args)=>{
                                 console.log(args)
+                                $('.dw-currnet-size').text(`${(args/1000000).toFixed(2)}mbs`)
                             })
+                            /**
+                             * show tottal bytes
+                             */
+                             ipcRenderer.on('totaldownload',(event,args)=>{
+                                // console.log(args)
+                                $('.total-dn-size').text(`${(args/1000000).toFixed(2)}mbs`)
+                            })
+                            /**
+                             * show  start time
+                             */
+                             ipcRenderer.on('starttime',(event,args)=>{
+                                console.log(args)
+                                $('.dwn-time').text(args)
+                            })
+                            /**
+                             * show file being downloaded
+                             */
+                             ipcRenderer.on('filedownload',(event,args)=>{
+                                console.log(args)
+                                $('.sg-title').text(args)
+                            });
+                            /**
+                             * update progress bar
+                             */
+                             ipcRenderer.on('progressbytes',(event,args)=>{
+                                // console.log(args)
+                                var percent = args * 100;
+                                $('.dwn-time').text(`${percent.toFixed(2)}%`)
+                                    $('.download-progress').css({
+                                          'width':percent+'%'
+                                    });
+                            });
+                            /**
+                             * close download panel when done
+                             */
+                             ipcRenderer.on('downloadcompleted',(event,args)=>{
+                                $('.download-body').removeClass(args)
+                                $('.download-container').removeClass(args)
+                            });
 							// alert($(this))
 						});
 
@@ -543,6 +692,19 @@ class ZPlayer {
 
     }
     streamHot100(){
+        async function checkConnection(){
+            let netCheck = await isOnline();
+            if(netCheck == false){
+                $('<p></p>').text(
+                    `😓 Sorry, but your currently offline , try checking your connection or data plan`
+                 ).css({
+                     "color": "#ffffff",
+                     "fontWeight": "300",
+                     "fontSize": "24px",
+                     "fontFamily": "Ubuntu"
+                 }).addClass('pick-msg').appendTo('.streaming-cont')
+            }else{
+        
         Axios.get(`https://www.nowviba.com/music/pages/top100.php`).then((dom)=>{
             var response = dom.data;
             const ch = cheerio.load(response);
@@ -556,7 +718,9 @@ class ZPlayer {
                 artWork:`${element.children[0].children[3].children[1].attribs.data}`,
                 url:element.children[2].children[3].children[1].attribs.src
             }
-           
+            // $(".lyrics").text("You are currently offline cannot fetch the Lyrics")
+        // .prepend($('<span></span>').addClass('material-icons-round mi-wifi-off'));
+      
 
 				var streamComponent = function(avatar = '',title = ''){
 					var avatar = $('<img/>').attr('src',avatar).addClass('stream-component-avatar');
@@ -569,16 +733,74 @@ class ZPlayer {
 							</table>`;
 				var streamBodyComponent = $('<div></div>').addClass('stream-component-body').append(track);
 					// main component
-
+                    var downloadBtn = $('<button></button>').addClass('stream-play')
+                    .append(
+                        $('<a></a>').addClass('fa fa-download').attr('href',`${hot100.url}`).attr('download',`${hot100.url.replace(/(.*)[\/\\]/,"").replace(" ","_")}`)
+                    ).on('click',function(){
+                        ipcRenderer.send('downloadsong');
+                        $('.download-body').addClass('active')
+                        $('.download-container').addClass('active')
+                        /**
+                         * show receved bytes
+                         */
+                        ipcRenderer.on('downloading',(event,args)=>{
+                            console.log(args)
+                            $('.dw-currnet-size').text(`${(args/1000000).toFixed(2)}mbs`)
+                        })
+                        /**
+                         * show tottal bytes
+                         */
+                         ipcRenderer.on('totaldownload',(event,args)=>{
+                            // console.log(args)
+                            $('.total-dn-size').text(`${(args/1000000).toFixed(2)}mbs`)
+                        })
+                        /**
+                         * show  start time
+                         */
+                         ipcRenderer.on('starttime',(event,args)=>{
+                            console.log(args)
+                            $('.dwn-time').text(args)
+                        })
+                        /**
+                         * show file being downloaded
+                         */
+                         ipcRenderer.on('filedownload',(event,args)=>{
+                            console.log(args)
+                            $('.sg-title').text(args)
+                        });
+                        /**
+                         * update progress bar
+                         */
+                         ipcRenderer.on('progressbytes',(event,args)=>{
+                            // console.log(args)
+                            var percent = args * 100;
+                            $('.dwn-time').text(`${percent.toFixed(2)}%`)
+                                $('.download-progress').css({
+                                      'width':percent+'%'
+                                });
+                        });
+                        /**
+                         * close download panel when done
+                         */
+                         ipcRenderer.on('downloadcompleted',(event,args)=>{
+                            $('.download-body').removeClass(args)
+                            $('.download-container').removeClass(args)
+                        });
+                        // alert($(this))
+                    });
 						/* Stream component*/
 					var component = $("<div></div>").addClass("stream-component").append(componentHeader)
-					.append(streamBodyComponent);
+					.append(streamBodyComponent).append(downloadBtn);
 					$('.stream-body').append(component);
 				}
                 streamComponent(hot100.artWork,hot100.title);
+
         })
            
         })
+    }
+}
+checkConnection();
     }
      
 } 

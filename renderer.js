@@ -1,14 +1,14 @@
 const { ipcRenderer } = require("electron");
 const fs = require("fs");
 const os = require("os");
+const $ = require("jquery");
+require('./Core/utils.js');
+require('./Core/lyrics');
+require('./Core/Mp3Tags')
 const AudioSystem = require('./Core/AudioSystem');
-const NowStream = require("./Core/NowStream");
+const searchYoutube = require('youtube-api-v3-search');
 const ZPlayer = require("./Core/Zplayer");
-// console.log(AudioSystem)
-// const emoji = require('emojis-list')
-/**
- * Helpers
- */
+
  var musicContainer = [];
  var route = 0;
 
@@ -16,9 +16,9 @@ const ZPlayer = require("./Core/Zplayer");
     var folderIcon = $('<td></td>').addClass('fa fa-folder');
     var name = $('<td></td>').text(content)
     var check =  $('<td></td>').append($('<input/>').attr('type','radio').attr('name','remove').attr('value',value).addClass('rem-folder fa fa-close'));
-    var tr = $("<tr></tr>").append(folderIcon).addClass('folder-tile').append(name).append(check).appendTo('.folders');
+     $("<tr></tr>").append(folderIcon).addClass('folder-tile').append(name).append(check).appendTo('.folders');
 }
-require('./lyrics');
+
 /*============================*/
 
 /**
@@ -36,22 +36,27 @@ function hideLoader(list = []){
 }
 
 var audio = new Audio();
-    
+    audio.volume = 0.17;
 var engine = new AudioSystem.AudioEngine(audio)
 
 engine.tuneBass("#bass");
-engine.tuneBassBooster('#bass-boost');
+engine.tuneBassBooster("#bassboost");
 engine.tuneCompressor(".compressor")
 engine.tuneAudioBalance('#balance');
-engine.tuneAudioPower('#audio-boost');
-engine.tuneMidVocal("#treb-boost");
-engine.tuneStereo('#stereo')
-engine.tuneRoomSwitch();
-$("#r-effects").on('input',function() {
-    engine.tuneRoomOptions( $(this).val());
-});
-
+engine.tuneAudioPower('#audioboost');
+engine.tuneMidVocal("#trebboost");
+engine.tuneStereo("#stereo")
+engine.tuneRoomSwitch(".room-switch");
+// 
+    engine.tuneRoomOptions("#r-effects");
 engine.tuneRoomEffects('.room-effects');
+
+
+(async ()=>{
+    var result = await searchYoutube(`AIzaSyAkgiQaLzuswUP-Jd1xwENo7u2YF5Xtq_c
+    `,{q:'migos',part:'snippet',type:'video'});
+    console.log(result)
+})()
 
 $("#eqns").on('input', function() {
     engine.tuneEq($(this).val());
@@ -59,82 +64,100 @@ $("#eqns").on('input', function() {
 /**
  * Initializing the equalizer
  */
-var eq = new ZPlayer(audio);
-eq.startPlayer();
-eq.getProgressData('.progress-bar');
-eq.getControlButtons(".btn-tn");
-eq.timeUpdate(".time");
-eq.getTempo("#rate-xp", "#sp-rate");
-eq.getAudioVolume("#vol-add", "#vol");
-eq.repeatStopTrack(".repeat-on",".repeat-off",'.mute-on','.mute-off');
-eq.streamHot100();
-// checking whether the database file exists 
+var Ziki = new ZPlayer(audio);
+Ziki.startPlayer();
+Ziki.getProgressData('.progress-bar');
+Ziki.getControlButtons(".btn-tn");
+Ziki.timeUpdate(".time");
+Ziki.getTempo("#ratexp", "#sp-rate");
+Ziki.getAudioVolume("#vol-add", "#vol");
+Ziki.repeatStopTrack(".repeat-on",".repeat-off",'.mute-on','.mute-off');
+Ziki.streamHot100();
 
+/**
+ * Control buttons
+ */
+$('.random-on').hide()
+$('.tags-edit-on').hide()
+
+/**
+ * tags editing panel
+ */
+ $('.tags-edit-off').on('click',function(){
+    $(this).hide();
+    $('.btns-container').toggleClass('active');
+     $('.btns-opener').toggleClass('active')
+     $('.tags-container').addClass('active')
+    $('.tags-panel').addClass('active')
+    $('.tags-edit-on').show();
+})
+$('.tags-edit-on').on('click',function(){
+    $(this).hide();
+    $('.btns-opener').removeClass('active')
+    $('.btns-container').removeClass('active')
+    $('.tags-container').addClass('active')
+    $('.tags-panel').addClass('active')
+    $('.tags-edit-off').show();
+})
+$('.close-editor').on('click',function(){
+    $('.tags-container').removeClass('active')
+    $('.tags-panel').removeClass('active')
+})
+/**
+ * buttons drawer openner
+ */
+$('.btns-opener').on('click',function(){
+    $(this).toggleClass('active')
+    $('.btns-container').toggleClass('active')
+})
     window.addEventListener('load',function(){
-        /**
-         * create database file
-         */
-        var database = {
-            cachedFolders:[],
-            playlist:[]
-        }
-        if(fs.existsSync(`${os.homedir()}/.ZPlayer/database.json`) == false){
-            fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(database))
-        }
+      
      // console.log(emoji.flat(1))
         var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
         if(data.cachedFolders.length < 1){
             $("#changelog").show();
             $('.welcome-container').addClass('active');
             $('.welcome-content').addClass('active');
+            ipcRenderer.send('showHelp')
             /**
- * Load track for first tym user
- */
-$('.import-folder').on('click',function(){
+             * Load track for first tym user
+             */
+                $('.import-folder').on('click',function(){
 
-    $('.welcome-container').removeClass('active');
-    $('.welcome-content').removeClass('active');
-    
-    var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
+                    $('.welcome-container').delay(20000).removeClass('active');
+                    $('.welcome-content').delay(20000).removeClass('active');
+                    
+                    var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
 
-    ipcRenderer.send('open-music-folder');
+                    ipcRenderer.send('open-music-folder');
 
-            ipcRenderer.on('musicFiles',(event,args)=>{
-                var paths = args.filePaths[0];
-                if(paths != null ){
-                    data.cachedFolders.push(paths);
-                    fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data));
-                    folders(paths,`${route}`);
-                
-                  
-                /**
-                 * Load music files instantly
-                 */
-                 var query = new AudioSystem.AudioQuery(paths);
-                 var allMusic = query.fetchAllSongs();
-                allMusic.flat(1).map((songs,index,array) => musicContainer.push(songs));
-                musicContainer.flat(1).map((songs,index,array) =>{
-                    $('.loader-container').show();
-                 (index < (array.length -1))?showLoader(songs.title):hideLoader(array);
-                 eq.getPlaylist(songs,index,array)
+                            ipcRenderer.on('musicFiles',(event,args)=>{
+                                var paths = args.filePaths[0];
+
+                                if(paths != null ){
+                                    data.cachedFolders.push(paths);
+                                    fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data));
+                                    folders(paths,`${route}`);
+                                /**
+                                 * Load music files instantly
+                                 */
+                                var query = new AudioSystem.AudioQuery(paths);
+                         query.fetchAllSongs().map((songs,index,array) => musicContainer.push(songs));
+                    //   console.log(musicContainer)
+                         musicContainer.map((songs,index,array) =>  Ziki.getPlaylist(songs,index,array))
+                            }
+                        })
                 })
-            }
-        })
-})
         }else{
+            $('#playlist').click();
             data.cachedFolders.map((url)=>{
                 var query = new AudioSystem.AudioQuery(url);
-                var allMusic = query.fetchAllSongs();
-                allMusic.map((songs) => musicContainer.push(songs))
-        })
+                // console.log(musicContainer)
+          query.fetchAllSongs().map((songs) => musicContainer.push(songs));
+            })
     }
-    musicContainer.map((songs,index,array) =>{
-        $('.loader-container').show();
-         (index < (array.length -1)) ? showLoader(songs.title) : hideLoader(array)
-         eq.getPlaylist(songs,index,array);
-    })   
+             musicContainer.map((songs,index,array) => Ziki.getPlaylist(songs,index,array));
 },false);
-
 
 /**
  * loader panel
@@ -161,33 +184,30 @@ $('.add-folder').on('click',function(){
 
       var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
       var filepath = args.filePaths[0];
+
       if(filepath != null){
         data.cachedFolders.push(filepath);
         fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data))
-       folders(args.filePaths[0],`${route+=1}`);
-     
+       folders(args.filePaths[0],`${parseInt(route+=1)}`);
+
+     /**
+      * Clear the playlist first the re-render the list
+      */
       
    $('.list-tile').remove()
     /**
      * Load music files instantly
      */
      var query = new AudioSystem.AudioQuery(args.filePaths[0]);
-     var allMusic = query.fetchAllSongs();
- allMusic.map((songs) => musicContainer.push(songs));
- musicContainer.map((songs,index,array) =>{
-    eq.getPlaylist(songs,index,array)
-    $('.loader-container').show();
-    (index < (array.length -1)) ? showLoader(songs.title) : hideLoader(array)
-    });
+      query.fetchAllSongs().map((songs) => musicContainer.push(songs));
+      musicContainer.map((songs,index,array) => Ziki.getPlaylist(songs,index,array));
   }
 })
 
 }) 
-
-
  /**
   * 
-  * @param {close} Closing the plaslist window 
+  *  Closing the plaslist window 
   */
 
   $('.fab-btn').on('click',function(){
@@ -199,16 +219,10 @@ $('.add-folder').on('click',function(){
  * Add music 
  */
 $('.fab-options').on('click',function(){
-    $(this).toggleClass('fa-times').toggleClass('fa-plus')
     $('.add-container').toggleClass('active')
     $('.add-body').toggleClass('active')
 })
-/**
- * 
- */
-$('.lyrics-container').click(function(){
-    $(this).fadeOut()
-})
+
 /**
  * Volume control
  */
@@ -249,17 +263,16 @@ $('.close-panel').on('click',function(){
             if(folder.cachedFolders.legnth < 1){
                 ipcRenderer.send('Nofolders',"No more directories to remove")
             }
-        if(data.checked){
-            console.log(data.checked)
-            console.log($(data).val())           
+        if(data.checked){         
             folder.cachedFolders.splice($(data).val(),1);
-           fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(folder))            
-
+           fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(folder))    
         }
     })
-    })
+})
 
-    $('.bottom-details').scrollLeft() + 800;
+
+
+    // $('.bottom-details').scrollLeft() + 800;
     /**
      * Closing the drawer
      */
@@ -267,48 +280,230 @@ $('.close-panel').on('click',function(){
         $('.setting').removeClass('active');
         $('.sidebar').removeClass('active');
     })
+       
+        /**
+         *  open sidebar
+         *  */
+        $(".setting").on("click",function(){
+            $(".sidebar-data").toggleClass("active")
+            $(".sidebar-icons").toggleClass("active")
+            $(this).toggleClass("active")
+            $(".sidebar").toggleClass("active");
+    })
 
+/**
+ * show visual panel
+ */
 
 $('#visual-select').click(function(){
+    $(".sidebar-data").removeClass("active")
+    $(".sidebar-icons").removeClass("active")
     $('.setting').removeClass('active');
     $('.sidebar').removeClass('active');
+    $('.body').addClass('active')
+    $('.Visualbox').addClass('active')
 })
 
-
-$('#lyrics-btn').click(function(){
+/**
+ * show settings panel
+ */
+ $('#app-settings').click(function(){
+    $(".sidebar-data").removeClass("active")
+    $(".sidebar-icons").removeClass("active")
     $('.setting').removeClass('active');
     $('.sidebar').removeClass('active');
+    $('.app-set-cont').addClass('active')
+    $('.settings-cont').addClass('active')
 })
-
-$('.search').on('input',function(){
-    eq.searchSongs($(this).val());
+/**
+ * 
+ * close settings panel
+ */
+ $('.close-settings').on('click',function(){
+    $('.app-set-cont').removeClass('active')
+    $('.settings-cont').removeClass('active')
+})
+/**
+ * Drawing over other appps
+ */
+$('.draw-over-apps').on('change',function(){
+    if($(this).get(0).checked == true){
+        ipcRenderer.send('drawOverApps',$(this).get(0).checked);
+    }else{
+        ipcRenderer.send('drawOverApps',$(this).get(0).checked);
+    }
 })
 /**
  * Animate scrolling the text
  */
 
- $.fn.scrollTxt = function () {
-    // var options = $.extend({
-    //     speed: 28
-    // }, arguments[0] || {});
+ $.fn.scrollText = function () {
+    var options = $.extend({
+        speed: 80
+    }, arguments[0] || {});
 
     return this.each(function () {
         var el = $(this);
-
+        var scrollx  = 0;
         if (el.width() > $('.bottom-details').width()) {
-            // el.get(0).style.animationPlayState = 'running';
-            $('.bottom-details').get(0).scroll({left:800});
-            console.log('true')
-        }else{
-            $('.bottom-details').get(0).scroll({left:0});
-            // el.get(0).style.animationPlayState = 'paused';
-            console.log('false')
-        };
+            el.css({
+                "transition":"0.3s ease-in-out"
+            })
+          setInterval(frame, options.speed); 
+               function frame(){
+                   if(scrollx == 300){
+                    // setTimeout(() => {
+                    
+
+                    $('.bottom-details').delay(200000).get(0).scroll({left:scrollx -= 4,behavior:'smooth'});                      
+                    // }, 2000);
+                    scrollx = 0;
+                   }else{
+                          scrollx += 4;
+                        $('.bottom-details').delay(200).get(0).scroll({left:scrollx,behavior:'smooth'});
+                      
+                   }
+               }
+        }
     });
 };
 
 
 
 $(audio).on('play',function () {
-   $('.dt').scrollTxt();
+   $('.dt').scrollText();
 });
+/**
+ * Open streaming
+ */
+$('.streaming-btn').on('click',function(){
+    $(".sidebar-data").removeClass("active")
+    $(".sidebar-icons").removeClass("active")
+    $('.setting').removeClass('active');
+    $('.sidebar').removeClass('active');
+    $('.streaming-conatiner').addClass('active')
+})
+/**
+ * display hot 100
+ */
+$('.btn-hot-100').on('click',function(){
+    eq.streamHot100();
+})
+/**serach your favourite jam from nowviba  */
+$('.search').on('input',function(){
+    eq.searchSongs($(this).val());
+})
+$('.find').on('click',function(){
+    eq.searchSongs($(this).val());
+})
+/**
+ * Close streaming panel
+ */
+$('.close-streaming').on('click',function(){
+    $('.streaming-conatiner').removeClass('active')
+})
+/******************************** */
+/**
+ * pause or resume download
+ */
+ $('.dw-pause').show()
+ $('.dw-resume').hide()
+
+ $('.dw-pause').on('click',function(){
+     $(this).hide();
+     $('.dw-resume').show()
+     ipcRenderer.send('pausedownload');
+ });
+ $('.dw-resume').on('click',function(){
+     $(this).hide();
+     $('.dw-pause').show()
+     ipcRenderer.send('resumeownload');
+ })
+
+ /**
+  * Add equalizer
+  */
+  $('.equalizer-btn').on('click',function(){
+    $(".sidebar-data").removeClass("active")
+    $(".sidebar-icons").removeClass("active")
+    $('.setting').removeClass('active');
+    $('.sidebar').removeClass('active');
+    $('.eq-cont').addClass('active')
+    $('.eq-wrapper').addClass('active')
+ })
+
+ $('.close-eq').on('click',function(){
+    $('.eq-cont').removeClass('active')
+    $('.eq-wrapper').removeClass('active')
+ })
+ /**
+  * Tunning panel
+  */
+ $('#audiotuning-btn').click(function(){
+    $(".sidebar-data").removeClass("active")
+    $(".sidebar-icons").removeClass("active")
+    $('.setting').removeClass('active');
+    $('.sidebar').removeClass('active');
+    $('.Tune-container').addClass('active')
+    $('.Tune').addClass('active')
+ })
+ /**
+  * Lanch audio tunning panel
+  */
+ $('.btn-tunning').on('click',function(){
+    $(".sidebar-data").removeClass("active")
+    $(".sidebar-icons").removeClass("active")
+    $('.compress').removeClass('active');
+    $('.room-box').removeClass('active');
+    $('.Tune').addClass('active')
+ })
+ $('.close-Tune').click(function(){
+     $('.Tune-container').removeClass('active')
+     $('.Tune').removeClass('active')
+ })
+ /**
+  * Compressor panel
+  */
+$('.btn-compress').click(function(){
+    $('.compress').addClass('active');
+    $('.Tune').removeClass('active')
+    $('.room-box').removeClass('active')
+})
+
+$('.close-compressor').click(function(){
+    $('.compress').removeClass('active');
+    $('.Tune-container').removeClass('active')
+})
+ /**
+  * room effects
+  */
+ $('.close-room').click(function(){
+    $('.room-box').removeClass('active');
+    $('.Tune-container').removeClass('active')
+ })
+
+ $('.btn-room').click(function(){
+    $('.room-box').addClass('active');
+    $('.compress').removeClass('active');
+    $('.Tune').removeClass('active')
+})
+/**
+ * close visualiser's panel
+ */
+// $('.close-visual-pnnel').on('click',function(){
+//     $('.Visualbox .body').removeClass('active')
+//     $('.Visualbox').removeClass('active')
+// })
+
+/**
+ * Show c
+ */
+$('.triggerChangeLog').on('click',function(){
+    $("#changelog").show();
+})
+/**
+ * Show help
+ */
+$('.triggerHelp').on('click',function(){
+    ipcRenderer.send('triggerHelp');
+})

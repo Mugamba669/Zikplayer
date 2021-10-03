@@ -1,9 +1,9 @@
 const NodeID3 = require('node-id3');
 const fs = require('fs');
-const path = require('path');
+
 const defaultPic = require('./default');
 const os = require('os');
-
+const { extname } = require('path');
 /**
  * @nCopyright 2021 Mugamba Bruno
  * AudioQuery library to fetch audio tracks basing on title,album and artist,
@@ -20,12 +20,12 @@ class AudioQuery{
         this.base64Image = (imageData)=>{
             if(imageData == undefined){
                 return defaultPic.image;
+                // this.path.
             }else{
             var raw = imageData.imageBuffer;
             var base64String  = '';
             for (let index = 0; index < raw.length; index++) {
                 base64String += String.fromCharCode(raw[index]);
-                
             }
             var image = "data:"+imageData.mime+";base64,"+window.btoa(base64String);
             return image;
@@ -38,7 +38,7 @@ class AudioQuery{
     /**
      * This function fill the gap of tracks without embeded tiles
      */
-    this.getTitle = (tags = NodeID3.read() ,file = '',ext)=>{
+    this.getTitle = (tags = NodeID3.read(), ext = '' ,file = '')=>{
         return (tags.title == undefined)? file.replace(`${ext}`,""):tags.title;
     }
     /**
@@ -78,7 +78,7 @@ class AudioQuery{
      * This method to extract lyrics of tracks
      * */ 
      this.filterLyrics = (lyrics = NodeID3.read() )=>{
-        return (lyrics.unsynchronisedLyrics == undefined)?'No lyrics found':lyrics.unsynchronisedLyrics;
+        return lyrics.unsynchronisedLyrics;
       }
       /**
        * This method the folder name from a given url
@@ -86,9 +86,16 @@ class AudioQuery{
       this.extractFolderName = (url = '')=>{
             return (url.replace(/(.*)[\/\\]/,"").split('.')[0]);
       }
+      /**
+       * This method returns the size of a file
+       */
+      this.fileSize = (url = '')=>{
+          let formatedUrl = url.replace('file://','');
+         return ((fs.statSync(`${formatedUrl}`).size)/1000000).toFixed(2);
+      }
  }
     /**
-     * function to fetch all songs
+     * function to fetch all songs and returns a promise
      * */
     fetchAllSongs(){
         /**
@@ -98,26 +105,29 @@ class AudioQuery{
        
        var rawData = fs.readdirSync(folderpath);
        var allSongs = [];
-    //    show music metadata
-       (rawData.flat(1)).map((songs)=>{
-    
-        var tags = NodeID3.read(folderpath+"/"+songs);
-        var extension = path.extname(folderpath+"/"+songs);
+    rawData.map((musicFile)=>{
+        var tags = NodeID3.read(`${folderpath}/${musicFile}`);
+        // var extension = path.extname(`${musicFile}`);
+        
            var songData = {
-                title:this.getTitle(tags,songs,extension),
+               
+                title:this.getTitle(tags,extname(`${folderpath}/${musicFile}`),musicFile),
                 genre:this.getGenre(tags),
                 album:this.getAlbum(tags),
                 lyrics:this.filterLyrics( tags),
                 artwork:this.base64Image(tags.image),
                 year:this.getYear(tags),
                 artist:this.getArtist(tags),
-                path :`file://${folderpath}/${songs}`,
+                size:this.fileSize(`file://${folderpath}/${musicFile}`),
+                path :`file://${folderpath}/${musicFile}`,
                 composer:this.getComposer(tags),
             }
+            
             allSongs.push(songData);
-       });
-    // }
+        });
+
       return allSongs;
+    
     }
     /**
      * function to fetch all albums

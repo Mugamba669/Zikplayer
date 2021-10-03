@@ -1,6 +1,9 @@
 ./.dist
 /tests
-
+/demo.html
+/index.html
+/server.js
+/template.js
 audio.js
 file.html
 file.js
@@ -14,7 +17,7 @@ tracks.txt
 /node_modules
 /streaming
 /lib
-fpm
+/fpm
 /dist
 
 
@@ -27,5 +30,5 @@ fpm
 .pnp.js
 
 # testing
-/coverage
-
+/draft
+/audiotagger

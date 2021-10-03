@@ -1,53 +1,81 @@
 .sidebar{
-    box-shadow: inset 0px 0px 2px 0px #eee;
+    box-shadow: 0px 0px 2px 0px #eee;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    top: 140px !important;
+    top: 90px !important;
     position: fixed !important;
     z-index: 2!important;
-    height: 60vh;
+    height: 80vh;
     backdrop-filter: blur(20px);
     background:#00000080;
     transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    width: 0px;
-    opacity: 0;
+    width: 100px;
+    /* opacity: 0; */
     display: flex;
     flex-direction: row;
     justify-content: center;
+    overflow: hidden;
     align-items: center;
-    /* pointer-events: none; */
-    visibility: hidden;
+    pointer-events: none;
+    /* visibility: hidden; */
 }
 .sidebar table{
     cursor: pointer;
 }
 body .sidebar.active{
     width: 300px;
-    opacity: 1;
+    /* opacity: 1; */
     visibility: visible;
 }
-.table{
+.sidebar .table{
     padding: 15px;
     color: #fff;
     font: 600 19px Ubuntu;
-    width: 100%;
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    left: 10px;
+    z-index: 5!important;
     border-collapse: collapse;
+    pointer-events: all;
 }
-.table tbody tr{
+.sidebar .table tbody tr{
     cursor: pointer !important;
-   padding: 20px;
+    border-collapse: collapse;
+    pointer-events: all!important;
+   padding: 20px!important;
 }
 
-.table tbody tr:nth-child(odd){
-    background: #1d1c1c8a;
+.sidebar .table tbody tr:nth-child(odd){
+    background: #1d1c1c62;
 }
-.table tbody td{
+.sidebar .table tbody td{
     /* border: 1px solid #eee; */
-    padding: 7px;
+    padding: 10px;
 }
-.table tbody td b{
+.sidebar .table tbody td b{
     margin: 7px;
     font-size: 17px !important;
+}
+.sidebar .table .sidebar-data{
+    visibility: hidden;
+}
+.sidebar .table .sidebar-data.active{
+    visibility: visible;
+}
+.sidebar-icons{
+    width: 40px!important;
+    height: 40px!important;
+    border-radius: 10px!important;
+    background: transparent!important;
+    padding: 15px !important;
+}
+.sidebar-icons.active{
+    width: initial!important;
+    height: initial !important;
+    border-radius: 0px!important;
+    background: initial!important;
+    padding: initial!important;
 }
 .drawer{
     top: 0 !important;
@@ -57,10 +85,11 @@ body .sidebar.active{
     z-index: 3 !important;
     display: flex;
     align-items:center !important;
-    /* pointer-events: none; */
+    pointer-events: none;
 }
 .drawer .btn-wrapper button{
     width:45px;
+    pointer-events: all;
     height:50px;
     border-end-end-radius: 40px;
     border-top-right-radius: 40px;
@@ -70,8 +99,8 @@ body .sidebar.active{
     font-size:36px;
     background-color:black;
     color:white;
-    left: 0;
-    transition:0.3s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+    left: 100px;
+    transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     font-weight:bolder;
     cursor:pointer;
     box-shadow: inset 0px 0px 10px 0px rgba(8, 8, 8, 1);
@@ -87,18 +116,39 @@ body .sidebar.active{
 
 
 .compress{
-    width:100%;
-    height:100%;
+    width:1200px;
+    height:600px;
+    box-shadow: 0px -4px 0px 0px #ccc;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background: #00000080;
+    backdrop-filter: blur(20px);
     position: fixed !important;
     display:flex !important;
-    top: 20px;
     flex-direction: row-reverse !important;
     align-items:center !important;
     justify-content:center !important;
-
+    visibility:hidden;
+    transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    right: -4000px;
 }
-.compress .comp-slider{
-    transform: rotate(-90deg);
+.compress.active{
+    visibility:visible;
+    right: 90px;
+}
+.compress .comp-knobs{
+    color:white;
+    font: 400 16px Ubuntu,Arial;
+    padding: 10px;
+    justify-content:center;
+    align-items:center;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    display: grid !important;
+    grid-template-columns:repeat(auto-fill,minmax(380px,2fr)) !important;
+    grid-template-rows:auto;
+    grid-gap: 1px 1px;
 }
 .compress .comp-reset{
     margin: 10px;
@@ -125,62 +175,218 @@ body .sidebar.active{
     transform: scale(1.1,1);
 
 }
-.compress input[type="range"]{
-    margin:25px;
+.compressor-header{
+    position:absolute;
+    font-size:30px;
+    color: white;
+    left: 20px;
+    top: 10px;
+}
+.close-compressor{
+    width: 40px;
+    height: 40px;
+    cursor:pointer;
+    transition: 0.3s ease-in-out;
+    border-radius: 50%;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    cursor: pointer;
+    color: white;
+    background: transparent;
+    transform: scale(1,1);
+    border: 1px solid #ccc;
+    outline:none;
+}
+.close-compressor:hover{
+    transform: scale(1.1,1.1);
+    background: red;
+    border: 1px solid red;
 }
 /* Tunning */
+.Tune-container{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    z-index: 10;
+}
+
+.Tune-container.active{
+    visibility: visible;
+}
+.Tune-container .Tune{
+    position:absolute;
+    justify-content: center;
+    align-items: center;
+    width: 800px;
+    margin: 10px;
+    backdrop-filter: blur(20px);
+    background-color: rgba(15, 14, 14, 0.445);
+    border-radius: 5px;
+    box-shadow: 0px -4px 0px 0px #eee;
+    border: 1px solid #ccc;
+    height: 500px;
+    transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    right: -700px;
+    visibility: hidden;
+}
+.Tune-container .Tune.active{
+    visibility: visible;
+    right: 300px;
+}
 .tun-container{
-    transform: rotate(-90deg);
     width:100%;
     height:100%;
-    position: fixed !important;
-    display:flex !important;
+    pointer-events: all;
+    flex-direction: column;
+    display: grid !important;
+	grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;
+	grid-gap: 12px 2px !important;
+	grid-template-rows: auto!important;
+    justify-content: center;
+    align-items: center;
+    
+}
+.Tune-header{
+    position: absolute;
     top: 20px;
-    flex-direction: column !important;
-    align-items:center !important;
-    justify-content:center !important;
-
+    left: 30px;
+    font: 500 20px Ubuntu,Arial,Helvetica;
+    color: #fff;
 }
-.tun-container p{
-    /* position: absolute; */
-    margin:10px;
-    /* transform: rotate(90deg)translateY(120px) !important; */
+.tunning-label{
+    font: 600 16px Ubuntu,Arial,Helvetica;
+  
+    /* background-color: #000000; */
+    padding: 3px;
+    border-radius: 5px;
+    color: rgb(241, 240, 240);
 }
-.tun-container input{
-    margin:40px;
+.close-Tune{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: transparent;
+    color: #fff;
+    width:50px;
+    height:50px;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    transform:scale(1,1);
+    transition: 0.3s all;
+}
+.close-Tune:hover{
+    transform:scale(1,1);
+    background: red;
+    border: 1px solid red;
 }
 /* Equaliser */
+#eqns{
+    width: 100px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #000000af;
+    color: #fff;
+}
+
 .eq-cont {
     width:100%;
     height:100%;
     position: fixed !important;
     display:flex !important;
-    top: 20px;
+    /* top: 20px; */
+    flex-direction: column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    z-index: 8!important;
+    visibility:hidden;
+
+}
+.eq-cont.active{
+    visibility: visible;
+}
+.eq-cont .eq-wrapper{
+    border-radius: 8px;
+    width:1050px;
+    height:500px;
+    position: absolute !important;
+    backdrop-filter: blur(19px);
+    box-shadow: 0px -4px 0px 0px #ccc;
+    border: 1px solid #ccc;
+    display:flex !important;
+    top: 30px;
+    left: -400px;
+    color: #fff;
+    background-color: #0000005e;
     flex-direction: row !important;
     align-items:center !important;
     justify-content:center !important;
-
+    z-index: 8!important;
+    visibility: hidden;
+    transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.eq-cont .eq-wrapper.active{
+    visibility: visible;
+    left: 160px;
 }
 
-.eq-cont .eq-cont-slides{
-    transform: rotate(-90deg);
-
+.eq-cont .eq-wrapper .eq-cont-slides{
+    /* padding: 15px; */
+    width:100%;
+    margin: 20px;
+    display: grid !important;
+	grid-template-columns:repeat(auto-fill,minmax(100px,3fr))!important;
+	grid-gap: 2px 10px !important;
+	grid-template-rows: auto!important;
 }
-.eq-cont .eq-cont-slides input{
-    margin:30px;
+.eq-cont .eq-wrapper .close-eq{
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    box-shadow: inset 0px 0px 5px 0px #ccc;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    border-radius: 50%;
+    outline: none;
+    border: 1px solid #ddd;
+    background: transparent;
+    color: #ccc;
 }
-.eq-cont .eq-options{
-    /* position: fixed; */
+.eq-cont .eq-wrapper .close-eq:hover{
+    /* box-shadow: 0px 4px 0px 0px rgb(248, 0, 0); */
+    background: red;
+    border: 1px solid red;
+}
+.eq-cont .eq-wrapper  .eq-header{
+    position: absolute;
+    left: 50px;
+    top: 10px;
+    font: 500 23px Ubuntu ,-apple-system,Helvetica,Arial;
+}
+.eq-cont .eq-wrapper .eq-cont-slides input{
+    margin:20px;
+}
+.eq-cont .eq-wrapper .eq-options{
+    width:100%;
     margin:20px;
     left:0;
-    width:400px;
     display:flex;
     flex-direction: column !important;
     align-items:center !important;
     justify-content:center !important;
 }
 
-.eq-cont .eq-options button{
+.eq-cont .eq-wrapper .eq-options button{
     margin:50px;
     width:100px;
     height:40px;
@@ -196,21 +402,32 @@ body .sidebar.active{
     box-shadow:inset 0px 0px 10px 0px #eeee;
     transition:0.2s cubic-bezier(0.215, 0.610, 0.355, 1);
 }
-.eq-cont .eq-options button:hover{
+.eq-cont .eq-wrapper .eq-options button:hover{
     transform: scale(1.1,1);
     background:rgba(98, 172, 241, 0.4);
     box-shadow:inset 0px 0px 20px 0px #63cdff;
 }
 .room-box{
-    /* backdrop-filter: blur(20px); */
-    width:100%;
-    height:100%;
-    position: fixed !important;
+    backdrop-filter: blur(30px);
+    background: #00000080;
+    width:1000px;
+    height:500px;
+    position: absolute !important;
+    box-shadow: 0px -4px 0px 0px #eeee;
+    border: 1px solid #eee;
+    border-radius: 10px;
     display:flex !important;
-    top: 20px;
+    top: 100px;
     flex-direction: row !important;
     align-items:center !important;
     justify-content:center !important;
+    right: -800px;
+    transition: 0.3s cubic-bezier(0.95, 0.05, 0.795, 0.035);
+    visibility:hidden;
+}
+.room-box.active{
+    right: 200px;
+    visibility:visible;
 }
 .room-box .room-options{
     display:flex;
@@ -221,6 +438,11 @@ body .sidebar.active{
     align-items:center !important;
     justify-content:center !important;
     /* height:500px */
+}
+.room-box .room-options select{
+    width:130px;
+    padding:10px;
+    border-radius: 5px;
 }
 .room-box .room-options .sw{
     color: #fdfeff;
@@ -252,10 +474,57 @@ body .sidebar.active{
     color: #63cdff !important;
 }
 .room-box .room-box-slides{
-    transform: rotate(-90deg);
-   
+    width:600px;
+    height: 100%;
+    padding: 10px;
+    display: grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,2fr));
+    grid-template-rows: auto;
+   justify-content: center;
+   align-items: center;
+    grid-gap: 2px 2px;
+   margin: 14px;
 }
-.room-box .room-box-slides input{
-    margin:20px;
-    
+.room-box .room-box-slides .room-label {
+    color: #fff;
+    font: 500 18px Ubuntu,Arial;
+}
+
+.room-box .room-box-slides .room-label span{
+    color: #fff;
+    font: 500 18px Ubuntu,Arial;
+}
+.room-box .room-box-slides .room-effects , .compressor, #ratexp,#balance,#audioboost{
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+}
+.room-box .room-header{
+    font: 300 23px Ubunt,Arial;
+    color: #ffffff;
+    position: absolute;
+    top: 20px;
+    left: 200px;
+
+}
+.close-room{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    outline: none;
+    cursor: pointer;
+    color: #fff;
+    background: transparent;
+    transform: scale(1,1);
+    transition: 0.25s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+.close-room:hover{
+    background: red;
+    border: 1px solid red;
+    transform: scale(1.1,1.1)
 }

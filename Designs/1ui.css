@@ -39,25 +39,30 @@ fab options button
     font: normal 19px Ubuntu,Arial;
 }
 button.fab-options{
-    background-color: rgb(25, 66, 180);
-    border-radius: 50%;
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    top: 100px;
-    right: 90px;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 0px;
+    outline: none;
+    width: 200px;
+    padding: 10px;
+    margin: 10px;
     border: none;
+    line-height: 10px;
     cursor: pointer !important;
-    border: 3.5px solid rgb(144, 158, 238);
-    font-size: 20px;
-    z-index: 10!important;
+    border-top: 1px solid #cccc;
+    border-right: 1px solid #cccc;
+    border-left: 1px solid rgb(69, 71, 69);
+    border-bottom: 1px solid rgb(69, 71, 69);
+    font-size: 16px;
+    transition: 0.3s ease-in-out;
     color: #fff;
 }
-
+button.fab-options:hover{
+    border-top: 1px solid rgb(69, 71, 69);
+    border-right: 1px solid rgb(69, 71, 69);
+    border-left: 1px solid #cccc;
+    border-bottom: 1px solid #cccc;
+}
 .vol-container{
-    /* pointer-events: none; */
-    backdrop-filter: blur(0px);
     width: 100%;
     height: 100%;
     position: fixed !important;
@@ -69,87 +74,63 @@ button.fab-options{
     visibility: hidden!important;
 }
 
-.vol-container .p-label{
-    right:240px;
-    bottom: 240px;
-    margin: 15px;
-    color: #fff;
-    background: #000;
-    padding: 10px;
-    border-radius: 10px;
-    font: 300 19px Segoe, Ubuntu , Arial;
-    position: absolute;
-}
-.vol-container .p-label span{
-    font: 300 19px Segoe, Ubuntu , Arial;
-    color: #fff;
-}
-.vol-container .close-panel{
-    position: absolute;
-    width: 50px;
+.vol-container .vol-panel  .close-panel{
+    position: absolute !important;
+    width: 36px;
     cursor: pointer;
-    height: 50px;
+    height: 36px;
     border-radius: 50%;
-    color: rgb(238, 229, 229);
-    box-shadow: inset 0px 0px 10px #555555;
+    color: #ffffff;
+    transform: scale(1,1);
     background: rgba(20, 20, 20, 0.233);
-    border: 2px solid #898a8f;
-    bottom: 140px;
+    border: 2px solid #dddfe7;
     font-size:20px;
     transition: 0.3s ease-in-out;
-    right:100px;
+    top: 20px;
+    right:20px;
 }
-.vol-container .close-panel:hover{
-    box-shadow: inset 0px 0px 10px 0px #4291eb;
-    border: 2px solid #4291eb;
+.vol-container  .vol-panel .close-panel:hover{
+ transform: scale(1.1,1.1);
 }
 .vol-container.active{
     visibility: visible!important;
-    backdrop-filter: blur(3px);
+    
 }
 .vol-container .vol-panel{
     width: 400px;
     padding: 10px;
-    position: absolute;
+    position: absolute !important;
     z-index: 10 !important;
-    right: 0;
+    right: 400px;
     bottom: -200px;
+    backdrop-filter: blur(20px);
+    border: 1px solid #ccc;
+    box-shadow: 0px -3px 0px 0px #ccc;
     display: flex!important;
-    background-color: #000;
+    background-color: rgba(0, 0, 0, 0.397);
     margin: 10px;
     border-radius: 8px;
     color: #fff;
     visibility: hidden!important;
     transition: 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
-    flex-direction:column-reverse!important;
+    flex-direction:column!important;
     justify-content: center;
     align-items: center!important;
-    /* transition-delay: 0.6s; */
-    transform: rotate(-90deg);
 }
-
+.vol-container .vol-panel .vol-label{
+    font: 300 19px  Ubuntu , Arial;
+    background-color:#000;
+    padding: 5px;
+    border-radius: 3px;
+    color: #fff;
+}
+.vol-container .vol-panel .vol-label span{
+    color: #fff;
+    font: 300 19px  Ubuntu , Arial;
+}
 .vol-container .vol-panel.active{
     visibility: visible !important;
-   
     bottom: 200px;
-}
-.vol-container .vol-panel input[type='range']{
-    width: 100%;
-    -webkit-appearance: none!important;
-    height: 20px;
-    border-radius: 10px;
-    box-shadow:inset 0px 0px 10px 0px #eee;
-    background-color: rgba(0,0,0,0.5);
-    overflow: hidden;
-}
-
-.vol-container .vol-panel input[type='range']::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #0cf;
-    border-radius: 50%;
-    transform: translateY(0.5px);
 }
 
 /**Welcome Panel **/

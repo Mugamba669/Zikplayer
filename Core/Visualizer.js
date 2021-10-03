@@ -12,6 +12,7 @@ module.exports = class Visualizer{
         this.context = this.canvas.getContext('2d');
         this.bufferLength = this.analyser.frequencyBinCount;
         this.freqDomain = new Uint8Array(this.bufferLength);
+        // setup = true;
     }
     // bufferLength
   
@@ -26,7 +27,8 @@ module.exports = class Visualizer{
         /**
          *Lets start by clearing the canvas
          */
-        this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+         this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+      
         // set visual Color: 
         this.context.fillStyle = "#FDDD74";
         /**
@@ -54,7 +56,7 @@ renderCanvas()
      dustyParticles(){
         var renderDusty = ()=>{
             window.requestAnimationFrame(renderDusty);
-            this.analyser.getByteTimeDomainData(this.freqDomain)
+            // this.analyser.getByteTimeDomainData(this.freqDomain)
                this.analyser.getByteFrequencyData(this.freqDomain)
                $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight)
                window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
@@ -84,11 +86,11 @@ renderCanvas()
     sineWaveVisualiser(){
         var renderSineWave = ()=>{
             window.requestAnimationFrame(renderSineWave);
-               this.analyser.getByteFrequencyData(this.freqDomain)
+            
                this.analyser.getByteTimeDomainData(this.freqDomain)
 
-               $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight)
-               window.onresize = ()=>  $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
+               $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight)
+               window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
            /**
             *Lets start by clearing the canvas
             */
@@ -124,10 +126,10 @@ renderCanvas()
     historgramVisualiser(){
         var barHistogram = ()=>{
             window.requestAnimationFrame(barHistogram);
-        this.analyser.getByteTimeDomainData(this.freqDomain);
+        
         this.analyser.getByteFrequencyData(this.freqDomain);
-        $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight)
-        window.onresize = ()=>  $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
+        $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight)
+        window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         for (var i = 0; i < this.bufferLength; i++) {
@@ -146,12 +148,11 @@ renderCanvas()
     ripleWaveVisualiser(){
         var ripleWaves = ()=>{
             window.requestAnimationFrame(ripleWaves);
-            var sliceWidth = (this.canvas.width) * 1.0 / this.bufferLength;
-            // var freqD = new Uint8Array(bufferLength);
-            this.analyser.getByteTimeDomainData(this.freqDomain);
             this.analyser.getByteFrequencyData(this.freqDomain);
-            $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight)
-            window.onresize = ()=>  $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
+            var sliceWidth = (this.canvas.width) * 1.0 / this.bufferLength;
+            
+            $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight)
+            window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
             // riple cicle
             var  radius = this.canvas.height < this.canvas.width ? this.canvas.height :this.canvas.width;
             radius = (radius * 0.65 / 3);
@@ -191,14 +192,12 @@ renderCanvas()
 
    var renderUpDownFrame  = ()=>  {
         window.requestAnimationFrame(renderUpDownFrame);
-           var freqDomain = new Uint8Array(this.analyser.frequencyBinCount);
-          this.analyser.getByteFrequencyData(freqDomain);
-          
-           $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
-           window.onresize = ()=>  $(this.canvas).attr("width",window.innerWidth).attr("height",window.innerHeight);
+        this.analyser.getByteFrequencyData(this.freqDomain);
+           $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
+           window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
            for(let i = 0;i < this.bufferLength;i++){
-			var value = freqDomain[i*2] / 400;
+			var value = this.freqDomain[i*2] / 400;
 			var barx = i * 5.5;
 			var barW = 2;
 			var height = this.canvas.height * value;
@@ -207,12 +206,18 @@ renderCanvas()
 		// Up frame
 			this.context.fillStyle = "#E8F572";
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
+            $(window).on('resize',()=>{
+                this.context.translate(1300, -400);
+            })
 			this.context.translate(1300, -400);
 			this.context.scale(-1, 1)
 			this.context.fillRect(barx,barH,barW,height);
             // down frame
 			this.context.fillStyle = "#E8F572";
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
+            $(window).on('resize',()=>{
+                this.context.translate(1300, -400);
+            })
 			this.context.translate(1300, 1080);// 1050, 916
 			this.context.scale(-1,-1);
 			this.context.fillRect(barx,barH,barW,height);
@@ -220,30 +225,34 @@ renderCanvas()
        }
        renderUpDownFrame();
    }
-
+/**
+ * 
+ * @param {*} 
+ * This method renders the spiral visualiser
+ * 
+ */
    spiralVisualiser(selector){
-    var that = this;
     var spiralVisual = () => {
     window.requestAnimationFrame(spiralVisual);
-    var freqDomain = new Uint8Array(this.analyser.frequencyBinCount);
-    this.analyser.getByteFrequencyData(freqDomain);
+    // var freqDomain = new Uint8Array(this.bufferLength);
+    this.analyser.getByteFrequencyData(this.freqDomain);
 
     var visuals = document.querySelectorAll(selector);
-    var context;
     // creating spiral visualizer
     visuals.forEach(elem => {
-        context = $(elem).get(0).getContext("2d");
         $(elem).attr("width",window.innerWidth ).attr("height",window.innerHeight/2);
         window.onresize = ()=>  $(elem).attr("width",window.innerWidth).attr("height",window.innerHeight/2);
        var WIDTH = elem.width;
        var HEIGHT = elem.height;
+       var context = elem.getContext("2d");
+    //    console.log(context)
         context.clearRect(0, 0, WIDTH, HEIGHT);
        
         context.fillStyle = "#FFB28F";
         for (let index = 0; index < WIDTH; index++) {
             var barX = index * 3;
             var barWidth = 2;
-            var element = freqDomain[index] / 220;
+            var element = this.freqDomain[index] / 220;
             var offset = HEIGHT * element;
             var height = HEIGHT - offset - 1;
             context.fillRect(barX, height, barWidth, offset);
@@ -252,15 +261,23 @@ renderCanvas()
 }
 spiralVisual()
 }
-
-   glassTilesVisualiser(){
+/**
+ * This method illustrates glass pills visualisation
+ */
+ glassTilesVisualiser(){
     var glassPills = ()=>{
         window.requestAnimationFrame(glassPills);
     this.analyser.getByteFrequencyData(this.freqDomain);
-    
+
+    $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
+    /**
+     * 
+     * @returns Update canvas on resize
+     */
+    window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.strokeStyle = '#85EE8A';
-    for (var i = 0; i < this.bufferLength / 5 ; i++) {
+    for (var i = 0; i < this.bufferLength / 3 ; i++) {
         var barWidth = i * 12;
         var barX = 7.5;
         var percent = this.freqDomain[i] / 327;
@@ -272,4 +289,98 @@ spiralVisual()
    glassPills();
    }
 
+   floatingBars(){
+    var floatingPills = ()=>{
+        window.requestAnimationFrame(floatingPills);
+    this.analyser.getByteFrequencyData(this.freqDomain);
+
+    $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
+    /**
+     * 
+     * @returns Update canvas on resize
+     */
+    window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.strokeStyle = '#99C437';
+    for (var i = 0; i < this.bufferLength / 3 ; i++) {
+        this.context.strokeRect(100+i*4,100+256-this.freqDomain[i]*2,3,100);
+    }
+     }
+   floatingPills();
+   }
+   /**
+    * This method renders a stretched image on the canvas
+    */
+   colorstetchVisualiser(){
+   
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+   
+    var rtick = 0;
+    var gtick = 0;
+    var btick = 0;
+    var buffer1 = null;
+    var buffer2 = null;
+    var setup = false;
+
+    /**
+     * 
+     * @returns responsible for updating the canvas image
+     */
+    const update = () => {
+        window.requestAnimationFrame(update);
+        $(this.cs).attr('width',window.innerWidth).attr('height',window.innerHeight)
+        this.analyser.getByteFrequencyData(this.freqDomain);
+
+        window.onresize = ()=>  $(this.cs).attr("width",window.innerWidth).attr("height",window.innerHeight);
+        // if(!setup) return;
+        
+       if(!buffer1){
+            // console.log('creating');
+           buffer1 = document.createElement("canvas");
+            $(buffer1).attr('width',w).attr('height',h)
+            buffer2 = document.createElement("canvas");
+            $(buffer2).attr('width',w).attr('height',h)
+       }
+       window.onresize = ()=>  $(buffer1).attr("width",w).attr("height",h);
+        window.onresize = ()=>  $(buffer2).attr("width",w).attr("height",h);
+        var bctx1 = buffer1.getContext('2d');
+        var bctx2 = buffer2.getContext('2d');
+        
+        //copy buffer1 to buffer2
+        bctx2.drawImage(buffer1,0,0);
+    
+    
+        //draw music into buffer 2
+        rtick = (rtick+1)%(10);
+        gtick = (gtick+2)%(200);
+        btick = (btick+3)%(90);
+      
+        bctx2.strokeStyle =  "rgba("+rtick+","+gtick+","+btick+")";
+        bctx2.beginPath();
+        
+        var s = this.freqDomain.length/2*4;
+        
+        var l = w/2-s/2;
+        var t = h/2-256/2;
+        bctx2.moveTo(l, t+128-this.freqDomain[0]+100);
+        
+        for(var i=0; i<this.freqDomain.length/2; i++) {
+            bctx2.lineTo(l+i*4, t+128-this.freqDomain[i]+10);
+        }
+        
+        for(var i=(this.freqDomain.length/2)-1; i>=0; i--) {
+            var max = this.freqDomain.length/2-1;
+            bctx2.lineTo(l+(max-i)*4, t+128-this.freqDomain[i]+100);
+        }
+        bctx2.stroke()
+        
+        //copy buffer2 to buffer1, stretched
+        //draw more onto buffer
+        bctx1.drawImage(buffer2, 0,0,w,h,-5,-5, w+10,h+10);
+        //draw buffer1 back to screen
+        this.context.drawImage(buffer1,0,0);   
+    }
+    update();
+   }
 }

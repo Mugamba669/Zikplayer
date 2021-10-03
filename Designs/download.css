@@ -1,0 +1,101 @@
+.download-container{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background: #00000000;
+    top: 10px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    
+    pointer-events: none;
+    visibility: hidden;
+    z-index: 8!important;
+    /* justify-content: center; */
+    align-items: center;
+}
+.download-container.active{
+    visibility: visible;
+}
+.download-container .download-body{
+    z-index: 10!important;
+    pointer-events: auto;
+    position: absolute;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+    width: 500px;
+    left: -500px;
+    height: 70px;
+    background-color: rgba(19, 19, 20, 0.945);
+    box-shadow: 0px -5px 0px 0px #ddd;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    bottom: 50px;
+    justify-content: center;
+    align-items: center;
+}
+.download-container .download-body.active{
+    left: 240px;
+    visibility: visible;
+}
+.download-container .download-body .download-panel{
+    width: 400px;
+    height: 6px;
+    background-color: white;
+    border-radius:10px;
+    overflow: hidden;
+    position: absolute;
+}
+.download-container .download-body .download-panel .download-progress{
+    width: 0%;
+    height: 7px;
+    /* margin: 2.3px; */
+   box-shadow: 0px 0px 4px 0px #0350f5;
+    top: 0;
+    position: absolute;
+    background-color: #0350f5;
+}
+.download-container .download-body .download-item{
+    position: absolute;
+    top: 3px;
+    /* margin: 8px; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.download-container .download-body .download-item .item{
+    width: 130px;
+    font: 400 13px Ubuntu, -apple-system,Arial,Helvetica,Georgia;
+    margin: 7px;
+    white-space: nowrap;
+}
+.download-container .download-body .download-item .item:first-child , .item:last-child{
+    width: 140px;
+    margin: 7px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.sg-title{
+    width: 10%;
+    
+}
+.dwn-controls{
+    position: absolute;
+    right: 0;
+    margin: 10px;
+}
+.dwn-controls button{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 12px;
+    background-color:#0350f5;
+    color: #fff;
+    border: 1px solid #0350f5;
+}

@@ -1,4 +1,4 @@
-@import url('../tools/w3.css');
+@import url('../Designs/Ziki.css');
 tr:nth-child(even){
     background-color: #666;
     /* color: #fff; */
@@ -8,11 +8,58 @@ body{
     background: transparent;
     
 }
-table{
-    -webkit-app-region:drag;
+.help-container{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.help-container .help-cont{
+    width: 600px;
+    height: 600px;
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.help-container .help-cont::-webkit-scrollbar{
+    appearance: none;
+    background: transparent;
+}
+
+.help-container .help-cont::-webkit-scrollbar-thumb{
+    appearance: none;
+    background: #ffff;
+    border-radius:10px;
+}
+
+.help-container .help-cont::-webkit-scrollbar-button{
+    appearance: none;
+    background: transparent;
+}
+.help-container .help-cont::-webkit-scrollbar-corner{
+    appearance: none;
+    background: transparent;
+}
+.help-container .help-cont::-webkit-scrollbar-track{
+    appearance: none;
+    background: transparent;
+}
+.help-container .help-cont table{
+    width: 100%!important;
+    height: inherit!important;
+    /* -webkit-app-region:drag; */
     background: #000;
     color: #eee;
-    border-radius: 50px;
+    margin: 10px;
     filter: contrast(20px) brightness(3px);
 }
 thead{
@@ -20,4 +67,19 @@ thead{
 }
 title{
     font:100 20px Arial !important;
+}
+ .btn{
+    width: 500px;
+    padding: 6px;
+    cursor: pointer;
+    outline: none;
+    border-radius: 10px;
+    position: inherit!important;
+    color: #fff;
+    background: #6eebb1;
+    transition: 0.3s ease-in-out;
+}
+button:hover{
+   
+    background: #e44545;
 }
