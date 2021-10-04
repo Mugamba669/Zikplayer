@@ -5,11 +5,16 @@ const gis = require('g-i-s');
 const emoji = require('emojis-list');
 const isOnline = require("is-online");
 // console.log(emoji)
+var artWork = '',songUrl = '';
 ipcRenderer.on('getPath',(e,args)=>{
-    var path = (args.path).replace('file://','');
+    artWork = args.artwork;
+    songUrl = args.path;
+})
+$('.tags-edit-btn').on('click',function(){
+    var path = (songUrl).replace('file://','');
     var tags = NodeID3.read(path);
     // console.log(tags.time)
-$('.tags-artwork img').attr('src',args.artwork)
+$('.tags-artwork img').attr('src',artWork)
 $('.tags-panel-body input').eq(0).val(tags.title)
 $('.tags-panel-body input').eq(1).val(tags.artist)
 $('.tags-panel-body input').eq(2).val(tags.genre)
@@ -56,7 +61,6 @@ $('.updateArtWork').on('click',function(){
          }
         $('.tags-img').attr('src',args);
         NodeID3.update(id3,`${path}`);
-        // ipcRenderer.send('reloadToSave');
     })
 })
 /**
@@ -74,28 +78,39 @@ $('.updateArtWork').on('click',function(){
             "fontFamily": "Ubuntu"
         }).addClass('pick-msg').appendTo('.picker-wrapper')
     } else {
+        $('.pick-msg').remove()
         $('<p></p>').text(
             `Loading images, please wait...`
          ).css({
              "color": "#ffffff",
              "fontSize": "20px",
              "fontFamily": "Ubuntu"
-         }).addClass('pick-msg').appendTo('.picker-wrapper')
+         }).addClass('pick-ms').appendTo('.picker-wrapper')
         gis(`${tags.artist}`,(err,data)=>{
-            $('.pick-msg').remove()
-            const drawImages = function(src){
-                const cover =  $('<div></div>').append(
+            if(err){
+                $('<p></p>').text(
+                    `${err}`
+                 ).css({
+                     "color": "#ffffff",
+                     "fontSize": "20px",
+                     "fontFamily": "Ubuntu"
+                 }).addClass('pick-ms').appendTo('.picker-wrapper')
+            }
+            $('.pick-ms').remove()
+            console.log(data)
+            var drawImages = function(src){
+                var cover =  $('<div></div>').append(
                     $('<img/>').attr('src',src).addClass('new-img')
                 ).addClass('new-cover').on('click',function(){
                     let imgsrc = $('.new-img').attr('src').valueOf();
                    $('.tags-img').attr('src',imgsrc);
                    var title,artist,album,genre;
-        title = $('.tags-panel-body input').eq(0).val();
-        artist = $('.tags-panel-body input').eq(1).val();
-        genre = $('.tags-panel-body input').eq(2).val();
-        album =  $('.tags-panel-body input').eq(3).val();
+                title = $('.tags-panel-body input').eq(0).val();
+                artist = $('.tags-panel-body input').eq(1).val();
+                genre = $('.tags-panel-body input').eq(2).val();
+                album =  $('.tags-panel-body input').eq(3).val();
        
-         const id3 = {
+        var id3 = {
              APIC:`${imgsrc}`,
              TIT2:`${title}`,
              TPE1:`${artist}`,
@@ -103,7 +118,6 @@ $('.updateArtWork').on('click',function(){
              TCON:`${genre}`,
          };
                    NodeID3.update(id3,`${path}`);
-                //    ipcRenderer.send('reloadToSave');
 
                 });
                 $('.picker-body').append(cover);

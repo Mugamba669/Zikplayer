@@ -6,6 +6,7 @@ const { Emitter } = require('custom-electron-titlebar/common/event');
 const { autoUpdater } = require('electron/main');
 const { Console } = require('console');
 const { join } = require('path');
+const { exit } = require('process');
 var mainWindow  = null,helpWindow = null;
 nativeTheme.shouldUseDarkColors = true;
 nativeTheme.themeSource = 'system'
@@ -75,16 +76,16 @@ ipcMain.on('removedSong',(event,args)=>{
    */
   
   ipcMain.on('reloadToSave',(e,args)=>{
+    e.preventDefault();
+    // e.stopPropagation();
    dialog.showMessageBox(mainWindow,{
-        title:"Saving Caution !",
-        message:'Restart the system to reflect the changes!!',
-        buttons:['Restart now','Maybe Later']
+        title:"Saving Caution !!",
+        message:'You need to restart the system to reflect the changes!!',
+        buttons:['Restart now']
       }).then((value)=>{
         switch (value.response) {
           case 0:
             mainWindow.reload();
-            break;
-          default:
             break;
         }
       });
@@ -247,12 +248,12 @@ app.whenReady().then(()=>{
     {
       label:"LW-Ziki Amp"
     },
-    // {label:"Tools",submenu:[
+    {label:"Tools",submenu:[
     //   // {label:"Exit",accelerator:"Ctrl + Q",click:()=> app.quit()},
     //   // {label:"Reload",accelerator:"F8",role:"reload"},
-    //   {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
+      {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
     //   {label:"Help",accelerator:"Ctrl + H",click:()=> openHelp()}
-    // ]},
+    ]},
   ]);
 
   Menu.setApplicationMenu(menu);

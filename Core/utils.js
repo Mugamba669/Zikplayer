@@ -101,12 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 //     case 'u':
                 //         $("#demo").click();
                 //     break;
-                    case 'p':
-                        $('#playlist').click();
-                    break;
-                    case 'v':
-                        $("#visual-select").click();
-                    break;
+                    // case 'p':
+                    //     $('#playlist').click();
+                    // break;
+                    // case 'v':
+                    //     $("#visual-select").click();
+                    // break;
                     // case 'l':
                     //     $("#lyrics-btn").click();
                     // break; 
