@@ -7,11 +7,12 @@ const isOnline = require("is-online");
 // console.log(emoji)
 var artWork = '',songUrl = '';
 ipcRenderer.on('getPath',(e,args)=>{
+    e.preventDefault();
     artWork = args.artwork;
     songUrl = args.path;
 })
 $('.tags-edit-btn').on('click',function(){
-    var path = (songUrl).replace('file://','');
+    var path = ($('.view').text()).replace('file://','');
     var tags = NodeID3.read(path);
     // console.log(tags.time)
 $('.tags-artwork img').attr('src',artWork)
@@ -102,6 +103,7 @@ $('.updateArtWork').on('click',function(){
                 var cover =  $('<div></div>').append(
                     $('<img/>').attr('src',src).addClass('new-img')
                 ).addClass('new-cover').on('click',function(){
+
                     let imgsrc = $('.new-img').attr('src').valueOf();
                    $('.tags-img').attr('src',imgsrc);
                    var title,artist,album,genre;
@@ -110,16 +112,17 @@ $('.updateArtWork').on('click',function(){
                 genre = $('.tags-panel-body input').eq(2).val();
                 album =  $('.tags-panel-body input').eq(3).val();
        
-        var id3 = {
-             APIC:`${imgsrc}`,
-             TIT2:`${title}`,
-             TPE1:`${artist}`,
-             TALB:`${album}`,
-             TCON:`${genre}`,
-         };
+                    var id3 = {
+                        APIC:`${imgsrc}`,
+                        TIT2:`${title}`,
+                        TPE1:`${artist}`,
+                        TALB:`${album}`,
+                        TCON:`${genre}`,
+                    };
                    NodeID3.update(id3,`${path}`);
 
                 });
+
                 $('.picker-body').append(cover);
             }
             $('.new-cover').remove();
@@ -127,12 +130,6 @@ $('.updateArtWork').on('click',function(){
          })
     }
 }
-
-
-    $('.update-image').on('click',function(){
-        $('.picker-wrapper').removeClass('active')
-        $('.picker-container').removeClass('active')
-    })
     fetchImages();
 })
 /**
@@ -149,6 +146,13 @@ $('.updateArtWork').on('click',function(){
  * close online image picker
  */
 $('.close-online-picker').on('click',function(){
+    $('.picker-wrapper').removeClass('active')
+    $('.picker-container').removeClass('active')
+})
+
+$('.update-image').on('click',function(){
+    $('.tags-panel').addClass('active')
+    $('.tags-container').addClass('active')
     $('.picker-wrapper').removeClass('active')
     $('.picker-container').removeClass('active')
 })
