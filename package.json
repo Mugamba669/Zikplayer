@@ -1,6 +1,6 @@
 {
   "name": "ziki",
-  "version": "1.5.16",
+  "version": "1.5.17",
   "description": "Enjoy the power of music through lw-ziki-amp",
   "main": "main.js",
   "scripts": {
