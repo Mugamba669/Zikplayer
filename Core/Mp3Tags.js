@@ -30,7 +30,7 @@ $('.save-changes').on('click',function(){
         TCON:`${genre}`,
     }
    NodeID3.update(id3,`${path}`);
-//    ipcRenderer.send('reloadToSave');
+   ipcRenderer.send('reloadToSave');
   })
 
 

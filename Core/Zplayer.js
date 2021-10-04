@@ -52,7 +52,7 @@ class ZPlayer {
                 this._('.image-container').classList.remove('active');
                 this._('#trackId').style.animationPlayState = 'paused';
                 $(".lyrics-wrapper").removeClass('active')
-            }           
+            }
             // this.fs = require('fs')
             this.tune = () => {
                 this._('.title').classList.add('active');
@@ -69,12 +69,12 @@ class ZPlayer {
             }
             $('#pause').hide();
             this._("#play").onclick = () => {
-               
+
                $('#play').hide();
                $('#pause').show();
            }
            this._("#pause").onclick = () => {
-              
+
                $('#play').show();
                $('#pause').hide();
            }
@@ -112,7 +112,7 @@ class ZPlayer {
             // alert("clicked");
             that.audio.loop = false;
         });
-        // muting current track  
+        // muting current track
         $(d).hide();
         $(c).click(function(){
             $(this).hide()
@@ -175,7 +175,7 @@ class ZPlayer {
 
     }
     getPlaylist(tags = {},index = 0,playlist = []){
-        var that = this;     
+        var that = this;
             // var time = new Date().getUTCMilliseconds();
             $('.total').text(`${index+1}`).css({
                 "color":"#fff",
@@ -183,7 +183,7 @@ class ZPlayer {
  /**=================================== */
             $('.tt-T').text(playlist.length);
 
-             
+
                 let check = $("<input/>").attr('type','checkbox').attr('name','listtile').attr('value',`${index}`).css({"appearance":"none"}).addClass('radiolist');
                 var erase = $('<td></td>').append(
                     $('<button></button>').addClass('material-icons-round mi-delete').on('click',function(){
@@ -202,7 +202,7 @@ class ZPlayer {
                          "border":"1px solid #ccc"
                     })
                 )
-                
+
                 var artWork = $("<td></td>").append( $('<img/>').attr('src', tags.artwork).addClass('coverArt'));
                let ext = (`${extname(tags.path)}`).replace('.','');
                 var trailing = $('<td></td>').append(
@@ -213,7 +213,7 @@ class ZPlayer {
                     $('title').text(`${tags.title}`);
                     $(".total-tracks").show(function(){
                         $(".current").text(`${(index + 1)}`);
-                       
+
                     });
                     //  track next
                     // $('.view').text(`${(tags.path).replace('file://','')}`)
@@ -221,12 +221,12 @@ class ZPlayer {
 
                 ipcRenderer.send('trackUrl',tags)
                 that.h = 0;
-            
+
 
                     // show track whose lyrics are to be displayed
                     $(".lyric-title").text(`${tags.title}`)
                     $('.lyric-artist').text(tags.artist);
-            
+
                new Notification(tags.title,{
                 icon:tags.artwork,
                 body:tags.artist,
@@ -269,12 +269,12 @@ class ZPlayer {
                     if(that.playing == true){
                         $("#play").show();
                         $("#pause").hide();
-                        that.audio.pause();
+                        // that.audio.pause();
                         // console.log(that.playing)
                     }else{
                         $("#play").hide();
                         $("#pause").show();
-                        that.audio.play();
+                        // that.audio.play();
                         // console.log(that.playing)
                     }
                     break;
@@ -287,12 +287,12 @@ class ZPlayer {
             }
         })
 
-        
-        that.audio.onended =  ()=>{ 
+
+        that.audio.onended =  ()=>{
             ipcRenderer.send('trackEnd');
             that.h = 0;
-            
-            
+
+
             if(that.shuffle  == true){
                 var next = Math.floor((Math.random() * (playlist.length)));
                     $(".current").text(`${(next)}`);
@@ -302,9 +302,9 @@ class ZPlayer {
                 var next = index+=1;
                 if((next +1) > playlist.length){
                     $(".bottom-container").show();
-                   
+
                     $('.bottom-sheet').addClass('active');
-                    $(".Art").attr("src",defaultPic.image); 
+                    $(".Art").attr("src",defaultPic.image);
                      $(".next-track").text('List finished')
                      setTimeout(() => {
                         $('.bottom-sheet').removeClass('active');
@@ -332,14 +332,14 @@ class ZPlayer {
                 if((next + 1) > playlist.length){
                     $(".bottom-container").show()
                     $('.bottom-sheet').addClass('active');
-                    $(".Art").attr("src",defaultPic.image); 
+                    $(".Art").attr("src",defaultPic.image);
                     $
                      $(".next-track").text('List finished')
                      setTimeout(() => {
                         $('.bottom-sheet').removeClass('active');
                         $(".bottom-container").hide();
                        }, 8000);
-        
+
                 }else{
                     $(".current").text(`${(next) + 1 }`);
                     $(".tt-T").text(`${(playlist.length)}`);
@@ -352,7 +352,7 @@ class ZPlayer {
         //  click to back to prev track
         $('#prevTrack').show().on('click',function(){
             that.h = 0;
-            
+
             if(that.shuffle == true){
                 var prev = Math.floor((Math.random() * (playlist.length)));
                     $(".current").text(`${(prev) + 1 }`);
@@ -364,8 +364,8 @@ class ZPlayer {
 
                     $(".bottom-container").show()
                     $('.bottom-sheet').addClass('active');
-                    $(".Art").attr("src",defaultPic.image); 
-                    
+                    $(".Art").attr("src",defaultPic.image);
+
                      $(".next-track").text('No more previous tracks')
                      setTimeout(() => {
                         $('.bottom-sheet').removeClass('active');
@@ -375,10 +375,10 @@ class ZPlayer {
                     $(".current").text(`${(prev) + 1 }`);
                     $(".tt-T").text(`${(playlist.length)}`);
                     prevTrack(playlist[prev]);
-    
+
                 }
             }
-        
+
         });
                 $(".plist").removeClass("active")
                 $(".plist-cont").removeClass("active")
@@ -392,27 +392,27 @@ class ZPlayer {
                 that._('.image-container').classList.add('active');
                 that._('.bottom-details').classList.add('active');
                 that._('#trackId').style.animationPlayState = 'running';
-           
+
 
                    that.audio.src = tags.path;
-                   
+
                    $(".view").text(tags.path);// for getting lyrics
                    that.audio.play();
                    $("#trackId").attr('src',tags.artwork);
                    $(".swiper-container").css({"backgroundImage": `url(${tags.artwork})`})
                });
      $("<tr></tr>").append(artWork).append(tile).addClass('list-tile').append(check).append(erase).append(trailing).appendTo(".plist-body")
-           
+
     //    next track function
     const nextTrack = function(tags){
         that.h = 0;
-            
+
         ipcRenderer.send('trackUrl',tags)
         // $('.view').text(`${(tags.path).replace('file://','')}`)
         new Notification(tags.title,{
             icon:tags.artwork,
             body:tags.artist,
-            
+
         }).onclick = (e)=>{
             ipcRenderer.send('showApp')
         };
@@ -434,7 +434,7 @@ class ZPlayer {
 
        const nextBtnTrack = function(tags){
         that.h = 0;
-            
+
         ipcRenderer.send('trackUrl',tags)
         // var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
         $('.size').text(`${tags.size} MB`)
@@ -456,7 +456,7 @@ class ZPlayer {
         // console.log('next track'+tags.title)
             $(".bottom-container").show()
             $('.bottom-sheet').addClass('active');
-            $(".Art").attr("src",tags.artwork); 
+            $(".Art").attr("src",tags.artwork);
             $
              $(".next-track").text(tags.title)
              setTimeout(() => {
@@ -468,7 +468,7 @@ class ZPlayer {
     //    previous track function
         const prevTrack = function(tags){
             that.h = 0;
-            
+
             ipcRenderer.send('trackUrl',tags)
             // var size = ((fs.statSync(((tags.path).replace('file://',''))).size) / 1000000).toFixed(2);
             $('.size').text(`${tags.size} MB`);
@@ -485,9 +485,9 @@ class ZPlayer {
                 that.audio.play();
                 $("#trackId").attr('src',tags.artwork);
                 $(".swiper-container").css({"backgroundImage": `url(${tags.artwork})`})
-        
+
             }
-      
+
     }
     getAudioVolume(volu, ou) {
         var out = this._(ou);
@@ -541,7 +541,7 @@ class ZPlayer {
                                 color:"gold",
                             });
                             /**
-                             * 
+                             *
                              * @returns Synchronised lyrics
                              */
                             $.fn.syncLyrics = function(){
@@ -557,7 +557,7 @@ class ZPlayer {
                                     },options.speed)
                                 })
                             }
-                       
+
                            $('.lyrics').syncLyrics();
 
                             var sec = parseInt(this.audio.currentTime % 60);
@@ -597,14 +597,14 @@ class ZPlayer {
            trackList.map((index,track) => {
                var element = track;
             var more = (`${element.children[0].children[1].attribs.style}`).replace("background-image:","");
-               
+
             var  stream = {
                   title: element.children[0].children[3].children[1].children[0].data,
                   artist:element.children[0].children[3].children[3].children[0].data,
                  coverArt:more.replace('url(',"").replace(");",""),
                   url:element.attribs.href,
                 }
-               
+
                 Axios.get(`https://www.nowviba.com/music/pages/${stream.url}`).then((response)=>{
                     var detail = response.data;
                     var ch = cheerio.load(detail);
@@ -687,8 +687,8 @@ class ZPlayer {
                 streamComponent(stream.coverArt,stream.title)
             })
         })
-          
-    }); 
+
+    });
 
     }
     streamHot100(){
@@ -704,7 +704,7 @@ class ZPlayer {
                      "fontFamily": "Ubuntu"
                  }).addClass('pick-msg').appendTo('.streaming-cont')
             }else{
-        
+
         Axios.get(`https://www.nowviba.com/music/pages/top100.php`).then((dom)=>{
             var response = dom.data;
             const ch = cheerio.load(response);
@@ -720,7 +720,7 @@ class ZPlayer {
             }
             // $(".lyrics").text("You are currently offline cannot fetch the Lyrics")
         // .prepend($('<span></span>').addClass('material-icons-round mi-wifi-off'));
-      
+
 
 				var streamComponent = function(avatar = '',title = ''){
 					var avatar = $('<img/>').attr('src',avatar).addClass('stream-component-avatar');
@@ -796,12 +796,12 @@ class ZPlayer {
                 streamComponent(hot100.artWork,hot100.title);
 
         })
-           
+
         })
     }
 }
 checkConnection();
     }
-     
-} 
+
+}
 module.exports =  ZPlayer;

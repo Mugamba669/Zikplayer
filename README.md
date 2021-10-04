@@ -28,12 +28,14 @@
 
 ## Screenshots
 
-  <img src="./build/Screenshot from 2021-09-21 18-59-36 (copy).png" width="300">
-  <img src="./build/Screenshot from 2021-09-21 19-00-49 (copy).png" width="300">
-  <img src="./build/Screenshot from 2021-09-21 19-01-42.png" width="300">
-  <img src="./build/Screenshot from 2021-09-21 19-03-08.png" width="300">
-  <img src="./build/Screenshot from 2021-09-21 19-03-21.png" width="300">
-  <img src="./build/Screenshot from 2021-09-21 19-03-42.png" width="300">
+  <img src="./build/Screenshot from 2021-10-04 19-39-43.png" width="300">
+  <img src="./build/Screenshot from 2021-10-04 19-39-35.png" width="300">
+  <img src="./build/Screenshot from 2021-10-04 19-37-11.png" width="300">
+  <img src="./build/Screenshot from 2021-10-03 06-16-15.png" width="300">
+  <img src="./build/Screenshot from 2021-10-03 06-15-49.png" width="300">
+  <img src="./build/Screenshot from 2021-10-03 06-15-34.png" width="300">
+  <img src="./build/Screenshot from 2021-10-03 06-13-02.png" width="300">
+  <img src="./build/Screenshot from 2021-10-03 06-12-34.png" width="300"/>
 
 ## TODOS
 

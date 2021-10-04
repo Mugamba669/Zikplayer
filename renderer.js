@@ -387,14 +387,14 @@ $('.streaming-btn').on('click',function(){
  * display hot 100
  */
 $('.btn-hot-100').on('click',function(){
-    eq.streamHot100();
+    Ziki.streamHot100();
 })
 /**serach your favourite jam from nowviba  */
 $('.search').on('input',function(){
-    eq.searchSongs($(this).val());
+    Ziki.searchSongs($(this).val());
 })
 $('.find').on('click',function(){
-    eq.searchSongs($(this).val());
+    Ziki.searchSongs($(this).val());
 })
 /**
  * Close streaming panel
