@@ -4,16 +4,18 @@
 
 ## Available on
 
-- Get Zikplayer official site [windows and Linux Versions is already available here.](https://official-zikplayer-site.herokuapp.com)
+- Go now to the Lw-Ziki-Amp official site for [windows and Linux Versions here.](https://lw-ziki-amp.herokuapp.com/)
 
-## [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ziki)
+
 
 - For all Linux distrbutions
 
+
     ```bash
-       sudo snap install --beta ziki 
+       sudo snap install ziki --beta
     ```
 
+  [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ziki)
 ## Features
 
 - 10 Graphic Visualisers

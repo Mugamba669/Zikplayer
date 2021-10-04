@@ -6,7 +6,7 @@ description: |
   Experience the power in music through lw-ziki-amp.
 
 grade: stable # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: override # use 'strict' once you have the right plugs and slots
 
 parts:
   my-part:
