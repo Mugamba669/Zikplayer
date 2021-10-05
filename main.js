@@ -22,7 +22,7 @@ function createWindow () {
     backgroundColor:"#000000",
     height: 580,
     frame:false,
-    icon:nativeImage.createFromPath('./images/icon.ico'),
+    icon:nativeImage.createFromPath('./images/zik.png'),
     webPreferences: {
       preload:path.join(__dirname,"preload.js"),
       nodeIntegration:true,
@@ -249,12 +249,12 @@ app.whenReady().then(()=>{
     {
       label:"LW-Ziki Amp"
     },
-    {label:"Tools",submenu:[
-    //   // {label:"Exit",accelerator:"Ctrl + Q",click:()=> app.quit()},
-    //   // {label:"Reload",accelerator:"F8",role:"reload"},
-      {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
-    //   {label:"Help",accelerator:"Ctrl + H",click:()=> openHelp()}
-    ]},
+    // {label:"Tools",submenu:[
+    // //   // {label:"Exit",accelerator:"Ctrl + Q",click:()=> app.quit()},
+    // //   // {label:"Reload",accelerator:"F8",role:"reload"},
+    //   {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
+    // //   {label:"Help",accelerator:"Ctrl + H",click:()=> openHelp()}
+    // ]},
   ]);
 
   Menu.setApplicationMenu(menu);

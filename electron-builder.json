@@ -5,7 +5,7 @@
     "directories": {
         "app": "./",
         "output": "dist",
-        "buildResources": "images"
+        "buildResources": "./images"
     },
     "files": [
         "./package.json",
@@ -52,6 +52,6 @@
     },
     "linux": {
         "target":["deb","snap"],
-        "icon":"/images/icon.ico"
+        "icon":"./images/zik.png"
     }
 }
