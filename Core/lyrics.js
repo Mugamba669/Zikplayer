@@ -4,6 +4,7 @@ const Lyrics = require('4lyrics');
 const isOnline = require('is-online');
 const $ = require('jquery');
 const NodeID3 = require('node-id3');
+const Apis = require('../APIS/Apis');
 window.addEventListener('DOMContentLoaded', ()=>{
 
     $('.close-lyrics').on('click',function(){
@@ -63,9 +64,10 @@ console.log(url)
       }
   };
   showLyrics();
+  
       const options = {
         title:title,
-        apiKey:'6ggSONbH0WJb2wy9gkzjE80kWTpPn5N_CeKVQoAcSdfrGaMXQHFZ4ocksApJGdCY',
+        apiKey:Apis.GeniuApi,
         artist:artist,
         optimizeQuery:true
     }

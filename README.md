@@ -12,7 +12,7 @@
 
 
     ```bash
-       sudo snap install ziki --beta
+       sudo snap install lw-ziki-amp --beta
     ```
 
   [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ziki)

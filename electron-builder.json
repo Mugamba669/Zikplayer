@@ -1,15 +1,16 @@
 {
-    "appId": "com.mugambabruno.zikapp",
-    "productName": "Ziki",
+    "appId": "com.mugambabruno.lwzikamp",
+    "productName": "Lw-Ziki-Amp",
     "copyright": "COPYRIGHT MUGAMBA BRUNO",
     "directories": {
         "app": "./",
         "output": "dist",
-        "buildResources": "/images"
+        "buildResources": "images"
     },
     "files": [
         "./package.json",
        "./main.js",
+       "./APIS",
         "./node_modules",
         "./Plugins", 
         "./ZPlayer.html",
@@ -41,7 +42,8 @@
         ]
     },
     "mac": {
-        "target": "dmg",
+
+        "target": "mas",
         "category": "public.app-category.utilities",
       },
     "win": {
@@ -50,6 +52,6 @@
     },
     "linux": {
         "target":["deb","snap"],
-        "icon":"./images/zik.png"
+        "icon":"/images/icon.ico"
     }
 }

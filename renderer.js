@@ -52,11 +52,11 @@ engine.tuneRoomSwitch(".room-switch");
 engine.tuneRoomEffects('.room-effects');
 
 
-(async ()=>{
-    var result = await searchYoutube(`AIzaSyAkgiQaLzuswUP-Jd1xwENo7u2YF5Xtq_c
-    `,{q:'migos',part:'snippet',type:'video'});
-    console.log(result)
-})()
+// (async ()=>{
+//     var result = await searchYoutube(
+//     `,{q:'migos',part:'snippet',type:'video'});
+//     console.log(result)
+// })()
 
 $("#eqns").on('input', function() {
     engine.tuneEq($(this).val());
@@ -73,7 +73,10 @@ Ziki.getTempo("#ratexp", "#sp-rate");
 Ziki.getAudioVolume("#vol-add", "#vol");
 Ziki.repeatStopTrack(".repeat-on",".repeat-off",'.mute-on','.mute-off');
 Ziki.streamHot100();
-
+/**
+ * 
+ */
+ $('.alert-notification').hide()
 /**
  * Control buttons
  */
@@ -85,6 +88,8 @@ $('.tags-edit-on').hide()
  */
  $('.tags-edit-off').on('click',function(){
     $(this).hide();
+    $('.alert-msg').text('Audio tags editor on')
+    $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
     $('.btns-container').toggleClass('active');
      $('.btns-opener').toggleClass('active')
      $('.tags-container').addClass('active')
@@ -92,6 +97,9 @@ $('.tags-edit-on').hide()
     $('.tags-edit-on').show();
 })
 $('.tags-edit-on').on('click',function(){
+    $('.alert-notification').slideDown(100).delay(4000).slideUp(100);
+    $('.alert-msg').text('Audio editor off');
+    // $('.alert-notification').text('Audio editor off').addClass('active').delay(4000).removeClass('active');
     $(this).hide();
     $('.btns-opener').removeClass('active')
     $('.btns-container').removeClass('active')
@@ -296,6 +304,8 @@ $('.close-panel').on('click',function(){
  */
 
 $('#visual-select').click(function(){
+    $('.alert-msg').text('Graphic Visualisers')
+    $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
     $(".sidebar-data").removeClass("active")
     $(".sidebar-icons").removeClass("active")
     $('.setting').removeClass('active');

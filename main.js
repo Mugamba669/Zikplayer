@@ -7,6 +7,7 @@ const { autoUpdater } = require('electron/main');
 const { Console } = require('console');
 const { join } = require('path');
 const { exit } = require('process');
+const isOnline = require('is-online');
 var mainWindow  = null,helpWindow = null;
 nativeTheme.shouldUseDarkColors = true;
 nativeTheme.themeSource = 'system'
@@ -21,7 +22,7 @@ function createWindow () {
     backgroundColor:"#000000",
     height: 580,
     frame:false,
-    icon:nativeImage.createFromPath('./images/zik.png'),
+    icon:nativeImage.createFromPath('./images/icon.ico'),
     webPreferences: {
       preload:path.join(__dirname,"preload.js"),
       nodeIntegration:true,
@@ -34,7 +35,7 @@ function createWindow () {
   ipcMain.on('trackUrl',(event,args)=>{
     // console.log(args)
     event.sender.send('getPath',args)
-  })
+  }).setMaxListeners(2)
 /**
  * Message for removing a song 
  */
@@ -44,20 +45,20 @@ ipcMain.on('removedSong',(event,args)=>{
       icon:nativeImage.createFromDataURL(`${args.artwork}`),
       message:`${args.title} is deleted parmanently.`,
     })
-})
+}).setMaxListeners(1);
   ipcMain.on('trackEnd',(event,args)=>{
     // console.log(args)
     event.sender.send('removeLyrics','active')
   })
   ipcMain.once('showApp',(event,args)=>{
     mainWindow.show()
-  })
+  }).setMaxListeners(3);
   /**
    * Message for drawings over other apps
    */
   ipcMain.on('drawOverApps',(event,args)=>{
     mainWindow.setAlwaysOnTop(args,'floating')
-  })
+  }).setMaxListeners(1)
 /**
  * Updating track artwork offline
  */
@@ -66,17 +67,18 @@ ipcMain.on('removedSong',(event,args)=>{
       title:"Choose new track cover",
       properties:['openFile'],
       buttonLabel:'Select track cover',
+      filters:[{'name':"Imgaes","extensions":["jpeg","png","jpg"]}],
       defaultPath:`${os.homedir()}/Pictures`
     }).then((coverUrl)=>{
       event.sender.send('sendartWork',coverUrl.filePaths[0])
     })
-  })
+  }).setMaxListeners(1)
   /**
    * Reload app to save changes
    */
   
   ipcMain.on('reloadToSave',(e,args)=>{
-    e.preventDefault();
+    // e.preventDefault();
     // e.stopPropagation();
    dialog.showMessageBox(mainWindow,{
         title:"Saving Caution !!",
@@ -85,19 +87,18 @@ ipcMain.on('removedSong',(event,args)=>{
       }).then((value)=>{
         switch (value.response) {
           case 0:
+            app.quit();
             app.relaunch();
-            app.exit();
-
             break;
         }
       });
 
-  })
+  }).setMaxListeners(1)
+  
   // and load the index.html of the app.
   // mainWindow.setIcon();
   // DownloadItem.prototype
   ipcMain.on('downloadsong',(event,args)=>{
-    
       mainWindow.webContents.session.on('will-download',(ent,downloadItem,webContents)=>{
   
       downloadItem.setSavePath(`${os.homedir()}/Music/Ziki/${downloadItem.getFilename()}`)
@@ -109,7 +110,7 @@ ipcMain.on('removedSong',(event,args)=>{
        */
       ipcMain.on('pausedownload',(e,arg)=>{
           downloadItem.pause();
-      })
+      }).setMaxListeners(1)
       /**
        * action to resume download
        */
@@ -117,7 +118,7 @@ ipcMain.on('removedSong',(event,args)=>{
         if(downloadItem.isPaused() == true){
           downloadItem.resume();
         }
-      })
+      }).setMaxListeners(1)
 
       downloadItem.on('updated',(e,state)=>{
         if(state == 'interrupted'){
@@ -155,20 +156,20 @@ ipcMain.on('removedSong',(event,args)=>{
 
   })
 
-});
+}).setMaxListeners(8);
 /**
  * checking connectivity
  */
   ipcMain.on('checkconnectivity',(e,args)=>{
-   var action  = dialog.showMessageBoxSync(mainWindow,{
+   var action  = dialog.showMessageBox(mainWindow,{
       title:"Network Connectivity",
       message:"No internet, Check your connectivity",
       icon:icon,
       buttons:['Okay, I got it'],
-      
+    }).then((value)=>{
     })
-    
-  })
+
+  }).setMaxListeners(1)
   // mainWindow.setProgressBar();
   mainWindow.maximize();
   mainWindow.loadFile(path.join(__dirname,'ZPlayer.html'));
@@ -182,12 +183,10 @@ ipcMain.on('removedSong',(event,args)=>{
             properties:['openDirectory'],
             buttonLabel:'Choose Music Folder',
             defaultPath:`${os.homedir()}/Music/`
-            //  filters: [
-            //         { name: 'Audio', extensions: ['mp3', 'm4a', 'aac'] }]
         }).then((files)=>{
             if(files) event.sender.send('musicFiles',files);
         });
-    })
+    }).setMaxListeners(3);
     /**========================================== */
 
     /**
@@ -196,7 +195,7 @@ ipcMain.on('removedSong',(event,args)=>{
     ipcMain.on('networkError',(event,args) =>{
       
         dialog.showErrorBox("Network Error",args)
-    })
+    }).setMaxListeners(1)
     /**-------------------------------------- */
 
     /**
@@ -206,14 +205,14 @@ ipcMain.on('removedSong',(event,args)=>{
       dialog.showMessageBox(mainWindow,{
         message:args
       })
-    })
+    }).setMaxListeners(1)
 
     /**
      * No directories to delete
      */
     ipcMain.on('Nofolders',(e,args)=>{
       dialog.showErrorBox("Illegal Operation",args)
-    })
+    }).setMaxListeners(1)
 }
  /**
   * create help window
@@ -250,12 +249,12 @@ app.whenReady().then(()=>{
     {
       label:"LW-Ziki Amp"
     },
-    // {label:"Tools",submenu:[
-    // //   // {label:"Exit",accelerator:"Ctrl + Q",click:()=> app.quit()},
-    // //   // {label:"Reload",accelerator:"F8",role:"reload"},
-    //   {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
-    // //   {label:"Help",accelerator:"Ctrl + H",click:()=> openHelp()}
-    // ]},
+    {label:"Tools",submenu:[
+    //   // {label:"Exit",accelerator:"Ctrl + Q",click:()=> app.quit()},
+    //   // {label:"Reload",accelerator:"F8",role:"reload"},
+      {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
+    //   {label:"Help",accelerator:"Ctrl + H",click:()=> openHelp()}
+    ]},
   ]);
 
   Menu.setApplicationMenu(menu);
@@ -269,18 +268,31 @@ app.whenReady().then(()=>{
    createHelpWindow()
  })
  
- let tray = new Tray(icon);
+//  let tray = new Tray(icon);
   
-  tray.setToolTip('Lw-Ziki Amp');
-  tray.setContextMenu(Menu.buildFromTemplate([
-    {label:"DevTools",accelerator:"F12",role:"toggleDevTools"},
+//   tray.setToolTip('Lw-Ziki Amp');
+//   tray.setContextMenu(Menu.buildFromTemplate([
+//     {label:"DevTools",accelerator:"F12",role:"toggleDevTools"},
 
-  ]));
+//   ]));
 });
 /***
  * IPC messages
  */
- autoUpdater.setFeedURL('https://snapcraft.io/ziki');
+async function autoUpadteAlert(){
+ let getOnlineUpdates = await isOnline();
+ if (getOnlineUpdates == true) {
+   
+ autoUpdater.setFeedURL('https://snapcraft.io/lw-ziki-amp');
+
+ autoUpdater.checkForUpdates();
+ autoUpdater.on('checking-for-update',()=>{
+  autoUpdater.checkForUpdates();
+});
+autoUpdater.on('update-downloaded',(e,notes,releaseName,releaseDate,updateURL)=>{
+  autoUpdater.quitAndInstall();
+})
+
 autoUpdater.on('update-available',()=>{
     dialog.showMessageBox(mainWindow,{
       title:'Update Alert',
@@ -289,7 +301,7 @@ autoUpdater.on('update-available',()=>{
     }).then((value)=>{
       switch(value.response){
           case 0:
-            shell.openPath('https://snapcraft.io/ziki').then((response)=> Console.prototype.log(response))
+            shell.openPath('https://snapcraft.io/lw-ziki-amp').then((response)=> console.log(response))
       }
     })
 })
@@ -300,6 +312,8 @@ autoUpdater.on('update-not-available',()=>{
     buttons:['Okay,got it']
   });
 })
-autoUpdater.addListener('checking-for-update',()=>{
-  autoUpdater.checkForUpdates();
-})
+
+  }
+}
+
+autoUpadteAlert();

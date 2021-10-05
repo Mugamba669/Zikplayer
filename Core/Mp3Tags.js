@@ -4,13 +4,15 @@ const { ipcRenderer } = require("electron/renderer");
 const gis = require('g-i-s');
 const emoji = require('emojis-list');
 const isOnline = require("is-online");
+const { nativeImage } = require("electron");
 // console.log(emoji)
 var artWork = '',songUrl = '';
 ipcRenderer.on('getPath',(e,args)=>{
-    e.preventDefault();
     artWork = args.artwork;
     songUrl = args.path;
+    // e.preventDefault();
 })
+// nativeImage.createFromPath()
 $('.tags-edit-btn').on('click',function(){
     var path = ($('.view').text()).replace('file://','');
     var tags = NodeID3.read(path);

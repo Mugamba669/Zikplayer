@@ -100,6 +100,9 @@ class ZPlayer {
        $(a).show();
        $(b).hide();
         $(a).click(function() {
+            $('.alert-msg').text('Repeat on')
+            $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
+
             $(this).hide();
             $(b).show().addClass('w3-black');
             that.audio.loop = true;
@@ -107,6 +110,9 @@ class ZPlayer {
         });
 
         $(b).click(function() {
+            $('.alert-msg').text('Repeat off')
+            $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
+
             $(this).hide().removeClass('w3-black');
             $(a).show();
             // alert("clicked");
@@ -115,12 +121,17 @@ class ZPlayer {
         // muting current track
         $(d).hide();
         $(c).click(function(){
+            $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
+
             $(this).hide()
             $(d).show().addClass('w3-black')
             that.audio.muted = true;
         });
         /* un mute */
         $(d).click(function(){
+            $('.alert-msg').text('Audio unmuted')
+            $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
+
             $(this).hide()
             $(c).show()
             that.audio.muted = false;
@@ -251,12 +262,18 @@ class ZPlayer {
          * Enable or diable shuffling music
          */
          $('.random-off').on('click',function(){
+             $('.alert-msg').text('Shuffle On')
+             $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
+             
             $(this).hide();
             $('.random-on').show().addClass('w3-black');
             that.shuffle = true;
         });
 
         $('.random-on').on('click',function(){
+            $('.alert-msg').text('Shuffle off')
+            $('.alert-notification').slideDown(100).delay(4000).slideUp(100)
+
             $(this).hide();
             $('.random-off').show();
             that.shuffle = false;
