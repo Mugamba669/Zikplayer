@@ -25,7 +25,7 @@
         <div class="picker-wrapper">
             <button class="material-icons-round mi-close close-online-picker"></button>
             <div class="picker-header">
-                <p>Choose your favourite 👇</p>
+                <p>Choose your favorite 👇</p>
             </div>
             <div class="picker-body"></div>
             <button class="update-image">Update Cover Image</button>
@@ -39,7 +39,7 @@
           <button class="onlineArtWork">Get it online</button>
        
             <div class="tags-artwork">
-                <p>Edit Au<span class="material-icons-round mi-audiotrack"></span>io &nbsp;Tags</p>
+                <p>Edit <span class="material-icons-round mi-audiotrack"></span>Audio &nbsp;Tags</p>
                 <br/>
                 <br/>
                 <br/>
@@ -89,16 +89,22 @@
                     </div>
                     <p id="opt"></p><p id="bb"></p>
                     <select id="eqns" disabled>
-                        <option selected value="normal">Normal</option>
-                        <option value="bass">Hip Hop</option>
-                    <option value="rock">Rock</option>
-                    <option value="rnb">R&B</option>
-                    <option value="reg">Reggea</option>
-                    <option value="flat">Flat</option>
-                    <option value="dance">Dance-Hall</option>
-                    <option value="heavy">Heavy Metal</option>
-                        <option value="vocal">Vocal Boost</option>
-                        <option value="pop">Pop</option>
+                            <option value="">Preset</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Rock">Rock</option>
+                            <option value="Reggea">Reggae</option>
+                            <option value="Techno">Techno</option>
+                            <option value="Folk">Folk</option>
+                            <option value="Bass">Bass</option>
+                            <option value="Live">Live</option>
+                            <option value="Loud">Loud</option>
+                            <option value="Treble">Treble</option>
+                            <option value="Flat">Flat</option>
+                            <option value="Dance">Dance-Hall</option>
+                            <option value="SoftBass">Soft Bass</option>
+                            <option value="SoftTreble">Soft Treble</option>
+                            <option value="Pop">Pop</option>
+                            <option value="Classic">Classic</option>
                     </select>
                     <br>
                     <!-- <hr> -->
@@ -106,25 +112,86 @@
                 </div>
                 <br>
             <div class="eq-cont-slides">
-            <!-- stereo -->
-            <p class="p-label">Stereo : <span id="st-out">0 dB</span></p>
-            <p id="stereo">
+                <div class="bandk">
+                    <div class="bandSlider">
+                        <span class="bd">0</span>
+                        <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/> 
+                        <span class="bandVal">32Hz</span>
+                    </div>
+                  
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/> 
+                    <span class="bandVal">62Hz</span>
+                </div>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/> 
+                    <span class="bandVal">125Hz</span>
+                  </div>
                 
-            </p>
-            <!-- <input type="range" value="0" max="5" id="stereo" min="0" step="0.01">  -->
-            <!-- mid -->
-            <p class="p-label">Mid XT : <span id="tb2">0 dB</span></p>
-            <p id="trebboost"></p>
-            <!-- <input type="range" value="0" max="3" id="treb-boost" min="0" step="0.01"> -->
-            <!-- bass -->
-            <p class="p-label">Bass : <span id="bb1">50 dB</span></p>
-            <p id="bass"></p>
-            <!-- <input type="range" value="50" max="120" min="0" step="0.01" id="bass"> -->
-            <!-- bass-boast -->
-            <p class="p-label">Bass Boost : <span id="bb2">1 dB</span></p>
-            <p id="bassboost"></p>
-            <!-- <input type="range" value="" max="4" min="0" step="0.01" id='bass-boost'> -->
-            <br>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/> 
+                    <span class="bandVal">250Hz</span>
+                </div>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/> 
+                    <span class="bandVal">500Hz</span>
+                </div>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/> 
+                    <span class="bandVal">1kHz</span>
+                </div>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/> 
+                    <span class="bandVal">2kHz</span>
+                </div>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/>
+                    <span class="bandVal">4kHz</span>
+                </div>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/>
+                    <span class="bandVal">8kHz</span>
+                </div>
+                    <br/>
+                    <div class="bandSlider">
+                    <span class="bd">0</span>
+                    <input type="range" class="bands" step="0.01" value="0" min="-15" max="15"/>
+                    <span class="bandVal">16kHz</span>
+                </div>
+             </div>
+             <div class="tone">
+
+                <div>
+                    <p>Treble</p>
+                    <div class="stereo"></div>
+                    <p class="treble-Val">0.0dB</p>
+                </div> 
+
+                <div>
+                    <p>Bass</p>
+                    <div class="bassboost"></div>
+                    <p class="bass-Val">0.0dB</p>
+                </div>
+
+                </div>
+             </div>
+           
         </div>
     </div>
 </div>
@@ -242,6 +309,10 @@
             <button class="fab-options">
                 <span class="material-icons-round mi-create-new-folder"></span>
                 Add Music Folder
+            </button>
+            <button class="refresh">
+                <span class="material-icons mi-refresh"></span>
+                Refresh List
             </button>
             <button class="fab-btn">
                 <span class="material-icons mi-exit-to-app"></span>
@@ -761,7 +832,7 @@
     </div>
 
               
-    <!-- Tunnings -->
+    <!-- Tunings -->
 
  <div class="Tune">
     <p class="Tune-header">Audio Tuning</p>
@@ -858,7 +929,7 @@
 
 <script src="./Plugins/swiper-bundle.min.js"></script>
 <script  src="./Plugins/webkit-input-range-fill-lower.min.js"></script>
-    <script> require('./renderer')</script>
+    <script type="module"> require('./renderer')</script>
 </body>
 
 </html>

@@ -10,7 +10,7 @@ const { extname } = require('path');
  * One can be able to extract embeded image data,create ,remove playlist
  */
 class AudioQuery{
-    constructor(paths){
+    constructor(paths = ''){
         this.folderPath = paths;
         /**
          * 
@@ -36,7 +36,7 @@ class AudioQuery{
        */
     
     /**
-     * This function fill the gap of tracks without embeded tiles
+     * This function fill the gap of tracks without embedded tiles
      */
     this.getTitle = (tags = NodeID3.read(), ext = '' ,file = '')=>{
         return (tags.title == undefined)? file.replace(`${ext}`,""):tags.title;
@@ -93,7 +93,53 @@ class AudioQuery{
           let formatedUrl = url.replace('file://','');
          return ((fs.statSync(`${formatedUrl}`).size)/1000000).toFixed(2);
       }
+      /**
+       * 
+       * @param {*} parentDirectory 
+       * @param {*} trackList 
+       * @param {*} musicFile 
+       * @returns CoverArt for folders,Albums,Artists
+       */
+      this.cover = (url)=>{
+          
+          const tags = NodeID3.read(url);
+         return this.base64Image(tags.image);
+      }
+      /**
+  * 
+  * @returns an array of mp3 Files
+  */
+ this.drawFiles = (parentDirectory = '',trackList = [],musicFile)=>{
+    const fullPath = `${parentDirectory}/${musicFile}`;
+    var tags = NodeID3.read(fullPath);
+
+       var songData = {
+            title:this.getTitle(tags,extname(fullPath),musicFile),
+            genre:this.getGenre(tags),
+            album:this.getAlbum(tags),
+            lyrics:this.filterLyrics( tags),
+            artwork:this.base64Image(tags.image),
+            year:this.getYear(tags),
+            artist:this.getArtist(tags),
+            size:this.fileSize(`file://${fullPath}`),
+            path :`file://${fullPath}`,
+            composer:this.getComposer(tags),
+        }
+        
+        trackList.push(songData);
  }
+ this.recursiveFolders = (folder,parentDirectory,trackList)=>{
+    const files  = fs.readdirSync(folder);
+    files.map((songs) => { 
+        if(fs.statSync(`${folder}/${songs}`).isFile() && extname(songs) == '.mp3'){
+        this.drawFiles(folder,trackList,songs);
+        }else if(fs.statSync(`${folder}/${songs}`).isDirectory()){
+            this.recursiveFolders(`${folder}/${songs}`,parentDirectory,trackList);
+        }
+    })
+ }
+ }
+ 
     /**
      * function to fetch all songs and returns a promise
      * */
@@ -106,24 +152,12 @@ class AudioQuery{
        var rawData = fs.readdirSync(folderpath);
        var allSongs = [];
     rawData.map((musicFile)=>{
-        var tags = NodeID3.read(`${folderpath}/${musicFile}`);
-        // var extension = path.extname(`${musicFile}`);
-        
-           var songData = {
-               
-                title:this.getTitle(tags,extname(`${folderpath}/${musicFile}`),musicFile),
-                genre:this.getGenre(tags),
-                album:this.getAlbum(tags),
-                lyrics:this.filterLyrics( tags),
-                artwork:this.base64Image(tags.image),
-                year:this.getYear(tags),
-                artist:this.getArtist(tags),
-                size:this.fileSize(`file://${folderpath}/${musicFile}`),
-                path :`file://${folderpath}/${musicFile}`,
-                composer:this.getComposer(tags),
-            }
+        if(extname(musicFile) == '.mp3' && fs.statSync(`${folderpath}/${musicFile}`).isFile()){
+                this.drawFiles(this.folderPath,allSongs,musicFile);
+           } else if(fs.statSync(`${folderpath}/${musicFile}`).isDirectory()){
+              this.recursiveFolders(`${folderpath}/${musicFile}`,this.folderPath,allSongs);
             
-            allSongs.push(songData);
+           }
         });
 
       return allSongs;
@@ -274,19 +308,49 @@ class AudioQuery{
     */
     fetchFolders(){
         var url = `${this.folderPath}`;
-       var directory = fs.readdirSync(url)
-       var isD = fs.statSync(url).isDirectory();
-       if(isD == true) return directory;
-        
+       var directory = fs.readdirSync(url);
+
+       const folderData = (url,array)=>{
+        var count = 0;
+        var onlyMusicFolders = false;
+           const files = fs.readdirSync(url);
+            files.map((songs ,index,array) => {
+                if(fs.statSync(`${url}/${songs}`).isFile() && extname(songs) == '.mp3'){
+                    onlyMusicFolders = true;
+                count = array.length;
+
+                } 
+
+            })
+            if(onlyMusicFolders == true){
+                const data = {
+                    name:this.extractFolderName(url),
+                    numberOfTracks:count,
+                    cover:this.cover(`${url}/${files[Math.floor(Math.random() * count)]}`),
+                    path:url,
+                };
+                array.push(data);
+            }
+           
+       }
+
+       const folders = [];
+      directory.map((dirs) => {
+          if(fs.statSync(`${url}/${dirs}`).isDirectory()){
+                folderData(`${url}/${dirs}`,folders)
+          }
+      })
+     
+        return folders;
     }
     /** 
      *  function to get songs from named folders
      * */
-    fetchSongsFolder(foldername){
+    fetchSongsInFolder(folderUrl){
         var songfolder = [];
-        var folder = `${os.homedir()}/Music/${foldername}`;
-        var rawData = fs.readdirSync(folder);
+        var rawData = fs.readdirSync(folderUrl);
         rawData.map((songs)=>{
+            if(fs.statSync(folder+"/"+songs).isFile() && extname(songs) == '.mp3'){
             var tags = NodeID3.read(folder+"/"+songs)
                 var artData = {};
                 artData.title = tags.title;
@@ -296,7 +360,7 @@ class AudioQuery{
                 artData.artWork = this.base64Image(tags.image)
                 artData.composer = tags.composer;
                 songfolder.push(artData);
-            
+            }
         })
         
         return songfolder;

@@ -1,14 +1,16 @@
-const {app,Menu,ipcMain, BrowserWindow,dialog, Tray, nativeImage, nativeTheme, webContents, DownloadItem, shell, systemPreferences, globalShortcut} = require('electron');
+const {app,Menu,ipcMain, BrowserWindow,dialog, Tray, nativeImage, nativeTheme, shell, systemPreferences, globalShortcut} = require('electron');
 const defaultPic = require('./Core/default');
 const path = require('path');
 const os = require('os');
-const { Emitter } = require('custom-electron-titlebar/common/event');
+const { existsSync, mkdirSync } = require("fs");
 const { autoUpdater } = require('electron/main');
-const { Console } = require('console');
 const { join } = require('path');
-const { exit } = require('process');
 const isOnline = require('is-online');
+const { enableLiveReload } = require('electron-compile');
+const { downloadDir } = require('./modules/Paths');
 var mainWindow  = null,helpWindow = null;
+ 
+
 nativeTheme.shouldUseDarkColors = true;
 nativeTheme.themeSource = 'system'
 let icon = nativeImage.createFromDataURL(`${defaultPic.image}`)
@@ -32,6 +34,7 @@ function createWindow () {
       contextIsolation:false,
     }
   })
+
   ipcMain.on('trackUrl',(event,args)=>{
     // console.log(args)
     event.sender.send('getPath',args)
@@ -43,7 +46,7 @@ ipcMain.on('removedSong',(event,args)=>{
     dialog.showMessageBox(mainWindow,{
       title:"Delete Song message",
       icon:nativeImage.createFromDataURL(`${args.artwork}`),
-      message:`${args.title} is deleted parmanently.`,
+      message:`${args.title} is deleted permanently.`,
     })
 }).setMaxListeners(1);
   ipcMain.on('trackEnd',(event,args)=>{
@@ -51,7 +54,8 @@ ipcMain.on('removedSong',(event,args)=>{
     event.sender.send('removeLyrics','active')
   })
   ipcMain.once('showApp',(event,args)=>{
-    mainWindow.show()
+    mainWindow.focus();
+    mainWindow.maximize()
   }).setMaxListeners(3);
   /**
    * Message for drawings over other apps
@@ -67,7 +71,7 @@ ipcMain.on('removedSong',(event,args)=>{
       title:"Choose new track cover",
       properties:['openFile'],
       buttonLabel:'Select track cover',
-      filters:[{'name':"Imgaes","extensions":["jpeg","png","jpg"]}],
+      filters:[{'name':"Images","extensions":["jpeg","png","jpg"]}],
       defaultPath:`${os.homedir()}/Pictures`
     }).then((coverUrl)=>{
       event.sender.send('sendartWork',coverUrl.filePaths[0])
@@ -94,14 +98,14 @@ ipcMain.on('removedSong',(event,args)=>{
       });
 
   }).setMaxListeners(1)
-  
+ 
   // and load the index.html of the app.
   // mainWindow.setIcon();
   // DownloadItem.prototype
   ipcMain.on('downloadsong',(event,args)=>{
       mainWindow.webContents.session.on('will-download',(ent,downloadItem,webContents)=>{
-  
-      downloadItem.setSavePath(`${os.homedir()}/Music/Ziki/${downloadItem.getFilename()}`)
+
+          downloadItem.setSavePath(`${downloadDir}/${downloadItem.getFilename()}`)
       event.sender.send('starttime',downloadItem.getStartTime())
       event.sender.send('filedownload',`${downloadItem.getFilename()}`)
       
@@ -142,13 +146,7 @@ ipcMain.on('removedSong',(event,args)=>{
       downloadItem.once('done', (eve, state) => {
         if (state === 'completed') {
           event.sender.send('downloadcompleted','active');
-       event.preventDefault()
-        // event.stopImmediatePropagation()
-        //  dialog.showMessageBox(mainWindow,{
-        //      message:`Download was successfull\n File save in ${downloadItem.getSavePath()} `,
-        //      icon:nativeImage.createFromDataURL(defaultPic.image),
-        //     //  buttons:['OK']
-        //  })
+       event.preventDefault();
         } else {
           dialog.showErrorBox("Error",`Download Failed  ${state}`)
         }
@@ -156,7 +154,7 @@ ipcMain.on('removedSong',(event,args)=>{
 
   })
 
-}).setMaxListeners(8);
+}).setMaxListeners(6);
 /**
  * checking connectivity
  */
@@ -170,8 +168,8 @@ ipcMain.on('removedSong',(event,args)=>{
     })
 
   }).setMaxListeners(1)
-  // mainWindow.setProgressBar();
-  mainWindow.maximize();
+  // mainWindow.se();
+   mainWindow.webContents.openDevTools();
   mainWindow.loadFile(path.join(__dirname,'ZPlayer.html'));
   /**
    * Getting music folders
@@ -249,13 +247,15 @@ app.whenReady().then(()=>{
     {
       label:"LW-Ziki Amp"
     },
-    // {label:"Tools",submenu:[
+     {label:"Tools",submenu:[
     // //   // {label:"Exit",accelerator:"Ctrl + Q",click:()=> app.quit()},
-    // //   // {label:"Reload",accelerator:"F8",role:"reload"},
-    //   {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
+      {label:"Reload",accelerator:"F8",role:"reload"},
+       {label:"OpendevTools",accelerator:"F12",role:"toggleDevTools"},
     // //   {label:"Help",accelerator:"Ctrl + H",click:()=> openHelp()}
-    // ]},
+     ]},
   ]);
+
+enableLiveReload({strategy:'naive'});
 
   Menu.setApplicationMenu(menu);
   createWindow();
@@ -267,19 +267,12 @@ app.whenReady().then(()=>{
  ipcMain.on('triggerHelp',(e,args)=>{
    createHelpWindow()
  })
- 
-//  let tray = new Tray(icon);
-  
-//   tray.setToolTip('Lw-Ziki Amp');
-//   tray.setContextMenu(Menu.buildFromTemplate([
-//     {label:"DevTools",accelerator:"F12",role:"toggleDevTools"},
-
-//   ]));
+ console.log(app.getPath('userData'));
 });
 /***
  * IPC messages
  */
-async function autoUpadteAlert(){
+async function autoUpdateAlert(){
  let getOnlineUpdates = await isOnline();
  if (getOnlineUpdates == true) {
    
@@ -316,4 +309,4 @@ autoUpdater.on('update-not-available',()=>{
   }
 }
 
-autoUpadteAlert();
+autoUpdateAlert();

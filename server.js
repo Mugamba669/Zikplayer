@@ -17,10 +17,11 @@ const NodeID3 = require('node-id3');
 //   })
   // google image search
 var gis = require('g-i-s');
+const { app } = require('electron');
 
-gis('gashi',(err,data)=>{
-  console.log(data)
-})
+//gis('gashi',(err,data)=>{
+ // console.log(data)
+//})
 // const searchYoutube = require('youtube-api-v3-search');
 // (async ()=>{
 //     var result = await searchYoutube(`AIzaSyAkgiQaLzuswUP-Jd1xwENo7u2YF5Xtq_c`,
@@ -29,5 +30,5 @@ gis('gashi',(err,data)=>{
 // })()
 
 //  NodeID3.update({title:'Veces'},'/home/mugamba/Music/January/500 Veces ( 256kbps cbr ).mp3');
-// var tags = NodeID3.read('/home/mugamba/Music/January/500 Veces ( 256kbps cbr ).mp3');
-// console.log(tags.title)
+ var tags = NodeID3.read('/home/mugamba/Music/March/Kelsea Ballerini - bragger (Official Audio)(MP3_160K)_1.mp3');
+

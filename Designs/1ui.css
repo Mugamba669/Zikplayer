@@ -38,7 +38,7 @@ fab options button
     padding: 10px;
     font: normal 19px Ubuntu,Arial;
 }
-button.fab-options{
+button.fab-options , .refresh{
     background-color: rgba(0, 0, 0, 0);
     border-radius: 0px;
     outline: none;
@@ -56,7 +56,7 @@ button.fab-options{
     transition: 0.3s ease-in-out;
     color: #fff;
 }
-button.fab-options:hover{
+button.fab-options:hover , .refresh:hover{
     border-top: 1px solid rgb(69, 71, 69);
     border-right: 1px solid rgb(69, 71, 69);
     border-left: 1px solid #cccc;

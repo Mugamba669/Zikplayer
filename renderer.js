@@ -1,16 +1,19 @@
 const { ipcRenderer } = require("electron");
-const fs = require("fs");
-const os = require("os");
 const $ = require("jquery");
 require('./Core/utils.js');
 require('./Core/lyrics');
 require('./Core/Mp3Tags')
-const AudioSystem = require('./Core/AudioSystem');
-const searchYoutube = require('youtube-api-v3-search');
+require('./server.js')
+const { AudioEngine, AudioQuery }= require('./Core/AudioSystem');
 const ZPlayer = require("./Core/Zplayer");
+const { extname, join } = require('path')
+const { audio } = require("./modules/processes.js");
+const { readFileSync,existsSync, writeFileSync } =  require('fs');
+const { musicFolders } = require("./modules/Paths.js");
 
- var musicContainer = [];
+var musicContainer = [];
  var route = 0;
+ ipcRenderer.send('appPath');
 
  var folders = (content,value) => {
     var folderIcon = $('<td></td>').addClass('fa fa-folder');
@@ -35,17 +38,18 @@ function hideLoader(list = []){
     });
 }
 
-var audio = new Audio();
+// var audio = new Audio();
     audio.volume = 0.17;
-var engine = new AudioSystem.AudioEngine(audio)
+var engine = new AudioEngine(audio)
 
-engine.tuneBass("#bass");
-engine.tuneBassBooster("#bassboost");
-engine.tuneCompressor(".compressor")
+// engine.tuneBass("#bass");
+engine.tuneBassBooster(".bassboost");
+engine.tuneCompressor(".compressor");
+engine.adjustBands();
 engine.tuneAudioBalance('#balance');
 engine.tuneAudioPower('#audioboost');
-engine.tuneMidVocal("#trebboost");
-engine.tuneStereo("#stereo")
+
+engine.tuneStereo(".stereo")
 engine.tuneRoomSwitch(".room-switch");
 // 
     engine.tuneRoomOptions("#r-effects");
@@ -118,53 +122,55 @@ $('.btns-opener').on('click',function(){
     $(this).toggleClass('active')
     $('.btns-container').toggleClass('active')
 })
-    window.addEventListener('load',function(){
-      
-     // console.log(emoji.flat(1))
-        var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
-        if(data.cachedFolders.length < 1){
-            $("#changelog").show();
-            $('.welcome-container').addClass('active');
-            $('.welcome-content').addClass('active');
-            ipcRenderer.send('showHelp')
-            /**
-             * Load track for first tym user
-             */
-                $('.import-folder').on('click',function(){
 
-                    $('.welcome-container').delay(20000).removeClass('active');
-                    $('.welcome-content').delay(20000).removeClass('active');
-                    
-                    var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
+window.addEventListener('load',function(){
+      console.log(musicFolders)
+    // console.log(emoji.flat(1))
+       var data =  JSON.parse(readFileSync(`${musicFolders}`));
+       if(data.folders.length < 1){
+           $("#changelog").show();
+           $('.welcome-container').addClass('active');
+           $('.welcome-content').addClass('active');
+           ipcRenderer.send('showHelp')
+           /**
+            * Load track for first tym user
+            */
+               $('.import-folder').on('click',function(){
 
-                    ipcRenderer.send('open-music-folder');
+                   $('.welcome-container').delay(20000).removeClass('active');
+                   $('.welcome-content').delay(20000).removeClass('active');
+                   
+                   var data =  JSON.parse(readFileSync(`${musicFolders}`));
 
-                            ipcRenderer.on('musicFiles',(event,args)=>{
-                                var paths = args.filePaths[0];
+                   ipcRenderer.send('open-music-folder');
 
-                                if(paths != null ){
-                                    data.cachedFolders.push(paths);
-                                    fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data));
-                                    folders(paths,`${route}`);
-                                /**
-                                 * Load music files instantly
-                                 */
-                                var query = new AudioSystem.AudioQuery(paths);
-                         query.fetchAllSongs().map((songs,index,array) => musicContainer.push(songs));
-                    //   console.log(musicContainer)
-                         musicContainer.map((songs,index,array) =>  Ziki.getPlaylist(songs,index,array))
-                            }
-                        })
-                })
-        }else{
-            $('#playlist').click();
-            data.cachedFolders.map((url)=>{
-                var query = new AudioSystem.AudioQuery(url);
-                // console.log(musicContainer)
-          query.fetchAllSongs().map((songs) => musicContainer.push(songs));
-            })
-    }
-             musicContainer.map((songs,index,array) => Ziki.getPlaylist(songs,index,array));
+                           ipcRenderer.on('musicFiles',(event,args)=>{
+                               var paths = args.filePaths[0];
+
+                               if(paths != null ){
+                                   data.folders.push(paths);
+                                   writeFileSync(`${musicFolders}`,JSON.stringify(data));
+                                   folders(paths,`${route}`);
+                               /**
+                                * Load music files instantly
+                                */
+                                console.log(new AudioQuery(paths).fetchFolders());
+                               var query = new AudioQuery(paths);
+                        query.fetchAllSongs().map((songs,index,array) => musicContainer.push(songs));
+                   //   console.log(musicContainer)
+                        musicContainer.map((songs,index,array) =>  Ziki.getPlaylist(songs,index,array))
+                           }
+                       })
+               })
+       }else{
+           $('#playlist').click();
+           data.folders.map((url)=>{
+            console.log(new AudioQuery(url).fetchFolders());
+               var query = new AudioQuery(url);
+             query.fetchAllSongs().map((songs) => musicContainer.push(songs));
+           })
+   }
+            musicContainer.map((songs,index,array) => Ziki.getPlaylist(songs,index,array));
 },false);
 
 /**
@@ -190,12 +196,12 @@ $('.add-folder').on('click',function(){
  ipcRenderer.on('musicFiles',(event,args)=>{
     // console.log(args)
 
-      var data =  JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));
+      var data =  JSON.parse(readFileSync(`${musicFolders}`));
       var filepath = args.filePaths[0];
 
       if(filepath != null){
-        data.cachedFolders.push(filepath);
-        fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(data))
+        data.folders.push(filepath);
+        writeFileSync(`${musicFolders}`,JSON.stringify(data))
        folders(args.filePaths[0],`${parseInt(route+=1)}`);
 
      /**
@@ -206,13 +212,30 @@ $('.add-folder').on('click',function(){
     /**
      * Load music files instantly
      */
-     var query = new AudioSystem.AudioQuery(args.filePaths[0]);
-      query.fetchAllSongs().map((songs) => musicContainer.push(songs));
+    console.log(new AudioQuery(args.filePaths[0]).fetchFolders())
+     var query = new AudioQuery(args.filePaths[0]);
+      query.fetchAllSongs().map((songs) =>  musicContainer.push(songs));
       musicContainer.map((songs,index,array) => Ziki.getPlaylist(songs,index,array));
   }
 })
 
 }) 
+/**
+ * Refreshing the playlist
+ */
+$(".refresh").on('click',function(){
+    const files =  JSON.parse(readFileSync(`${musicFolders}`))
+    console.log('refresh start');
+
+    files.folders.map((url)=>{
+    console.log('refreshing')
+    console.log(new AudioQuery(args.filePaths[0]).fetchFolders())
+        var query = new AudioQuery(url);
+      query.fetchAllSongs().map((songs) => musicContainer.push(songs));
+    })
+
+     musicContainer.map((songs,index,array) => Ziki.getPlaylist(songs,index,array));
+})
  /**
   * 
   *  Closing the plaslist window 
@@ -248,9 +271,9 @@ $('.close-panel').on('click',function(){
  * Add Music Folder and remove it as well
  */
 
-       var folder = JSON.parse(fs.readFileSync(`${os.homedir()}/.ZPlayer/database.json`));  
+       var folder = JSON.parse(readFileSync(`${musicFolders}`));  
 
-     folder.cachedFolders.map((name,index) => folders(name,index));
+     folder.folders.map((name,index) => folders(name,index));
      
      $('.rem-folder').map((index,dom) => {
 
@@ -268,12 +291,12 @@ $('.close-panel').on('click',function(){
 
         $('.rem-folder').each((index,data) => {
 
-            if(folder.cachedFolders.legnth < 1){
+            if(folder.folders.length < 1){
                 ipcRenderer.send('Nofolders',"No more directories to remove")
             }
         if(data.checked){         
-            folder.cachedFolders.splice($(data).val(),1);
-           fs.writeFileSync(`${os.homedir()}/.ZPlayer/database.json`,JSON.stringify(folder))    
+            folder.folders.splice($(data).val(),1);
+           writeFileSync(`${musicFolders}`,JSON.stringify(folder))    
         }
     })
 })
@@ -334,7 +357,7 @@ $('#visual-select').click(function(){
     $('.settings-cont').removeClass('active')
 })
 /**
- * Drawing over other appps
+ * Drawing over other apps
  */
 $('.draw-over-apps').on('change',function(){
     if($(this).get(0).checked == true){
@@ -361,16 +384,13 @@ $('.draw-over-apps').on('change',function(){
             })
           setInterval(frame, options.speed); 
                function frame(){
-                   if(scrollx == 300){
-                    // setTimeout(() => {
-                    
-
-                    $('.bottom-details').delay(200000).get(0).scroll({left:scrollx -= 4,behavior:'smooth'});                      
-                    // }, 2000);
+                   if(scrollx == el.width()){
+                    $('.bottom-details').delay(0).get(0).scroll({left:scrollx -= 800,behavior:'smooth'});                      
+                   
                     scrollx = 0;
                    }else{
                           scrollx += 4;
-                        $('.bottom-details').delay(200).get(0).scroll({left:scrollx,behavior:'smooth'});
+                        $('.bottom-details').delay(20).get(0).scroll({left:scrollx,behavior:'smooth'});
                       
                    }
                }
@@ -399,7 +419,7 @@ $('.streaming-btn').on('click',function(){
 $('.btn-hot-100').on('click',function(){
     Ziki.streamHot100();
 })
-/**serach your favourite jam from nowviba  */
+/**search your favorite jam from nowviba  */
 $('.search').on('input',function(){
     Ziki.searchSongs($(this).val());
 })

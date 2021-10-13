@@ -4,16 +4,13 @@
  */
 const $ = require('jquery');
 const EqKnobs = require('../Plugins/Eq-knobs');
+const { presets, Rooms } = require('./Presets');
 const Visualizer = require('./Visualizer');
-
+const bands = document.querySelectorAll('.bands');
+const bandValue = document.querySelectorAll('.bd');
 class AudioEngine{
     constructor(audio = {}){
         this.bst = 0;
-        this.globalBass = 0;
-        this.globalBBoost = 0;
-        this.globalStereo = 0;
-        this.globalTreb = 0;
-      
         this.si1 = null
         this.dy2 = null
         this.si2 = null;
@@ -30,85 +27,78 @@ class AudioEngine{
             }
         }
         this.audioCtx = new AudioContext();
-        this.source = this.audioCtx.createMediaElementSource(this.audio);
-        this.analyser = this.audioCtx.createAnalyser();
-        this.stereo = this.audioCtx.createBiquadFilter();
-        this.treble = this.audioCtx.createBiquadFilter();
-        this.dance = this.audioCtx.createBiquadFilter();
-        this.bass = this.audioCtx.createBiquadFilter();
-        this.echo = this.audioCtx.createDelay();
-        this.feedback = this.audioCtx.createGain();
-        this.audioBoost = this.audioCtx.createGain();
-        this.delay1 = this.audioCtx.createDelay();
-        this.delay2 = this.audioCtx.createDelay();
-        this.size1 = this.audioCtx.createGain();
-        this.size2 = this.audioCtx.createGain();
-        this.bassBoost = this.audioCtx.createGain();
-        this.trebleBoost = this.audioCtx.createGain();
-        this.balance = this.audioCtx.createStereoPanner();
-        this.splitter = this.audioCtx.createChannelSplitter(2);
-        this.merger = this.audioCtx.createChannelMerger(2);
-        this.mono = this.audioCtx.createChannelMerger(1);
-        this.compressor = this.audioCtx.createDynamicsCompressor();
-        this.St_treble = this.audioCtx.createBiquadFilter();
-        this.St_treble_boost = this.audioCtx.createGain();
-
-        this.St_treble.type = 'highpass';
-        this.St_treble.frequency.value = 4530.11;
-        this.St_treble.gain.value = 2;
-        this.St_treble.Q.value = 3;
+        this.sourceNode = new MediaElementAudioSourceNode(this.audioCtx,{mediaElement:this.audio});
+        this.analyser = new AnalyserNode(this.audioCtx,{minDecibels:-80,maxDecibels:-10,smoothingTimeConstant:0.88});
+          //  bands 
+        this.bandFilter1 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:32,type:'peaking'});
+        this.bandFilter2 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:62,type:'peaking'});
+        this.bandFilter3 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:125,type:'peaking'});
+        this.bandFilter4 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:250,type:'peaking'});
+        this.bandFilter5 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:500,type:'peaking'});
+        this.bandFilter6 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:1000,type:'peaking'});
+        this.bandFilter7 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:2000,type:'peaking'});
+        this.bandFilter8 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:4000,type:'peaking'});
+        this.bandFilter9 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:8000,type:'peaking'});
+        this.bandFilter10 = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:16000,type:'peaking'});
+        this.gainNode = new GainNode(this.audioCtx,{gain:0.9});
+        // Tone
+        this.bassAmp = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:20,type:'peaking'});
+        this.trebleAmp = new BiquadFilterNode(this.audioCtx,{gain:0,frequency:18000,type:'peaking',Q:0.46});
+       
         /**
          * Audio Balance
          */
-        this.balance = this.audioCtx.createStereoPanner()
+        this.balance = new StereoPannerNode(this.audioCtx,{pan:0});
         /**
          * Audio Compressor
          */
-        this.compressor = this.audioCtx.createDynamicsCompressor();
-        /**
-         * Compressor props
+        this.compressor = new DynamicsCompressorNode(this.audioCtx,{threshold:0,knee:10,release:0,ratio:1,attack:0.3});
+         /* Room Effects
          */
-        this.compressor.threshold.value = 0;//( -100 -> 0)
-        this.compressor.attack.value = 0.3;//(0->1)
-        this.compressor.release.value = 0;//(0-> 1)
-        this.compressor.knee.value = 10;//(0 -> 40)
-        this.compressor.ratio.value = 1;//( 1-> 20)
-
-        
-      
-        //Connections	
-        this.source.connect(this.trebleBoost);
-        this.trebleBoost.connect(this.stereo);
-        this.stereo.connect(this.analyser);
-        this.analyser.connect(this.audioCtx.destination);
-
-        this.stereo.type = 'highpass';
-        this.bass.type = 'lowpass';
-  
-       
-        this.stereo.frequency.value = 20000;
-        this.trebleBoost.gain.value = 0;
-
-        this.bass.frequency.value = 20;
-          /**
-         * Room Effects
-         */
-        this.splitter = this.audioCtx.createChannelSplitter(2);
-        this.merger = this.audioCtx.createChannelMerger(2);
+        this.splitter = new ChannelSplitterNode(this.audioCtx,{numberOfOutputs:2});
+        this.merger = new ChannelMergerNode(this.audioCtx,{numberOfInputs:2});
         /**
          * Delay nodes to help in create the room effects
          */
-         this.leftDelay = this.audioCtx.createDelay();
-         this.rightDelay = this.audioCtx.createDelay();
-
-         this.midDelay = this.audioCtx.createDelay();
+         this.leftDelay = new DelayNode(this.audioCtx,{delayTime:0});
+         this.rightDelay = new DelayNode(this.audioCtx,{delayTime:0});
+         this.midDelay = new DelayNode(this.audioCtx,{delayTime:0});
         /**
-         * Gain nodes to aid in audio audibilty
+         * Gain nodes to aid in audio audibility
          */
-        this.leftGain = this.audioCtx.createGain();
-        this.rightGain = this.audioCtx.createGain();
-        this.midGain = this.audioCtx.createGain();
-        //     
+        this.leftGain = new GainNode(this.audioCtx,{gain:0});
+        this.rightGain = new GainNode(this.audioCtx,{gain:0});
+        this.midGain = new GainNode(this.audioCtx,{gain:0});
+        /**
+         * Method to update the bands
+         *  */   
+     
+    this.updateBands = (band1 = 0,band2 = 0,band3 = 0,band4 = 0,band5 = 0,band6 = 0,band7 = 0,band8 = 0,band9 = 0,band10 = 0) => {
+         bands[0].value = band1;
+         bands[1].value = band2;
+         bands[2].value = band3;
+         bands[3].value = band4;
+         bands[4].value = band5;
+         bands[5].value = band6;
+         bands[6].value = band7;
+         bands[7].value = band8;
+         bands[8].value = band9;
+         bands[9].value = band10;
+         // band Values
+         bandValue[0].textContent = band1;
+         bandValue[1].textContent = band2;
+         bandValue[2].textContent = band3;
+         bandValue[3].textContent = band4;
+         bandValue[4].textContent = band5;
+         bandValue[5].textContent = band6;
+         bandValue[6].textContent = band7;
+         bandValue[7].textContent = band8;
+         bandValue[8].textContent = band9;
+         bandValue[9].textContent = band10;
+         
+     
+     }
+
         this.dy1 = (value)=>{
            return new EqKnobs({
                 initialValue:value,
@@ -127,98 +117,102 @@ class AudioEngine{
 
        
 
-          /* Visualisser */
+          /* Visualizers */
           try {
             $(".canvas-full").hide();
             $(".sp1").hide();
             } catch (error) {
                 console.log(error)
             }
-
-        this.visualizer = new Visualizer(this.analyser,'.canvas-full')
-        var that = this;
+            this.audio.addEventListener('playing',() => {
+                // connections
+                this.sourceNode.connect(this.balance);
+                this.balance.connect(this.analyser)
+                this.analyser.connect(this.audioCtx.destination)
+            },false)
+        const visualizer = new Visualizer(this.analyser,'.canvas-full');
             // this.visualizer.barsVisualiser();
-        $(".visual-table tr").eq(0).on('click',function() {
+        $(".visual-table tr").eq(0).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.barsVisualiser();
+            visualizer.barsVisualiser();
         })
 
-        $(".visual-table tr").eq(2).on('click',function() {
+        $(".visual-table tr").eq(2).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.choroFloroVisualiser();
+            visualizer.choroFloroVisualiser();
         });
 
-        $(".visual-table tr").eq(1).on('click',function() {
+        $(".visual-table tr").eq(1).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-             that.visualizer.dustyParticles();
+             visualizer.dustyParticles();
         });
 
-        $(".visual-table  tr").eq(6).on('click',function() {
+        $(".visual-table  tr").eq(6).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.glassTilesVisualiser();
+            visualizer.glassTilesVisualiser();
         });
 
-        $(".visual-table  tr").eq(5).on('click',function() {
+        $(".visual-table  tr").eq(5).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.historgramVisualiser();
+            visualizer.historgramVisualiser();
         })
 
-        $(".visual-table  tr").eq(7).on('click',function() {
+        $(".visual-table  tr").eq(7).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.ripleWaveVisualiser()
+            visualizer.ripleWaveVisualiser()
         })
 
-        $(".visual-table  tr").eq(8).on('click',function() {
+        $(".visual-table  tr").eq(8).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.colorstetchVisualiser()
+            visualizer.colorstetchVisualiser()
         })
 
-        $(".visual-table  tr").eq(4).on('click',function() {
+        $(".visual-table  tr").eq(4).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.sineWaveVisualiser();
+            visualizer.sineWaveVisualiser();
         });
 
-        $(".visual-table  tr").eq(3).on('click',function() {
+        $(".visual-table  tr").eq(3).on('click',() => {
             $(".canvas-full").hide();
             $(".sp1").show();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.spiralVisualiser(".sp1");
+            visualizer.spiralVisualiser(".sp1");
         })
 
-        $(".visual-table  tr").eq(9).on('click',function() {
+        $(".visual-table  tr").eq(9).on('click',() => {
             $(".canvas-full").show();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
             $('.Visualbox').removeClass('active')
-            that.visualizer.floatingBars();
+            visualizer.floatingBars();
         })
 
-        $(".visual-table  tr").eq(10).on('click',function() {
+        $(".visual-table  tr").eq(10).on('click',() => {
             $(".canvas-full").hide();
             $(".sp1").hide();
             $('.Visualbox .body').removeClass('active')
@@ -232,393 +226,432 @@ class AudioEngine{
             if($(".tune-on-eq").get(0).checked  == true){
                 this.eqsw = true;
                 $('#eqns').attr('disabled',false);
-                // this.source.diconnect(this.analyser)
-                // this.analyser.disconnect(this.audioCtx.destination);
-
-                this.source.connect(this.treble)
-                this.treble.connect(this.compressor);
-                this.compressor.connect(this.audioBoost);
-                this.audioBoost.connect(this.balance);
-                this.balance.connect(this.analyser);
-                this.analyser.connect(this.audioCtx.destination);
-                bassCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
+                this.sourceNode.disconnect(this.balance);
+                this.balance.disconnect(this.analyser)
+                this.analyser.disconnect(this.audioCtx.destination)
+                    // connections
+                    this.sourceNode.connect(this.bandFilter1);
+                    this.bandFilter1.connect(this.bandFilter2);
+                    this.bandFilter2.connect(this.bandFilter3);
+                    this.bandFilter3.connect(this.bandFilter4);
+                    this.bandFilter4.connect(this.bandFilter5);
+                    this.bandFilter5.connect(this.bandFilter6);
+                    this.bandFilter6.connect(this.bandFilter7);
+                    this.bandFilter7.connect(this.bandFilter8);
+                    this.bandFilter8.connect(this.bandFilter9);
+                    this.bandFilter9.connect(this.bandFilter10);
+                    this.bandFilter10.connect(this.gainNode);
+                    this.gainNode.connect(this.bassAmp);
+                    this.bassAmp.connect(this.trebleAmp);
+                    this.trebleAmp.connect(this.balance)
+                    this.balance.connect(this.analyser)
+                    this.analyser.connect(this.audioCtx.destination)
             }else{
-                // bassDisCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
                 this.eqsw = false;
                 $('#eqns').attr('disabled',true);
-                this.source.disconnect(this.treble)
-                this.treble.disconnect(this.compressor);
-                this.compressor.disconnect(this.audioBoost);
-                this.audioBoost.disconnect(this.balance);
-                this.balance.disconnect(this.analyser);
-                this.analyser.disconnect(this.audioCtx.destination);
+                this.sourceNode.disconnect(this.bandFilter1);
+                this.bandFilter1.disconnect(this.bandFilter2);
+                this.bandFilter2.disconnect(this.bandFilter3);
+                this.bandFilter3.disconnect(this.bandFilter4);
+                this.bandFilter4.disconnect(this.bandFilter5);
+                this.bandFilter5.disconnect(this.bandFilter6);
+                this.bandFilter6.disconnect(this.bandFilter7);
+                this.bandFilter7.disconnect(this.bandFilter8);
+                this.bandFilter8.disconnect(this.bandFilter9);
+                this.bandFilter9.disconnect(this.bandFilter10);
+                this.bandFilter10.disconnect(this.gainNode);
+                this.gainNode.disconnect(this.bassAmp);
+                this.bassAmp.disconnect(this.trebleAmp);
+                this.trebleAmp.disconnect(this.balance)
+                this.balance.disconnect(this.analyser)
+                this.analyser.disconnect(this.audioCtx.destination)
 
-                this.source.connect(this.analyser)
-                this.analyser.connect(this.audioCtx.destination);
+                this.sourceNode.connect(this.balance);
+                this.balance.connect(this.analyser)
+                this.analyser.connect(this.audioCtx.destination)
             }
         });
+
          /**
-         * connections
+         * Reset Equaliser settings
          */
-          this.source.connect(this.analyser)
-          this.analyser.connect(this.audioCtx.destination);
-         // --Analyser settings
-         this.analyser.fftSize = 1024;
-         this.analyser.minDecibels = -90;
-         this.analyser.maxDecibels = 0;
-         this.analyser.smoothingTimeConstant = 0.88; 
-    }
-    tuneStereo(selector){
-        var that =this;
-       new EqKnobs({
-        trackColor:"#D4E069",
-        size:110,
-        trackWidth:0.3,
-        initialValue:this.globalStereo,
-        minValue:0,
-        bgColor:'#333333',
-        maxValue:5,
-       }).knobControl(selector,(knob,output)=>{
-            $("#st-out").text((output).toFixed(2));
-            that.St_treble_boost.gain.value = output;
-            that.source.connect(that.St_treble)
-            that.St_treble.connect(that.St_treble_boost)
-            that.St_treble_boost.connect(that.analyser)
-            that.analyser.connect(that.audioCtx.destination)
-        });
-    }
-    tuneEq(tune){
-        var that = this;   
+          this.resetEqualiser =  ()=>{
+            this.updateBands(0,0,0,0,0,0,0,0,0,0);
+            $(".tune-on-eq").get(0).checked = false;
+            this.eqsw = false;
+            $('#eqns').val('Preset');
+            $('#eqns').attr('disabled',true);
+            this.sourceNode.disconnect(this.bandFilter1);
+            this.bandFilter1.disconnect(this.bandFilter2);
+            this.bandFilter2.disconnect(this.bandFilter3);
+            this.bandFilter3.disconnect(this.bandFilter4);
+            this.bandFilter4.disconnect(this.bandFilter5);
+            this.bandFilter5.disconnect(this.bandFilter6);
+            this.bandFilter6.disconnect(this.bandFilter7);
+            this.bandFilter7.disconnect(this.bandFilter8);
+            this.bandFilter8.disconnect(this.bandFilter9);
+            this.bandFilter9.disconnect(this.bandFilter10);
+            this.bandFilter10.disconnect(this.gainNode);
+            this.gainNode.disconnect(this.bassAmp);
+            this.bassAmp.disconnect(this.trebleAmp);
+            this.trebleAmp.disconnect(this.balance)
+            this.balance.disconnect(this.analyser)
+            this.analyser.disconnect(this.audioCtx.destination)
 
-        switch (tune) {
-            case 'normal':
-                this.treble.type = 'peaking';
-                this.treble.frequency.value = 2000;
-                // stereo.frequency.value = 0.60;
-                $('#bb2').text(Math.floor(parseFloat(1.4).toFixed(1)) + ' dB');
-                $('#bb1').text(Math.floor(parseFloat(20).toFixed(1)) + ' dB');
-                this.globalTreb = 0.60;
-               this.globalBBoost = 1.4;
-               this.globalBass = 20;
-               this.globalStereo = 0;
-                this.bst = 1.4;
-                $('#tb2').text(parseFloat(0.6).toFixed(3) + ' dB');
-                this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
-                $('#threshold').val(0);
-                $('#threshold-v').text(0);
-                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser)
-                break;
-
-            case 'rnb':
-                this.stereo.frequency.value = 0.8;
-                this.compressor.threshold.setValueAtTime(-58.4, this.audioCtx.currentTime);
-                this.treble.type = 'lowpass';
-                this.treble.frequency.value = 60;
-                // treble.Q.value = 7;
-                this.bass.frequency.value = 58;
-                // bass.gain.value = 15;
-               this.bassBoost.gain.setValueAtTime(2.0, this.audioCtx.currentTime);
-
-               this.globalTreb = 0.8;
-               this.globalBBoost = 2.0;
-               this.globalBass = 58;
-               this.globalStereo = 0;
-                this.bst = 2.0;
-                $('#bb2').text(Math.floor(parseFloat(2.0).toFixed(1)) + ' dB');
-                $('#bb1').text(Math.floor(parseFloat(58).toFixed(1)) + ' dB');
-                $('#tb2').text(parseFloat(0.8).toFixed(3) + ' dB');
-                $('#threshold').val(-58.4)
-                $('#threshold-v').text(-58.4);
-                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
-                break;
-
-            case 'dance':
-                this.treble.type = 'lowpass';
-                this.bassBoost.gain.setValueAtTime(1.40, this.audioCtx.currentTime);
-
-                this.stereo.frequency.value = 0.5;
-                this.treble.frequency.value = 50;
-                // treble.gain.value = 16;
-                this.dance.type = 'bandpass';
-                this.dance.frequency.value = 100;
-                // dance.Q.value = 7;
-                this.bass.frequency.value = 46;
-                this.bassBoost.gain.setValueAtTime(2.7, this.audioCtx.currentTime);
-                $('#bb2').text(Math.floor(parseFloat(2.7).toFixed(2)) + ' dB');
-    
-                  this.bst = 2.7;
-                  this.globalTreb = 0.50;
-                  this.globalBBoost = 1.4;
-                  this.globalBass = 46;
-                  this.globalStereo = 0;
-                $('#bb1').text(Math.floor(parseFloat(50).toFixed(1)) + ' dB');
-                $('#tb2').text(parseFloat(0.5).toFixed(3) + ' dB');
-                $('#threshold').val(0);
-                $('#threshold-v').text(0);
-
-            if(this.eqsw == true){
-                 this.source.connect(this.bassBoost);
-                this.bassBoost.connect(this.bass);
-                this.bass.connect(this.dance);
-                this.dance.connect(this.analyser);
-                this.analyser.connect(this.audioCtx.destination);
-            }else{
-                this.source.disconnect(this.bassBoost);
-                this.bassBoost.disconnect(this.bass);
-                this.bass.disconnect(this.dance);
-                this.dance.disconnect(this.analyser);
-                this.analyser.disconnect(this.audioCtx.destination);
-            }
-               
-                break;
-
-            case 'reg':
-                this.treble.type = 'bandpass';
-                this.treble.frequency.value = 0;
-                this.bass.frequency.value = 35;
-                // bass.Q.value = 7;
-                this.bassBoost.gain.setValueAtTime(4.0, this.audioCtx.currentTime);
-                this.stereo.frequency.value = 0.49;
-        
-                this.bst = 4.0;
-                this.globalTreb = 0.49;
-                this.globalBBoost = 4.0;
-                this.globalBass = 35;
-                this.globalStereo = 0;
-                $('#bb2').text(Math.floor(parseFloat(4.0).toFixed(1)) + ' dB');
-                $("#bass-boost").val(parseFloat(4.0).toFixed(1) + ' dB');
-                $('#tb2').text(parseFloat(0.49).toFixed(2) + ' dB');
-                this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
-                $('#threshold').val(0)
-                $('#threshold-v').text(0);
-               
-                break;
-
-            case 'bass':
-                this.treble.type = 'bandpass';
-                this.treble.frequency.value = 0;
-                this.bass.frequency.value = 55;
-                // bass.Q.value = 3;
-                this.bassBoost.gain.setValueAtTime(2.5, this.audioCtx.currentTime);
-                
-                this.stereo.frequency.value = 0.70;
-               
-                this.bst = 2.5;
-                this.globalTreb = 0.70;
-                this.globalBBoost = 2.5;
-                this.globalBass = 55;
-                this.globalStereo = 0;
-                $('#bb2').textContent = Math.floor(parseFloat(3.5).toFixed(1)) + ' dB';
-
-                $('#bb1').text(Math.floor(parseFloat(58).toFixed(1)) + ' dB');
-             
-                $('#tb2').text(parseFloat(0.7).toFixed(3) + ' dB');
-                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx,this.analyser);
-                break;
-
-            case 'flat':
-                this.treble.type = 'peaking';
-               this.bass.frequency.value = 20;
-                this.treble.frequency.value = 2000;
-                // this.stereo.frequency.value = 
-                this.bassBoost.gain.setValueAtTime(1.0, this.audioCtx.currentTime);
-                $('#bb2').text(Math.floor(parseFloat(1.0).toFixed(1)) + ' dB');
-                
-                this.bst = 1.0;
-                this.globalTreb = 0.60;
-                this.globalBBoost = 1.0;
-                this.globalBass = 20;
-                this.globalStereo = 0;
-                
-                $('#bb1').text(Math.floor(parseFloat(30).toFixed(1)) + ' dB');
-               
-                $('#tb2').text(parseFloat(1).toFixed(3) + ' dB');
-                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx ,this.analyser);
-                break;
-
-            case 'rock':
-                this.treble.type = 'bandpass';
-                this.bass.frequency.value = 53;
-                this.treble.frequency.value = 1800;
-               
-                this.bassBoost.gain.setValueAtTime(2.59, this.audioCtx.currentTime);
-                $('#bb2').text(Math.floor(parseFloat(2.59).toFixed(1)) + ' dB');
-
-
-                $('#bb1').text(Math.floor(parseFloat(75).toFixed(1)) + ' dB');
-              
-                $('#tb2').text(parseFloat(0.5).toFixed(3) + ' dB');
-             
-                this.stereo.frequency.value = 0.50;
-                this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
-                this.bst = 2.59;
-                $('#threshold').val(0)
-                $('#threshold-v').text(0);
-                this.globalTreb = 0.50;
-                this.globalBBoost = 2.59;
-                this.globalBass = 53;
-                this.globalStereo = 0;
-                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
-                break;
-
-            case 'heavy':
-                this.treble.type = 'notch';
-                this.bass.frequency.value = 60;
-                this.treble.frequency.value = 160;
-                $("#treb-boost").val(0.89);
-                this.stereo.frequency.value = 0.89;
-
-                this.bassBoost.gain.setValueAtTime(3.6, this.audioCtx.currentTime);
-                $('#bb2').text(Math.floor(parseFloat(3.6).toFixed(1)) + ' dB');
-
-                $("#bass").val(60);
-                $('#bb1').text(Math.floor(parseFloat(3.6).toFixed(1)) + ' dB');
-                this.bst = 3.6;
-                $("#bass-boost").val(3.6);
-                
-                $('#tb2').text(parseFloat(0.89).toFixed(3) + ' dB');
-                this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
-                $('#threshold').val(0)
-                $('#threshold-v').text(0);
-                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
-                break;
-
-            case 'vocal':
-                this.treble.type = 'allpass';
-                this.bass.frequency.value = 0;
-                this.bassBoost.gain.setValueAtTime(0, this.audioCtx.currentTime);
-                $('#bb2').text(Math.floor(parseFloat(0).toFixed(1)) + ' dB');
-
-                this.treble.frequency.value = 2000;
-        
-                this.bst = 0;
-                this.globalTreb = 1.8;
-                this.globalBBoost = 0;
-                this.globalBass = 0;
-                this.globalStereo = 0;
-                $('#bb1').text(Math.floor(parseFloat(0).toFixed(1)) + ' dB');
-               
-                $('#tb2').textContent = parseFloat(1.8).toFixed(2) + ' dB';
-             
-               
-                this.stereo.frequency.value = 1.8;
-               this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
-                $('#threshold').val(0)
-                $('#threshold-v').text(0);
-                // bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
-                break;
-
-            case 'pop':
-                this.treble.type = 'notch';
-                this.bass.frequency.value = 70;
-               this.treble.Q.value = 1;
-               this.treble.frequency.value = 600;
-                
-                this.stereo.frequency.value = 0.7;
-                this.bassBoost.gain.setValueAtTime(2.0, this.audioCtx.currentTime);
-             
-                this.bst = 2.0;
-                this.globalTreb = 0.70;
-                this.globalBBoost = 2.0;
-                this.globalBass = 70;
-                this.globalStereo = 0;
-                
-                $('#bb2').text(Math.floor(parseFloat(2.0).toFixed(1)) + ' dB');
-
-                $('#bb1').text(Math.floor(parseFloat(70).toFixed(1)) + ' dB');
-                
-                $('#tb2').textContent = parseFloat(0.7).toFixed(3) + ' dB';
-              
-                this.compressor.threshold.setValueAtTime(0, this.audioCtx.currentTime);
-                 $('#threshold').val(0)
-                 $('#threshold-v').text(0);
-                //  bassCon(this.source, this.bassBoost, this.bass, this.audioCtx , this.analyser);
-                break;
+            this.sourceNode.connect(this.balance);
+            this.balance.connect(this.analyser)
+            this.analyser.connect(this.audioCtx.destination)
         }
-    }
-    tuneBass(selector){
-    // from user 
-       
- new EqKnobs({
-        trackColor:"#88ff88",
-        size:120,
-        trackWidth:0.45,
-        initialValue:this.globalBass,
-        bgColor:'#333333',
-        minValue:0,
-        maxValue:120,
-    }).knobControl(selector,(knob,output)=>{
-        //   console.log('bass '+output)
-            $('#bb1').text((output).toFixed(1) + ' dB');
-            // this.changeColor(knobs.)
-            this.bass.frequency.setValueAtTime(output, this.audioCtx.currentTime);
-    });
-    }
-
-    tuneMidVocal(selector){
-        this.treble.type = 'peaking';
-        this.treble.frequency.value = 2000;
-
-       new EqKnobs({
-            trackColor:"#D4E069",
-            size:110,
-            trackWidth:0.3,
-            initialValue:this.globalTreb,
-            minValue:0,
-            bgColor:'#333333',
-            maxValue:4,
-        }).knobControl(selector,(knob,output)=>{
-            $('#tb2').text((output.toFixed(2))+ ' dB');
-            this.trebleBoost.gain.setValueAtTime(output, this.audioCtx.currentTime);
-        })
+/**
+ * Button to activate equalizer reset
+ */
+        $('.eq-reset').on('click',()=>{
+            $('.alert-msg').text('Equaliser settings have been reset')
+            $('.alert-notification').slideDown(200).delay(4000).slideUp(100)
+            this.resetEqualiser();
+        });
     }
 
     /**
+     * AudioEngine Methods
+     */
+    tuneStereo(selector){
+       new EqKnobs({
+        trackColor:"#D4E069",
+        size:100,
+        trackWidth:0.4,
+        initialValue:0,
+        minValue:0,
+        bgColor:'#333333',
+        maxValue:80,
+       }).knobControl(selector,(knob,output)=>{
+            $(".treble-Val").text((output).toFixed(1)+'dB');
+            this.trebleAmp.gain.setValueAtTime(output,this.audioCtx.currentTime);
+        });
+    }
+    tuneEq(preset){
+        switch (preset) {
+            case 'Normal':
+                this.bandFilter1.gain.value = presets.Normal[0]
+                this.bandFilter2.gain.value = presets.Normal[1]
+                this.bandFilter3.gain.value = presets.Normal[2]
+                this.bandFilter4.gain.value = presets.Normal[3]
+                this.bandFilter5.gain.value = presets.Normal[4]
+                this.bandFilter6.gain.value = presets.Normal[5]
+                this.bandFilter7.gain.value = presets.Normal[6]
+                this.bandFilter8.gain.value = presets.Normal[7]
+                this.bandFilter9.gain.value = presets.Normal[8]
+                this.bandFilter10.gain.value = presets.Normal[9]
+                this.updateBands(presets.Normal[0],presets.Normal[1],presets.Normal[2],presets.Normal[3],presets.Normal[4],presets.Normal[5],presets.Normal[6],presets.Normal[7],presets.Normal[8],presets.Normal[9])
+    
+                // update 
+                break;
+                case 'Bass':
+                this.bandFilter1.gain.value = presets.Bass[0]
+                this.bandFilter2.gain.value = presets.Bass[1]
+                this.bandFilter3.gain.value = presets.Bass[2]
+                this.bandFilter4.gain.value = presets.Bass[3]
+                this.bandFilter5.gain.value = presets.Bass[4]
+                this.bandFilter6.gain.value = presets.Bass[5]
+                this.bandFilter7.gain.value = presets.Bass[6]
+                this.bandFilter8.gain.value = presets.Bass[7]
+                this.bandFilter9.gain.value = presets.Bass[8]
+                this.bandFilter10.gain.value = presets.Bass[9]
+                this.updateBands(presets.Bass[0],presets.Bass[1],presets.Bass[2],presets.Bass[3],presets.Bass[4],presets.Bass[5],presets.Bass[6],presets.Bass[7],presets.Bass[8],presets.Bass[9])
+    
+                    break;
+                case 'Pop':
+                this.bandFilter1.gain.value = presets.Pop[0]
+                this.bandFilter2.gain.value = presets.Pop[1]
+                this.bandFilter3.gain.value = presets.Pop[2]
+                this.bandFilter4.gain.value = presets.Pop[3]
+                this.bandFilter5.gain.value = presets.Pop[4]
+                this.bandFilter6.gain.value = presets.Pop[5]
+                this.bandFilter7.gain.value = presets.Pop[6]
+                this.bandFilter8.gain.value = presets.Pop[7]
+                this.bandFilter9.gain.value = presets.Pop[8]
+                this.bandFilter10.gain.value = presets.Pop[9]
+                this.updateBands(presets.Pop[0],presets.Pop[1],presets.Pop[2],presets.Pop[3],presets.Pop[4],presets.Pop[5],presets.Pop[6],presets.Pop[7],presets.Pop[8],presets.Pop[9])
+    
+                        break;
+    
+                        case 'Treble':
+                            this.bandFilter1.gain.value = presets.Treble[0]
+                            this.bandFilter2.gain.value = presets.Treble[1]
+                            this.bandFilter3.gain.value = presets.Treble[2]
+                            this.bandFilter4.gain.value = presets.Treble[3]
+                            this.bandFilter5.gain.value = presets.Treble[4]
+                            this.bandFilter6.gain.value = presets.Treble[5]
+                            this.bandFilter7.gain.value = presets.Treble[6]
+                            this.bandFilter8.gain.value = presets.Treble[7]
+                            this.bandFilter9.gain.value = presets.Treble[8]
+                            this.bandFilter10.gain.value = presets.Treble[9]
+                            this.updateBands(presets.Treble[0],presets.Treble[1],presets.Treble[2],presets.Treble[3],presets.Treble[4],presets.Treble[5],presets.Treble[6],presets.Treble[7],presets.Treble[8],presets.Treble[9])
+                
+                           break;
+    
+    
+                           case 'Live':
+                            this.bandFilter1.gain.value = presets.Live[0]
+                            this.bandFilter2.gain.value = presets.Live[1]
+                            this.bandFilter3.gain.value = presets.Live[2]
+                            this.bandFilter4.gain.value = presets.Live[3]
+                            this.bandFilter5.gain.value = presets.Live[4]
+                            this.bandFilter6.gain.value = presets.Live[5]
+                            this.bandFilter7.gain.value = presets.Live[6]
+                            this.bandFilter8.gain.value = presets.Live[7]
+                            this.bandFilter9.gain.value = presets.Live[8]
+                            this.bandFilter10.gain.value = presets.Live[9]
+                            this.updateBands(presets.Live[0],presets.Live[1],presets.Live[2],presets.Live[3],presets.Live[4],presets.Live[5],presets.Live[6],presets.Live[7],presets.Live[8],presets.Live[9])
+                
+                           break;
+    
+                           case 'Loud':
+                            this.bandFilter1.gain.value = presets.Loud[0]
+                            this.bandFilter2.gain.value = presets.Loud[1]
+                            this.bandFilter3.gain.value = presets.Loud[2]
+                            this.bandFilter4.gain.value = presets.Loud[3]
+                            this.bandFilter5.gain.value = presets.Loud[4]
+                            this.bandFilter6.gain.value = presets.Loud[5]
+                            this.bandFilter7.gain.value = presets.Loud[6]
+                            this.bandFilter8.gain.value = presets.Loud[7]
+                            this.bandFilter9.gain.value = presets.Loud[8]
+                            this.bandFilter10.gain.value = presets.Loud[9]
+                            this.updateBands(presets.Loud[0],presets.Loud[1],presets.Loud[2],presets.Loud[3],presets.Loud[4],presets.Loud[5],presets.Loud[6],presets.Loud[7],presets.Loud[8],presets.Loud[9])
+                
+                           break;
+                
+                case 'Reggea':
+                this.bandFilter1.gain.value = presets.Reggea[0]
+                this.bandFilter2.gain.value = presets.Reggea[1]
+                this.bandFilter3.gain.value = presets.Reggea[2]
+                this.bandFilter4.gain.value = presets.Reggea[3]
+                this.bandFilter5.gain.value = presets.Reggea[4]
+                this.bandFilter6.gain.value = presets.Reggea[5]
+                this.bandFilter7.gain.value = presets.Reggea[6]
+                this.bandFilter8.gain.value = presets.Reggea[7]
+                this.bandFilter9.gain.value = presets.Reggea[8]
+                this.bandFilter10.gain.value = presets.Reggea[9]
+                this.updateBands(presets.Reggea[0],presets.Reggea[1],presets.Reggea[2],presets.Reggea[3],presets.Reggea[4],presets.Reggea[5],presets.Reggea[6],presets.Reggea[7],presets.Reggea[8],presets.Reggea[9])
+    
+                break;
+    
+                case 'Folk':
+                    this.bandFilter1.gain.value = presets.Folk[0]
+                this.bandFilter2.gain.value = presets.Folk[1]
+                this.bandFilter3.gain.value = presets.Folk[2]
+                this.bandFilter4.gain.value = presets.Folk[3]
+                this.bandFilter5.gain.value = presets.Folk[4]
+                this.bandFilter6.gain.value = presets.Folk[5]
+                this.bandFilter7.gain.value = presets.Folk[6]
+                this.bandFilter8.gain.value = presets.Folk[7]
+                this.bandFilter9.gain.value = presets.Folk[8]
+                this.bandFilter10.gain.value = presets.Folk[9]
+                this.updateBands(presets.Folk[0],presets.Folk[1],presets.Folk[2],presets.Folk[3],presets.Folk[4],presets.Folk[5],presets.Folk[6],presets.Folk[7],presets.Folk[8],presets.Folk[9])
+    
+                break;
+    
+                case 'Dance':
+                this.bandFilter1.gain.value = presets.Dance[0]
+                this.bandFilter2.gain.value = presets.Dance[1]
+                this.bandFilter3.gain.value = presets.Dance[2]
+                this.bandFilter4.gain.value = presets.Dance[3]
+                this.bandFilter5.gain.value = presets.Dance[4]
+                this.bandFilter6.gain.value = presets.Dance[5]
+                this.bandFilter7.gain.value = presets.Dance[6]
+                this.bandFilter8.gain.value = presets.Dance[7]
+                this.bandFilter9.gain.value = presets.Dance[8]
+                this.bandFilter10.gain.value = presets.Dance[9]
+                this.updateBands(presets.Dance[0],presets.Dance[1],presets.Dance[2],presets.Dance[3],presets.Dance[4],presets.Dance[5],presets.Dance[6],presets.Dance[7],presets.Dance[8],presets.Dance[9])
+    
+                break;
+    
+                case 'SoftTreble':
+                this.bandFilter1.gain.value = presets.SoftTreble[0]
+                this.bandFilter2.gain.value = presets.SoftTreble[1]
+                this.bandFilter3.gain.value = presets.SoftTreble[2]
+                this.bandFilter4.gain.value = presets.SoftTreble[3]
+                this.bandFilter5.gain.value = presets.SoftTreble[4]
+                this.bandFilter6.gain.value = presets.SoftTreble[5]
+                this.bandFilter7.gain.value = presets.SoftTreble[6]
+                this.bandFilter8.gain.value = presets.SoftTreble[7]
+                this.bandFilter9.gain.value = presets.SoftTreble[8]
+                this.bandFilter10.gain.value = presets.SoftTreble[9]
+                this.updateBands(presets.SoftTreble[0],presets.SoftTreble[1],presets.SoftTreble[2],presets.SoftTreble[3],presets.SoftTreble[4],presets.SoftTreble[5],presets.SoftTreble[6],presets.SoftTreble[7],presets.SoftTreble[8],presets.SoftTreble[9])
+    
+                break;
+                case 'SoftBass':
+                    this.bandFilter1.gain.value = presets.SoftBass[0]
+                this.bandFilter2.gain.value = presets.SoftBass[1]
+                this.bandFilter3.gain.value = presets.SoftBass[2]
+                this.bandFilter4.gain.value = presets.SoftBass[3]
+                this.bandFilter5.gain.value = presets.SoftBass[4]
+                this.bandFilter6.gain.value = presets.SoftBass[5]
+                this.bandFilter7.gain.value = presets.SoftBass[6]
+                this.bandFilter8.gain.value = presets.SoftBass[7]
+                this.bandFilter9.gain.value = presets.SoftBass[8]
+                this.bandFilter10.gain.value = presets.SoftBass[9]
+                this.updateBands(presets.SoftBass[0],presets.SoftBass[1],presets.SoftBass[2],presets.SoftBass[3],presets.SoftBass[4],presets.SoftBass[5],presets.SoftBass[6],presets.SoftBass[7],presets.SoftBass[8],presets.SoftBass[9])
+    
+                break;
+                case 'Classic':
+                this.bandFilter1.gain.value = presets.Classic[0]
+                this.bandFilter2.gain.value = presets.Classic[1]
+                this.bandFilter3.gain.value = presets.Classic[2]
+                this.bandFilter4.gain.value = presets.Classic[3]
+                this.bandFilter5.gain.value = presets.Classic[4]
+                this.bandFilter6.gain.value = presets.Classic[5]
+                this.bandFilter7.gain.value = presets.Classic[6]
+                this.bandFilter8.gain.value = presets.Classic[7]
+                this.bandFilter9.gain.value = presets.Classic[8]
+                this.bandFilter10.gain.value = presets.Classic[9]
+                this.updateBands(presets.Classic[0],presets.Classic[1],presets.Classic[2],presets.Classic[3],presets.Classic[4],presets.Classic[5],presets.Classic[6],presets.Classic[7],presets.Classic[8],presets.Classic[9])
+    
+                break;
+    
+                case 'Flat':
+                    this.bandFilter1.gain.value = presets.Flat[0]
+                this.bandFilter2.gain.value = presets.Flat[1]
+                this.bandFilter3.gain.value = presets.Flat[2]
+                this.bandFilter4.gain.value = presets.Flat[3]
+                this.bandFilter5.gain.value = presets.Flat[4]
+                this.bandFilter6.gain.value = presets.Flat[5]
+                this.bandFilter7.gain.value = presets.Flat[6]
+                this.bandFilter8.gain.value = presets.Flat[7]
+                this.bandFilter9.gain.value = presets.Flat[8]
+                this.bandFilter10.gain.value = presets.Flat[9]
+                this.updateBands(presets.Flat[0],presets.Flat[1],presets.Flat[2],presets.Flat[3],presets.Flat[4],presets.Flat[5],presets.Flat[6],presets.Flat[7],presets.Flat[8],presets.Flat[9])
+    
+                break;
+                case 'Rock':
+                this.bandFilter1.gain.value = presets.Rock[0]
+                this.bandFilter2.gain.value = presets.Rock[1]
+                this.bandFilter3.gain.value = presets.Rock[2]
+                this.bandFilter4.gain.value = presets.Rock[3]
+                this.bandFilter5.gain.value = presets.Rock[4]
+                this.bandFilter6.gain.value = presets.Rock[5]
+                this.bandFilter7.gain.value = presets.Rock[6]
+                this.bandFilter8.gain.value = presets.Rock[7]
+                this.bandFilter9.gain.value = presets.Rock[8]
+                this.bandFilter10.gain.value = presets.Rock[9]
+                this.updateBands(presets.Rock[0],presets.Rock[1],presets.Rock[2],presets.Rock[3],presets.Rock[4],presets.Rock[5],presets.Rock[6],presets.Rock[7],presets.Rock[8],presets.Rock[9])
+                break;
+    
+                case 'Techno':
+                    this.bandFilter1.gain.value = presets.Techno[0]
+                    this.bandFilter2.gain.value = presets.Techno[1]
+                    this.bandFilter3.gain.value = presets.Techno[2]
+                    this.bandFilter4.gain.value = presets.Techno[3]
+                    this.bandFilter5.gain.value = presets.Techno[4]
+                    this.bandFilter6.gain.value = presets.Techno[5]
+                    this.bandFilter7.gain.value = presets.Techno[6]
+                    this.bandFilter8.gain.value = presets.Techno[7]
+                    this.bandFilter9.gain.value = presets.Techno[8]
+                    this.bandFilter10.gain.value = presets.Techno[9]
+                    this.updateBands(presets.Techno[0],presets.Techno[1],presets.Techno[2],presets.Techno[3],presets.Techno[4],presets.Techno[5],presets.Techno[6],presets.Techno[7],presets.Techno[8],presets.Techno[9])
+                    break;
+    
+            default:
+                break;
+        }
+    }
+    /**
+     * This method provides functionality to eq knobs
+     */
+    adjustBands(){
+        bands.forEach((filter,index)=>{
+            switch (index) {
+                case 0:
+                    filter.addEventListener('input',() => {
+                        bandValue[0].textContent = filter.value
+                        this.bandFilter1.gain.value = filter.value;
+                    },false)
+                break;
+        
+                case 1:
+                    filter.addEventListener('input',() => {
+                        bandValue[1].textContent = filter.value
+                        this.bandFilter2.gain.value = filter.value;
+                    },false)
+                break;
+        
+                case 2:
+                    filter.addEventListener('input',() => {
+                        bandValue[2].textContent = filter.value
+                        this.bandFilter3.gain.value = filter.value;
+                    },false)
+                break;
+        
+                case 3:
+                    filter.addEventListener('input',() => {
+                        bandValue[3].textContent = filter.value
+                        this.bandFilter4.gain.value = filter.value;
+                    },false);
+                break;
+            
+                case 4:
+                    filter.addEventListener('input',() => {
+                        bandValue[4].textContent = filter.value
+                        this.bandFilter5.gain.value = filter.value;
+                    },false);
+                break;
+        
+                case 5:
+                    filter.addEventListener('input',() => {
+                        bandValue[5].textContent = filter.value
+                        this.bandFilter6.gain.value = filter.value;
+                    },false);
+                break;
+        
+                case 6:
+                    filter.addEventListener('input',() => {
+                        bandValue[6].textContent = filter.value
+                        this.bandFilter7.gain.value = filter.value;
+                    },false);
+                break;
+        
+                case 7:
+                    filter.addEventListener('input',() => {
+                        bandValue[7].textContent = filter.value
+                        this.bandFilter8.gain.value = filter.value;
+                    },false);
+                break;
+        
+                case 8:
+                    filter.addEventListener('input',() => {
+                        bandValue[8].textContent = filter.value
+                        this.bandFilter9.gain.value = filter.value;
+                    },false);
+                break;
+        
+                case 9:
+                    filter.addEventListener('input',() => {
+                        bandValue[9].textContent = filter.value
+                        this.bandFilter10.gain.value = filter.value;
+                    },false);
+                break;
+            }
+        })
+    }
+   /**
      * 
      * @param {BassBooster} selector 
      * Tuning the bassboaster
      */
     tuneBassBooster(selector){
     //-------Initials 
-    $('#bb2').text(parseFloat(2.0).toFixed(2) + ' dB');
-    this.bassBoost.gain.value = 2.0;
-
-    var nodeSwitch = (value, a, b) => {
-        switch (value) {
-            case 0:
-                a.disconnect(b);
-                b.disconnect(this.bass);
-                a.connect(this.bass);
-                this.bass.connect(this.analyser);
-                this.analyser.connect(this.audioCtx.destination);
-                break;
-
-            default:
-                a.connect(b);
-                b.connect(this.bass);
-                this.bass.connect(this.analyser);
-                this.analyser.connect(this.audioCtx.destination);
-                break;
-        }
-    }
-        let bbvalue = parseFloat($('#bb2').text());
      new EqKnobs({
-        trackColor:"#88ff88",
-        size:120,
-        trackWidth:0.45,
+        trackColor:"#56B7F0",
+        size:100,
+        trackWidth:0.4,
+        
         bgColor:'#333333',
-        initialValue:bbvalue,
-        value:this.globalBBoost,
+        initialValue:0,
         minValue:0,
-        maxValue:4,
+        maxValue:60,
     }).knobControl(selector, (knob,value)=>{
-        $('#bb2').text((value).toFixed(2) + ' dB');
-        this.bst = (value) + ' dB';
-        this.bassBoost.gain.setValueAtTime(value, this.audioCtx.currentTime);
-        if(this.eqsw == true){
-            nodeSwitch(value, this.source, this.bassBoost);
-        }
-      
+        $('.bass-Val').text(value.toFixed(1)+'dB')
+        this.bassAmp.gain.setValueAtTime(value,this.audioCtx.currentTime);
     });
    
       
@@ -629,7 +662,6 @@ class AudioEngine{
      */
     tuneCompressor(selector){
         var inputs = document.querySelectorAll(selector);
-        var that = this;
         $(inputs).each((index,dom) => {
             switch (index) {
                 case 2:
@@ -716,71 +748,43 @@ class AudioEngine{
     }
     tuneRoomOptions(selector){
 
-        var d1 = 0, d2 = 0, s1 = 0, s2 = 0,that = this;
+        var that = this;
         
         $(selector).on('input',()=> {
         switch ($(selector).val()) {
             case 'echo':
-                d1 = 0.11;
-                s1 = 0.36;
-                d2 = 0.10;
-                s2 = 0.50;
                 nodeCons();
-                updateREffects(d1, d2, s1, s2);
+                updateREffects(Rooms.Echo[0],Rooms.Echo[1],Rooms.Echo[2],Rooms.Echo[3]);
                 break;
 
             case 'auditorium':
-                d1 = 0.06;
-                s1 = 0.29;
-                d2 = 0.08;
-                s2 = 0.35;
                 nodeCons();
-                updateREffects(d1, d2, s1, s2);
+                updateREffects(Rooms.Audit[0],Rooms.Audit[1],Rooms.Audit[2],Rooms.Audit[3]);
                 break;
 
             case 'scene':
-                d1 = 0.04;
-                s1 = 0.35;
-                d2 = 0.07;
-                s2 = 0.37;
                 nodeCons();
-                updateREffects(d1, d2, s1, s2);
+                updateREffects(Rooms.Scene[0],Rooms.Scene[1],Rooms.Scene[2],Rooms.Scene[3]);
                 break;
 
             case 'smallroom':
-                d1 = 0.03;
-                s1 = 0.46;
-                d2 = 0.012;
-                s2 = 0.51;
                 nodeCons();
-                updateREffects(d1, d2, s1, s2);
+                updateREffects(Rooms.Sm[0],Rooms.Sm[1],Rooms.Sm[2],Rooms.Sm[3]);
                 break;
 
             case 'medium':
-                d1 = 0.19;
-                s1 = 0.38;
-                d2 = 0.18;
-                s2 = 0.47;
                 nodeCons();
-                updateREffects(d1, d2, s1, s2);
+                updateREffects(Rooms.Medi[0],Rooms.Medi[1],Rooms.Medi[2],Rooms.Medi[3]);
                 break;
 
             case 'greathall':
-                d1 = 0.13;
-                s1 = 0.53;
-                d2 = 0.08;
-                s2 = 0.6;
                 nodeCons();
-                updateREffects(d1, d2, s1, s2);
+                updateREffects(Rooms.GtH[0],Rooms.GtH[1],Rooms.GtH[2],Rooms.GtH[3]);
                 break;
 
             case 'stadium':
-                d1 = 0.14;
-                s1 = 0.35;
-                d2 = 0.11;
-                s2 = 0.25;
                 nodeCons();
-                updateREffects(d1, d2, s1, s2);
+                updateREffects(Rooms.Stadi[0],Rooms.Stadi[1],Rooms.Stadi[2],Rooms.Stadi[3]);
                 break;
 
             default:
@@ -792,7 +796,7 @@ class AudioEngine{
     })
     that.dy1(d1).knobControl('.dy1',(knob,value)=>{
         $("#d1").text(value.toFixed(2)+ ' dB');
-         this.delay1.delayTime.setValueAtTime(value,this.audioCtx.currentTime)
+         this.leftDelay.delayTime.setValueAtTime(value,this.audioCtx.currentTime)
        })
            new EqKnobs({
             initialValue:d2,
@@ -803,7 +807,7 @@ class AudioEngine{
             trackColor:'#ccff00'
         }).knobControl('.d2',(knob,value)=>{
          $("#d2").text(value.toFixed(2)+ ' dB');
-          this.delay1.delayTime.setValueAtTime(value,this.audioCtx.currentTime)
+          this.rightDelay.delayTime.setValueAtTime(value,this.audioCtx.currentTime)
         })
 
         new EqKnobs({
@@ -815,7 +819,7 @@ class AudioEngine{
             trackColor:'#ccff00'
         }).knobControl('.s1',(knob,value)=>{
          $("#s1").text(value.toFixed(2)+ ' dB');
-          this.size1.gain.setValueAtTime(value,this.audioCtx.currentTime)
+          this.leftGain.gain.setValueAtTime(value,this.audioCtx.currentTime)
         })
 
         new EqKnobs({
@@ -827,7 +831,7 @@ class AudioEngine{
             trackColor:'#ccff00'
         }).knobControl('.s2',(knob,value)=>{
          $("#s2").text(value.toFixed(2) + ' dB');
-          this.size2.gain.setValueAtTime(value,this.audioCtx.currentTime)
+          this.rightGain.gain.setValueAtTime(value,this.audioCtx.currentTime)
         })
 
         /**
@@ -836,16 +840,16 @@ class AudioEngine{
          function nodeCons() {
             //
             //source.connect(audioCtx.destination);
-            that.splitter.connect(that.delay1, 0);
-            that.delay1.connect(that.size1);
-            that.size1.connect(that.delay2);
+            that.splitter.connect(that.leftDelay, 0);
+            that.leftDelay.connect(that.leftGain);
+            that.leftGain.connect(that.rightDelay);
             //right delay
-            that.splitter.connect(that.delay2, 1);
-            that.delay2.connect(that.size2);
-            that.size2.connect(that.delay1);
+            that.splitter.connect(that.rightDelay, 1);
+            that.rightDelay.connect(that.rightGain);
+            that.rightGain.connect(that.leftDelay);
             //left and right delay connected to the merger
-            that.size1.connect(that.merger, 0, 0);
-            that.size2.connect(that.merger, 0, 1);
+            that.leftGain.connect(that.merger, 0, 0);
+            that.rightGain.connect(that.merger, 0, 1);
         }
     
     
@@ -859,17 +863,14 @@ class AudioEngine{
            $("#s1").text(0 + ' dB');
            $("#s2-v").val(0);
            $("#s2").text(0 + ' dB');
-            //Echo
-            that.echo.delayTime.value = 0;
-            that.feedback.gain.value = 0;
             //Values
-            that.delay1.delayTime.value = 0;
-            that.delay2.delayTime.value = 0;
-            that.size1.gain.value = 0;
-            that.size2.gain.value = 0;
+            that.leftDelay.delayTime.value = 0;
+            that.rightDelay.delayTime.value = 0;
+            that.leftGain.gain.value = 0;
+            that.rightGain.gain.value = 0;
     
            $("#r-effects").val('None');
-            /*-------------Styling siders on change*/
+            /*-------------Styling sliders on change*/
             // new WebkitInputRangeFillLower({
             //     selectors: ["s1-v", "s2-v", "d1-v", "d2-v"],
             //     color: '#63cdff'
@@ -877,31 +878,20 @@ class AudioEngine{
         }
     
         //Update RoomEffects sliders
-        function updateREffects(a, b, c, d) {
-            let pos = 0;
-            // $("#d1-v").val(a);
-           
+        function updateREffects(a = 0, b = 0, c = 0, d = 0) {
             $("#d1").text(a + ' dB');
             // $("#d2-v").val(b);
-            $("#d2").text(b + ' dB');
+            $("#d2").text(c + ' dB');
             // $("#s1-v").val(c);
-            $("#s1").text(a + ' dB');
+            $("#s1").text(b + ' dB');
             // $("#s2-v").val(d);
             $("#s2").text(d + ' dB');
-            //Echo Values
-            that.echo.delayTime.value = a;
-            that.feedback.gain.value = b;
     
             //Other Values
-            that.delay1.delayTime.value = a;
-            that.delay2.delayTime.value = b;
-            that.size1.gain.value = c;
-            that.size2.gain.value = d;
-            //-------------Styling siders on change
-            // new WebkitInputRangeFillLower({
-            //     selectors: ["s1-v", "s2-v", "d1-v", "d2-v"],
-            //     color: '#63cdff'
-            // });
+            that.leftDelay.delayTime.value = a;
+            that.rightDelay.delayTime.value = c;
+            that.leftGain.gain.value = b;
+            that.rightGain.gain.value = d;
         }
     }
     tuneRoomEffects(selectors){
@@ -945,8 +935,8 @@ class AudioEngine{
 
         $(selector).on('change',() => {       
                 $(selector).get(0).checked?
-                effectsOn(this.source, this.splitter, this.merger, this.audioCtx):
-                effectsOff(this.source, this.splitter, this.merger, this.audioCtx);
+                effectsOn(this.sourceNode, this.splitter, this.merger, this.audioCtx):
+                effectsOff(this.sourceNode, this.splitter, this.merger, this.audioCtx);
        })
     }
     tuneAudioBalance(selector){
@@ -970,63 +960,13 @@ class AudioEngine{
         bgColor:'#222222',
         trackColor:"#65F32C",
         minValue:0,
-        initialValue:1,
+        initialValue:0.8,
         maxValue:4,
         size:170
     }).knobControl(selector,(knob,value)=>{
         $('#audio-b').text((value).toFixed(1) + ' dB');
-        this.audioBoost.gain.setValueAtTime(value, this.audioCtx.currentTime);
+        this.gainNode.gain.setValueAtTime(value, this.audioCtx.currentTime);
     })
     }
-}
-
-var bassConn = function(source, bassBoost, bass, dance, audioCtx){
-    new WebkitInputRangeFillLower({
-        selectors: ["bass", "treb-boost"],
-        color: '#63cdff'
-    });
-
-    // source.connect(bassBoost);
-    bassBoost.connect(bass);
-    bass.connect(dance);
-    dance.connect(analyser);
-    analyser.connect(audioCtx.destination);
-}
-
-function bassCon(source, bassBoost, bass, audioCtx,analyser) {
-    new WebkitInputRangeFillLower({
-        selectors: ["bass","bass-boost","threshold","treb-boost"],
-        color: '#63cdff'
-    });
-
-    source.connect(bassBoost);
-    bassBoost.connect(bass);
-    bass.connect(analyser);
-    analyser.connect(audioCtx.destination);
-}
-
-function bassDisCon(source, bassBoost, bass, audioCtx,analyser) {
-
-    source.disconnect(bassBoost);
-    bassBoost.disconnect(bass);
-    bass.disconnect(analyser);
-    analyser.disconnect(audioCtx.destination);
-}
-
-let  eqDefault = function() {
-    _("#bass").value = 0
-    _('#bb1').textContent = 0 + " dB";
-    treble.type = 'allpass';
-    treble.frequency.setValueAtTime(2000, audioCtx.currentTime);;
-    _("#treb-boost").value = 0;
-    _('#tb2').textContent = 0 + ' dB';
-    _('#bass-boost').value = 0;
-    trebleBoost.gain.setValueAtTime(0, audioCtx.currentTime);
-    bassBoost.gain.setValueAtTime(0, audioCtx.currentTime);
-    bass.frequency.setValueAtTime(0, audioCtx.currentTime);
-    new WebkitInputRangeFillLower({
-        selectors: ["bass-boost", "treb-boost", "treble", "bass"],
-        color: '#63cdff'
-    });
 }
 module.exports = AudioEngine;

@@ -61,7 +61,6 @@ module.exports = class EqKnobs{
         knob.setProperty('val',this.values.value);
 
 
-
         // Set initial value.
     knob.setValue(this.values.initialValue);
 

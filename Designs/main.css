@@ -405,7 +405,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 8!important;
+    z-index: 18!important;
     visibility: visible!important;
 }
 
@@ -418,13 +418,14 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    bottom: 200px;
+    bottom: 10px;
     /* visibility: hidden; */
-    margin: 10px;
+    margin: 80px;
     transition: 0.3s ease-in-out;
     height: 60px;
     padding: 13px;
     border-radius: 5px;
+    position: absolute;
     
 }
 .alert-container .alert-notification span{
